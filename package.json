@@ -50,6 +50,7 @@
     "@rbxts/react-roblox": "^17.3.7-ts.1",
     "@rbxts/remo": "^1.5.2",
     "@rbxts/ripple": "^0.10.1",
-    "@rbxts/services": "^1.6.0"
+    "@rbxts/services": "^1.6.0",
+    "@rbxts/sift": "^0.0.11"
   }
 }

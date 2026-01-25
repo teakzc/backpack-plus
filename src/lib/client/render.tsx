@@ -2,6 +2,7 @@ import { createPortal, createRoot, Root } from "@rbxts/react-roblox";
 import { Players } from "@rbxts/services";
 import { App } from "./ui/app";
 import { atom } from "@rbxts/charm";
+import React from "@rbxts/react";
 
 const inventoryState = atom<boolean>(false);
 
