@@ -1,15 +1,21 @@
 import { client } from "@rbxts/charm-sync";
-import { clientInventory } from "../server";
-import { atom } from "@rbxts/charm";
-import { inventorySyncRemotes } from "../shared/networking";
+import { clientRegistry, inventorySyncRemotes } from "../shared/networking";
+import { computed } from "@rbxts/charm";
+import { Players } from "@rbxts/services";
 
-const clientInventory = atom<clientInventory>([]);
+export const inventory = computed(() => {
+	return clientRegistry()[Players.LocalPlayer.Name] ?? [];
+});
 
 const clientSyncer = client({
 	atoms: {
-		clientRegistry: clientInventory,
+		clientRegistry: clientRegistry,
 	},
-    ignoreUnhydrated: true
+	ignoreUnhydrated: true,
 });
 
-inventorySyncRemotes.syncState.
+inventorySyncRemotes.syncState.connect((payload) => {
+	clientSyncer.sync(payload);
+});
+
+inventorySyncRemotes.requestState.fire();

@@ -1,14 +1,5 @@
-import { atom } from "@rbxts/charm";
-import { tool } from "./tools";
 import { server } from "@rbxts/charm-sync";
-import { inventorySyncPayload, inventorySyncRemotes } from "../shared/networking";
-
-export type clientInventory = tool[];
-export type clientRegistry = {
-	[client: string]: clientInventory;
-};
-
-const clientRegistry = atom<clientRegistry>({});
+import { clientInventory, clientRegistry, inventorySyncPayload, inventorySyncRemotes } from "../shared/networking";
 
 /**
  * Sets up a client for adding tools to their inventory.
@@ -132,5 +123,9 @@ const syncer = server({
 });
 
 syncer.connect((client, payload) => {
-	inventorySyncRemotes.syncState(client, filterPayload(client, payload));
+	inventorySyncRemotes.syncState.fire(client, filterPayload(client, payload));
+});
+
+inventorySyncRemotes.requestState.connect((client) => {
+	syncer.hydrate(client);
 });

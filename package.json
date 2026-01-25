@@ -48,7 +48,7 @@
     "@rbxts/react": "^17.3.7-ts.1",
     "@rbxts/react-charm": "^0.3.0",
     "@rbxts/react-roblox": "^17.3.7-ts.1",
-    "@rbxts/remo": "^1.5.3",
+    "@rbxts/remo": "^1.5.2",
     "@rbxts/ripple": "^0.10.1",
     "@rbxts/services": "^1.6.0"
   }
