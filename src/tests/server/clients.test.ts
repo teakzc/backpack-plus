@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it } from "@rbxts/jest-globals";
-import { clear_client, modify_client, register_client, remove_all, retrieve_client } from "../../lib/server/clients";
+import {
+	clear_client,
+	modify_client,
+	register_client,
+	remove_all,
+	remove_client,
+	retrieve_client,
+} from "../../lib/server/clients";
 
 describe("client inventory management", () => {
 	afterEach(() => {
@@ -20,13 +27,13 @@ describe("client inventory management", () => {
 	});
 
 	describe("retrieve client", () => {
-		it("should return array without register", () => {
+		it("should return nil without registering", () => {
 			const mockClient = {
 				Name: "Test",
 				UserId: 1,
 			} as Player;
 
-			expect(retrieve_client(mockClient)).toEqual([]);
+			expect(retrieve_client(mockClient)).toBeNil();
 		});
 
 		it("should return the client's tools", () => {
@@ -37,13 +44,17 @@ describe("client inventory management", () => {
 
 			register_client(mockClient);
 
-			modify_client(mockClient, [
-				{
-					id: 123,
-				},
-			]);
+			modify_client(mockClient, (current) => {
+				const cloned = table.clone(current);
 
-			expect(retrieve_client(mockClient)[0].id).toEqual(123);
+				cloned.push({
+					id: 123,
+				});
+
+				return cloned;
+			});
+
+			expect(retrieve_client(mockClient)?.[0].id).toEqual(123);
 		});
 
 		it("should not return removed tools", () => {
@@ -54,13 +65,19 @@ describe("client inventory management", () => {
 
 			register_client(mockClient);
 
-			modify_client(mockClient, [
-				{
-					id: 123,
-				},
-			]);
+			modify_client(mockClient, (current) => {
+				const cloned = table.clone(current);
 
-			modify_client(mockClient, []);
+				cloned.push({
+					id: 123,
+				});
+
+				return cloned;
+			});
+
+			modify_client(mockClient, () => {
+				return [];
+			});
 
 			expect(retrieve_client(mockClient)).toEqual([]);
 		});
@@ -75,21 +92,28 @@ describe("client inventory management", () => {
 
 			register_client(mockClient);
 
-			modify_client(mockClient, [
-				{
+			modify_client(mockClient, (current) => {
+				const cloned = table.clone(current);
+
+				cloned.push({
 					id: 1,
-				},
-			]);
+				});
 
-			expect(retrieve_client(mockClient)[0].id).toEqual(1);
+				return cloned;
+			});
 
-			modify_client(mockClient, [
-				{
-					id: 100,
-				},
-			]);
+			expect(retrieve_client(mockClient)?.[0].id).toEqual(1);
 
-			expect(retrieve_client(mockClient)[0].id).toEqual(100);
+			modify_client(mockClient, (current) => {
+				if (!current[0]) return current;
+
+				const cloned = table.clone(current);
+				cloned[0].id = 100;
+
+				return cloned;
+			});
+
+			expect(retrieve_client(mockClient)?.[0].id).toEqual(100);
 		});
 	});
 
@@ -102,15 +126,58 @@ describe("client inventory management", () => {
 
 			register_client(mockClient);
 
-			modify_client(mockClient, [
-				{
+			modify_client(mockClient, (current) => {
+				const cloned = table.clone(current);
+
+				cloned.push({
 					id: 1,
-				},
-			]);
+				});
+
+				return cloned;
+			});
 
 			clear_client(mockClient);
 
 			expect(retrieve_client(mockClient)).toEqual([]);
+		});
+	});
+
+	describe("remove client", () => {
+		it("should remove the client", () => {
+			const mockClient = {
+				Name: "Test",
+				UserId: 1,
+			} as Player;
+
+			register_client(mockClient);
+
+			remove_client(mockClient);
+
+			expect(retrieve_client(mockClient)).toBeNil();
+		});
+	});
+
+	describe("remove all", () => {
+		it("should remove all clients", () => {
+			const mockClient = {
+				Name: "Test",
+				UserId: 1,
+			} as Player;
+
+			register_client(mockClient);
+
+			const mockClient2 = {
+				Name: "Test2",
+				UserId: 12,
+			} as Player;
+
+			register_client(mockClient2);
+
+			remove_all();
+
+			expect(retrieve_client(mockClient)).toBeNil();
+
+			expect(retrieve_client(mockClient2)).toBeNil();
 		});
 	});
 });

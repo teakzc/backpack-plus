@@ -1,20 +1,27 @@
 {
   "name": "@rbxts/inventory",
-  "version": "1.0.0",
-  "description": "",
-  "main": "out/init.lua",
+  "version": "0.1.0",
+  "description": "A modern roblox inventory (using react) alternative inspired by satchel",
+  "main": "out/lib/init.luau",
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "Roblox",
+    "Inventory"
+  ],
+  "repository": {
+    "url": "https://github.com/teakzc/inventory"
+  },
+  "author": "teakzc",
+  "license": "MIT",
   "type": "commonjs",
-  "types": "out/index.d.ts",
+  "types": "out/lib/index.d.ts",
   "files": [
-    "out",
+    "out/lib/index.d.ts",
+    "out/lib/init.luau",
     "!**/*.tsbuildinfo"
   ],
   "publishConfig": {
@@ -37,9 +44,11 @@
   },
   "dependencies": {
     "@rbxts/charm": "^0.10.0",
+    "@rbxts/charm-sync": "^0.3.0",
     "@rbxts/react": "^17.3.7-ts.1",
     "@rbxts/react-charm": "^0.3.0",
     "@rbxts/react-roblox": "^17.3.7-ts.1",
+    "@rbxts/remo": "^1.5.3",
     "@rbxts/ripple": "^0.10.1",
     "@rbxts/services": "^1.6.0"
   }

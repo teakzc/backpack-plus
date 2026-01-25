@@ -1,9 +1,14 @@
 import { atom } from "@rbxts/charm";
 import { tool } from "./tools";
+import { server } from "@rbxts/charm-sync";
+import { inventorySyncPayload, inventorySyncRemotes } from "../shared/networking";
 
 export type clientInventory = tool[];
+export type clientRegistry = {
+	[client: string]: clientInventory;
+};
 
-const clientRegistry = atom<Map<Player, clientInventory>>(new Map());
+const clientRegistry = atom<clientRegistry>({});
 
 /**
  * Sets up a client for adding tools to their inventory.
@@ -13,7 +18,7 @@ const clientRegistry = atom<Map<Player, clientInventory>>(new Map());
 export function register_client(client: Player) {
 	clientRegistry((current) => {
 		const cloned = table.clone(current);
-		cloned.set(client, []);
+		cloned[client.Name] = [];
 
 		return cloned;
 	});
@@ -26,19 +31,29 @@ export function register_client(client: Player) {
  * @returns The client's inventory of tools
  */
 export function retrieve_client(client: Player) {
-	return clientRegistry().get(client) ?? [];
+	return clientRegistry()[client.Name];
 }
 
 /**
- * Update client's inventory
+ * Update client's inventory by passing the new inventory
+ *
+ * Warning: Updates must be immutable, as this package uses `@rbxts/charm` for internal state management
  *
  * @param client The client to modify
- * @param modifiedInventory The updated inventory
+ * @param modifiedInventory A callback that passes the `clientInventory` state and should return a `clientInventory`
  */
-export function modify_client(client: Player, modifiedInventory: tool[]) {
+export function modify_client(client: Player, modifiedInventory: (current: clientInventory) => clientInventory) {
 	clientRegistry((current) => {
+		const clientInventory = retrieve_client(client);
+
+		if (!clientInventory) {
+			warn("Client does not exist within the registry! (retrieve_client returned nil)");
+
+			return current;
+		}
+
 		const cloned = table.clone(current);
-		cloned.set(client, modifiedInventory);
+		cloned[client.Name] = modifiedInventory(clientInventory);
 
 		return cloned;
 	});
@@ -52,7 +67,7 @@ export function modify_client(client: Player, modifiedInventory: tool[]) {
 export function clear_client(client: Player) {
 	clientRegistry((current) => {
 		const cloned = table.clone(current);
-		cloned.set(client, []);
+		cloned[client.Name] = [];
 
 		return cloned;
 	});
@@ -66,7 +81,7 @@ export function clear_client(client: Player) {
 export function remove_client(client: Player) {
 	clientRegistry((current) => {
 		const cloned = table.clone(current);
-		cloned.delete(client);
+		cloned[client.Name] = undefined!;
 
 		return cloned;
 	});
@@ -76,5 +91,46 @@ export function remove_client(client: Player) {
  * Removes everyone
  */
 export function remove_all() {
-	clientRegistry(new Map());
+	clientRegistry({});
 }
+
+/**
+ * SYNC SECTION
+ */
+
+function filterPayload(client: Player, payload: inventorySyncPayload): inventorySyncPayload {
+	if (payload.type === "init") {
+		return {
+			...payload,
+			data: {
+				...payload.data,
+				clientRegistry: {
+					[client.Name]: payload.data.clientRegistry[client.Name],
+				},
+			},
+		};
+	}
+
+	return {
+		...payload,
+		data: {
+			...payload.data,
+			clientRegistry: payload.data.clientRegistry && {
+				[client.Name]: payload.data.clientRegistry[client.Name],
+			},
+		},
+	};
+}
+
+const syncer = server({
+	atoms: {
+		clientRegistry: clientRegistry,
+	},
+	interval: 0,
+	preserveHistory: false,
+	autoSerialize: true,
+});
+
+syncer.connect((client, payload) => {
+	inventorySyncRemotes.syncState(client, filterPayload(client, payload));
+});

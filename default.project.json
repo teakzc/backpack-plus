@@ -1,0 +1,34 @@
+{
+	"name": "tests",
+	"globIgnorePaths": [
+		"**/package.json",
+		"**/tsconfig.json"
+	],
+	"tree": {
+		"$className": "DataModel",
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"TS": {
+				"$path": "out/tests"
+			}
+		},
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+            "rbxts_include": {
+                "$path": "include",
+                "node_modules": {
+                    "$className": "Folder",
+                    "@rbxts": {
+                        "$path": "node_modules/@rbxts"
+                    },
+                    "@rbxts-js": {
+                        "$path": "node_modules/@rbxts-js"
+                    }
+                }
+            },
+			"Package": {
+				"$path": "out/lib"
+			}
+		}
+	}
+}
