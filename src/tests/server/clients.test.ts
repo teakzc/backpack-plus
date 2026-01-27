@@ -49,6 +49,7 @@ describe("client inventory management", () => {
 
 				cloned.push({
 					id: 123,
+					name: "test"
 				});
 
 				return cloned;

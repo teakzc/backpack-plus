@@ -1,10 +1,9 @@
 import { createPortal, createRoot, Root } from "@rbxts/react-roblox";
 import { Players } from "@rbxts/services";
 import { App } from "./ui/app";
-import { atom } from "@rbxts/charm";
 import React from "@rbxts/react";
-
-const inventoryState = atom<boolean>(false);
+import { inventoryVisibilityState } from "./atoms";
+import { dropTool } from "./core";
 
 /**
  * Renders the inventory
@@ -30,5 +29,9 @@ export function renderInventory(
  * @param state Whether to display the full backpack or not
  */
 export function toggleInventory(state: boolean) {
-	inventoryState(state);
+	inventoryVisibilityState(state);
+
+	if (!state) {
+		dropTool();
+	}
 }

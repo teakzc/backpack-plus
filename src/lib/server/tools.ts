@@ -4,14 +4,16 @@ import { modify_client, retrieve_client } from "./clients";
 export interface tool {
 	image?: string;
 	tooltip?: string;
-	model?: Instance;
+	model?: Tool;
+	name?: string;
 	id: number;
 }
 
 export interface toolData {
 	image?: string;
 	tooltip?: string;
-	model?: Instance;
+	name?: string;
+	model?: Tool;
 }
 
 /**

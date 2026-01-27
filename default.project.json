@@ -29,6 +29,15 @@
 			"Package": {
 				"$path": "out/lib"
 			}
+		},
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"TS": {
+					"$path": "out/client"
+				}
+			}
 		}
 	}
 }

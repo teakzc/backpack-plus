@@ -1,9 +1,8 @@
-import React, { forwardRef, Ref } from "@rbxts/react";
-
+import React, { forwardRef } from "@rbxts/react";
 import { FrameProps } from "./frame";
 import { usePx } from "../hooks/usePx";
 
-interface TextProps extends FrameProps<TextLabel> {
+export interface TextBoxProps extends FrameProps<TextBox> {
 	text?: string | React.Binding<string>;
 	textColor3?: Color3 | React.Binding<Color3>;
 	textDirection?: Enum.TextDirection | React.Binding<Enum.TextDirection>;
@@ -19,14 +18,15 @@ interface TextProps extends FrameProps<TextLabel> {
 	thickness?: number | React.Binding<number>;
 	strokeTransparency?: number | React.Binding<number>;
 	richText?: boolean | React.Binding<boolean>;
+	placeHolderText?: string | React.Binding<string>;
 }
 
-export const TextLabel = forwardRef((props: TextProps, ref: Ref<TextLabel>) => {
+export const TextBox = forwardRef<TextBox, TextBoxProps>((props, ref) => {
 	const px = usePx();
 
 	return (
-		<textlabel
-			ref={ref}
+		<textbox
+			PlaceholderText={props.placeHolderText ?? ""}
 			Size={props.size ?? UDim2.fromScale(1, 1)}
 			Position={props.position ?? UDim2.fromScale(0.5, 0.5)}
 			AnchorPoint={props.anchorPoint ?? new Vector2(0.5, 0.5)}
@@ -37,7 +37,6 @@ export const TextLabel = forwardRef((props: TextProps, ref: Ref<TextLabel>) => {
 			ZIndex={props.zIndex}
 			LayoutOrder={props.layoutOrder}
 			BorderSizePixel={0}
-			Change={props.change}
 			Text={props.text ?? ""}
 			TextColor3={props.textColor3 ?? Color3.fromRGB(255, 255, 255)}
 			TextDirection={props.textDirection}
@@ -47,13 +46,14 @@ export const TextLabel = forwardRef((props: TextProps, ref: Ref<TextLabel>) => {
 			TextWrapped={props.textWrapped ?? true}
 			TextXAlignment={props.textXAlignment}
 			TextYAlignment={props.textYAlignment}
+			ref={ref}
 			FontFace={props.font}
 			TextTruncate={props.textTruncate}
 			LineHeight={props.lineHeight}
 			RichText={props.richText}
 		>
 			{props.children}
-			<uistroke Transparency={props.strokeTransparency ?? 0} Thickness={props.thickness ?? px(4)}></uistroke>
-		</textlabel>
+			<uistroke Transparency={props.strokeTransparency ?? 0} Thickness={props.thickness ?? px(4)} />
+		</textbox>
 	);
 });

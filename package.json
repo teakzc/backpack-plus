@@ -45,12 +45,15 @@
   "dependencies": {
     "@rbxts/charm": "^0.10.0",
     "@rbxts/charm-sync": "^0.3.0",
+    "@rbxts/fuzzy-search": "^1.0.4",
+    "@rbxts/pretty-react-hooks": "^0.6.4",
     "@rbxts/react": "^17.3.7-ts.1",
     "@rbxts/react-charm": "^0.3.0",
     "@rbxts/react-roblox": "^17.3.7-ts.1",
     "@rbxts/remo": "^1.5.2",
     "@rbxts/ripple": "^0.10.1",
     "@rbxts/services": "^1.6.0",
-    "@rbxts/sift": "^0.0.11"
+    "@rbxts/sift": "^0.0.11",
+    "@rbxts/t": "^3.2.1"
   }
 }
