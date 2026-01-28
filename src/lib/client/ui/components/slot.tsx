@@ -175,7 +175,7 @@ export function Slot(props: slotProps) {
 						textScaled={false}
 						textSize={px(16)}
 						strokeTransparency={0.5}
-						thickness={2}
+						thickness={px(2)}
 						text={tostring(props.index + 1 === 10 ? 0 : props.index + 1)}
 						zIndex={2}
 						font={INVENTORY_PROPERTIES.INVENTORY_FONT}
@@ -199,7 +199,7 @@ export function Slot(props: slotProps) {
 							textScaled={true}
 							textWrapped={true}
 							strokeTransparency={0.5}
-							thickness={2}
+							thickness={px(2)}
 							text={props.tool.name}
 							zIndex={2}
 							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
@@ -213,7 +213,7 @@ export function Slot(props: slotProps) {
 							textScaled={true}
 							textWrapped={true}
 							strokeTransparency={0.5}
-							thickness={2}
+							thickness={px(2)}
 							text={`Tool: ${tostring(props.tool.id)}`}
 							zIndex={2}
 							font={INVENTORY_PROPERTIES.INVENTORY_FONT}

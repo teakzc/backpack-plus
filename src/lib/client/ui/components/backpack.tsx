@@ -12,6 +12,7 @@ import { INVENTORY_PROPERTIES } from "../../core";
 import { FuzzyScoreSorting } from "@rbxts/fuzzy-search/out/Sorting/FuzzyScoreSorting";
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import { tool } from "../../../server";
+import { INVENTORY_DIMENSIONS, INVENTORY_DIMENSIONS_MOBILE } from "./dimensions";
 
 function filterBackpack(text: string, backpack: (tool | "drag")[]) {
 	const searchText = text;
@@ -51,11 +52,24 @@ export function Backpack() {
 
 	const displayTools = search.current?.Text !== "" ? filter : backpack;
 
+	const dimensions = INVENTORY_PROPERTIES.MOBILE ? INVENTORY_DIMENSIONS_MOBILE : INVENTORY_DIMENSIONS;
+
+	const offset =
+		-(
+			INVENTORY_PROPERTIES.TOOLBAR_AMOUNT * math.floor(px(dimensions.cellSize)) +
+			(INVENTORY_PROPERTIES.TOOLBAR_AMOUNT - 1) * math.floor(px(dimensions.cellPadding)) -
+			math.floor(px(dimensions.backpackWidth))
+		) /
+			2 +
+		(INVENTORY_PROPERTIES.MOBILE ? -1 : 1);
+
+	print(offset, px(dimensions.backpackWidth), px(dimensions.cellSize));
+
 	return (
 		<Frame
 			anchorPoint={new Vector2(0.5, 1)}
 			position={new UDim2(0.5, 0, 1, px(-90))}
-			size={new UDim2(0, px(INVENTORY_PROPERTIES.MOBILE ? 511.2 : 852), 0, px(416))}
+			size={new UDim2(0, px(dimensions.backpackWidth), 0, px(dimensions.backpackHeight))}
 			backgroundTransparency={0.5}
 		>
 			<uicorner CornerRadius={new UDim(0, px(16))} />
@@ -63,7 +77,7 @@ export function Backpack() {
 			<Frame
 				anchorPoint={new Vector2(0, 0)}
 				position={new UDim2(0, px(6.5), 0, px(6.5))}
-				size={UDim2.fromOffset(px(INVENTORY_PROPERTIES.MOBILE ? 240 : 400), px(45))}
+				size={UDim2.fromOffset(px(dimensions.textSize), px(45))}
 				backgroundTransparency={1}
 			>
 				<TextLabel
@@ -103,23 +117,23 @@ export function Backpack() {
 
 			<Scrolling
 				anchorPoint={new Vector2(0, 0)}
-				size={new UDim2(1, px(11.7), 1, px(-58))}
+				size={new UDim2(1, px(10), 1, px(-58))}
 				position={UDim2.fromOffset(0, px(58))}
 				disableInset={true}
-				scrollBarThickness={4}
+				scrollBarThickness={px(4)}
 				zIndex={10}
 			>
 				<Frame
 					anchorPoint={new Vector2(0, 0)}
-					size={new UDim2(1, px(-13), 1, 0)}
-					position={UDim2.fromOffset(px(6.5), 0)}
+					size={new UDim2(1, px(-10), 1, 0)}
+					position={UDim2.fromOffset(offset, 0)}
 					backgroundTransparency={1}
 				>
 					<uigridlayout
 						HorizontalAlignment={Enum.HorizontalAlignment.Left}
 						VerticalAlignment={Enum.VerticalAlignment.Top}
-						CellPadding={UDim2.fromOffset(px(6.5), px(6.5))}
-						CellSize={UDim2.fromOffset(px(78), px(78))}
+						CellPadding={UDim2.fromOffset(px(dimensions.cellPadding), px(dimensions.cellPadding))}
+						CellSize={UDim2.fromOffset(px(dimensions.cellSize), px(dimensions.cellSize))}
 						SortOrder={Enum.SortOrder.LayoutOrder}
 					/>
 
@@ -133,8 +147,8 @@ export function Backpack() {
 				<Button
 					zIndex={-10}
 					anchorPoint={new Vector2(0, 0)}
-					size={new UDim2(1, px(-13), 1, 0)}
-					position={UDim2.fromOffset(px(6.5), 0)}
+					size={new UDim2(1, px(-10), 1, 0)}
+					position={UDim2.fromOffset(offset, 0)}
 					backgroundTransparency={1}
 					onMouseEnter={() => {
 						inventorySelectionState("backpack");

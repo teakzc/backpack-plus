@@ -2,8 +2,8 @@ import { UserInputService } from "@rbxts/services";
 import { initialize_inventory, renderInventory, toggleInventory } from "../lib/client";
 
 initialize_inventory({
-	TOOLBAR_AMOUNT: 6,
-	MOBILE: true,
+	TOOLBAR_AMOUNT: 10,
+	MOBILE: false,
 });
 
 renderInventory();

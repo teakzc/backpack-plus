@@ -9,6 +9,8 @@ import { useAtom } from "@rbxts/react-charm";
 export function Toolbar() {
 	const px = usePx();
 
+	print(px(1));
+
 	useAtom(() => inventoryVisibilityState());
 	useAtom(() => draggingState());
 

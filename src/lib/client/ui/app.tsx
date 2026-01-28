@@ -22,7 +22,7 @@ export function App() {
 			{/* Drag */}
 			{visibility ? <Drag /> : undefined}
 
-			<uiscale Scale={INVENTORY_PROPERTIES.MOBILE ? 2 : 1.1} />
+			<uiscale Scale={INVENTORY_PROPERTIES.MOBILE ? 1.8 : 1.1} />
 		</Layer>
 	);
 }

@@ -1,7 +1,7 @@
 import { client } from "@rbxts/charm-sync";
 import { clientRegistry, equippedRegistry, inventorySyncRemotes } from "../shared/networking";
 import { computed, observe } from "@rbxts/charm";
-import { Players } from "@rbxts/services";
+import { Players, StarterGui } from "@rbxts/services";
 import { tool } from "../server";
 import { push, removeValue, set } from "@rbxts/sift/out/Array";
 import { equals } from "@rbxts/sift/out/Dictionary";
@@ -69,7 +69,7 @@ export function initialize_inventory({
 
 	toolbarState(slotsSetup as (tool | "empty" | "drag")[]);
 
-	//StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false);
+	StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false);
 }
 
 /**

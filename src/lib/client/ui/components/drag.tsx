@@ -58,7 +58,9 @@ export function Drag() {
 				// 	if (!realMouse) return;
 				// 	realMouse.Icon = "";
 				// }}
-			/>
+			>
+				<uiscale Scale={INVENTORY_PROPERTIES.MOBILE ? 1.8 : 1.1} />
+			</Button>
 
 			<Frame
 				active={false}
@@ -80,7 +82,7 @@ export function Drag() {
 							textScaled={false}
 							textSize={px(24)}
 							strokeTransparency={0.5}
-							thickness={2}
+							thickness={px(2)}
 							text={tostring(dragState.index + 1)}
 							zIndex={2}
 							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
@@ -103,7 +105,7 @@ export function Drag() {
 							textScaled={true}
 							textWrapped={true}
 							strokeTransparency={0.5}
-							thickness={2}
+							thickness={px(2)}
 							text={dragState.tool.name}
 							zIndex={2}
 							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
@@ -117,7 +119,7 @@ export function Drag() {
 							textScaled={true}
 							textWrapped={true}
 							strokeTransparency={0.5}
-							thickness={2}
+							thickness={px(2)}
 							text={`Tool: ${tostring(dragState.tool.id)}`}
 							zIndex={2}
 							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
@@ -131,7 +133,7 @@ export function Drag() {
 						image={dragState.tool.image ?? ""}
 					/>
 				</Button>
-
+				<uiscale Scale={INVENTORY_PROPERTIES.MOBILE ? 1.8 : 1.1} />
 				<uiaspectratioconstraint AspectRatio={1} />
 			</Frame>
 		</Layer>
