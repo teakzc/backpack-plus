@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { Frame } from "../core/frame";
-import { usePx } from "../hooks/usePx";
+//import { usePx } from "../hooks/usePx";
 import { TextLabel } from "../core/text";
 import { TextBox } from "../core/textbox";
 import { Scrolling } from "../core/scrolling";
@@ -34,7 +34,7 @@ function filterBackpack(text: string, backpack: (tool | "drag")[]) {
 }
 
 export function Backpack() {
-	const px = usePx();
+	const px = (n: number) => n; //usePx();
 
 	const backpack = useAtom(() => backpackState());
 	const visible = useAtom(() => inventoryVisibilityState());
@@ -125,7 +125,7 @@ export function Backpack() {
 			>
 				<Frame
 					anchorPoint={new Vector2(0, 0)}
-					size={new UDim2(1, px(-10), 1, 0)}
+					size={new UDim2(1, px(0), 1, 0)}
 					position={UDim2.fromOffset(offset, 0)}
 					backgroundTransparency={1}
 				>
