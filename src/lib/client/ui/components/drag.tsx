@@ -41,7 +41,7 @@ export function Drag() {
 	if (!dragState) return;
 
 	return (
-		<Layer displayOrder={5}>
+		<Layer safeZoneBypass={Enum.ScreenInsets.None} displayOrder={5}>
 			<Button
 				active={false}
 				backgroundTransparency={1}

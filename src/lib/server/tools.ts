@@ -23,10 +23,10 @@ export interface toolData {
  * @param toolData The tool
  * @returns The `id` of the tool
  */
-export function addTool(client: Player, toolData: toolData) {
+export function addTool(client: Player, toolData: toolData): number {
 	if (!retrieve_client(client)) {
 		warn("Client is not registered yet!");
-		return;
+		return -1;
 	}
 
 	const data = {

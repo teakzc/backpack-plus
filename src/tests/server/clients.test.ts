@@ -7,6 +7,7 @@ import {
 	remove_client,
 	retrieve_client,
 } from "../../lib/server/clients";
+import { addTool, removeTool } from "../../lib/server";
 
 describe("client inventory management", () => {
 	afterEach(() => {
@@ -49,7 +50,7 @@ describe("client inventory management", () => {
 
 				cloned.push({
 					id: 123,
-					name: "test"
+					name: "test",
 				});
 
 				return cloned;
@@ -179,6 +180,72 @@ describe("client inventory management", () => {
 			expect(retrieve_client(mockClient)).toBeNil();
 
 			expect(retrieve_client(mockClient2)).toBeNil();
+		});
+	});
+
+	describe("add tool", () => {
+		it("should add a tool to the client", () => {
+			const mockClient = {
+				Name: "Test",
+				UserId: 1,
+			} as Player;
+
+			register_client(mockClient);
+
+			addTool(mockClient, {
+				name: "Hammer",
+				image: "hammer.png",
+				tooltip: "A useful hammer",
+			});
+
+			const tools = retrieve_client(mockClient);
+
+			expect(tools).never.toBeNil();
+
+			expect(tools?.[0].name).toEqual("Hammer");
+			expect(tools?.[0].image).toEqual("hammer.png");
+			expect(tools?.[0].tooltip).toEqual("A useful hammer");
+			expect(tools?.[0].id).toBeDefined();
+		});
+
+		it("should have seperate ids", () => {
+			const mockClient = {
+				Name: "Test",
+				UserId: 1,
+			} as Player;
+
+			register_client(mockClient);
+
+			const id1 = addTool(mockClient, {
+				name: "Hammer",
+			});
+
+			const id2 = addTool(mockClient, {
+				name: "Wrench",
+			});
+
+			expect(id1).never.toEqual(id2);
+		});
+	});
+
+	describe("remove tool", () => {
+		it("should remove a tool from the client", () => {
+			const mockClient = {
+				Name: "Test",
+				UserId: 1,
+			} as Player;
+
+			register_client(mockClient);
+
+			const toolId = addTool(mockClient, {
+				name: "Hammer",
+			});
+
+			removeTool(mockClient, toolId);
+
+			const tools = retrieve_client(mockClient);
+
+			expect(tools?.size()).toEqual(0);
 		});
 	});
 });
