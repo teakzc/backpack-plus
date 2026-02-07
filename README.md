@@ -11,8 +11,6 @@
   [![License](https://img.shields.io/github/license/teakzc/backpack-plus?style=for-the-badge)](https://github.com/teakzc/backpack-plus/blob/main/LICENSE)
 </div>
 
-[npm package](https://www.npmjs.com/package/@rbxts/backpack-plus)
-
 ## 🎒 What can backpack-plus do?
 - Provide a better alternative to Roblox's inventory
 - Easy customization by mounting in react components
