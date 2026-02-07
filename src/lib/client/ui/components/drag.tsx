@@ -53,7 +53,7 @@ export function Drag() {
 		<Layer displayOrder={999}>
 			<Button
 				active={false}
-				backgroundTransparency={0.5}
+				backgroundTransparency={1}
 				position={mouse.map((V) => UDim2.fromOffset(V.X, V.Y))}
 				size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
 				onMouseUp={() => {
