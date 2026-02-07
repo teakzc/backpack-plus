@@ -18,6 +18,11 @@ declare interface vDivProps extends React.PropsWithChildren {
 	sortOrder?: Enum.SortOrder | React.Binding<Enum.SortOrder>;
 }
 
+/**
+ * Creates a div
+ *
+ * @hidden
+ */
 export function Div(props: vDivProps) {
 	const px = usePx();
 

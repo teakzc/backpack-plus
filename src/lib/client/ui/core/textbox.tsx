@@ -21,6 +21,11 @@ export interface TextBoxProps extends FrameProps<TextBox> {
 	placeHolderText?: string | React.Binding<string>;
 }
 
+/**
+ * Creates a textbox
+ *
+ * @hidden
+ */
 export const TextBox = forwardRef<TextBox, TextBoxProps>((props, ref) => {
 	const px = usePx();
 

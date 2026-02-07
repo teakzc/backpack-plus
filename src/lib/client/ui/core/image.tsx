@@ -13,6 +13,11 @@ interface ImageProps extends FrameProps<ImageLabel> {
 	tileSize?: UDim2 | React.Binding<UDim2>;
 }
 
+/**
+ * Creates a image
+ *
+ * @hidden
+ */
 export function Image(props: ImageProps) {
 	return (
 		<imagelabel

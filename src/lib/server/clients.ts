@@ -1,15 +1,16 @@
 import { server } from "@rbxts/charm-sync";
 import {
-	clientInventory,
+	clientBackpack,
 	clientRegistry,
 	equippedRegistry,
-	inventorySyncPayload,
-	inventorySyncRemotes,
+	backpackSyncPayload,
+	backpackSyncRemotes,
 } from "../shared/networking";
 import { set } from "@rbxts/sift/out/Dictionary";
+import { CollectionService } from "@rbxts/services";
 
 /**
- * Sets up a client for adding tools to their inventory.
+ * Sets up a client for adding tools to their backpack.
  *
  * @param client The client to setup
  */
@@ -23,42 +24,42 @@ export function register_client(client: Player) {
 }
 
 /**
- * Retrieve client's inventory
+ * Retrieve client's backpack
  *
  * @param client The client to retrieve
- * @returns The client's inventory of tools
+ * @returns The client's backpack of tools
  */
-export function retrieve_client(client: Player): clientInventory | undefined {
+export function retrieve_client(client: Player): clientBackpack | undefined {
 	return clientRegistry()[client.Name];
 }
 
 /**
- * Update client's inventory by passing the new inventory
+ * Update client's backpack by passing the new backpack
  *
  * Warning: Updates must be immutable, as this package uses `@rbxts/charm` for internal state management
  *
  * @param client The client to modify
- * @param modifiedInventory A callback that passes the `clientInventory` state and should return a `clientInventory`
+ * @param modifiedBackpack A callback that passes the `clientBackpack` state and should return a `clientBackpack`
  */
-export function modify_client(client: Player, modifiedInventory: (current: clientInventory) => clientInventory) {
+export function modify_client(client: Player, modifiedBackpack: (current: clientBackpack) => clientBackpack) {
 	clientRegistry((current) => {
-		const clientInventory = retrieve_client(client);
+		const clientBackpack = retrieve_client(client);
 
-		if (!clientInventory) {
+		if (!clientBackpack) {
 			warn("Client does not exist within the registry! (retrieve_client returned nil)");
 
 			return current;
 		}
 
 		const cloned = table.clone(current);
-		cloned[client.Name] = modifiedInventory(clientInventory);
+		cloned[client.Name] = modifiedBackpack(clientBackpack);
 
 		return cloned;
 	});
 }
 
 /**
- * Remove a clients inventory
+ * Remove a clients backpack
  *
  * @param client The client to remove
  */
@@ -93,10 +94,12 @@ export function remove_all() {
 }
 
 /**
- * SYNC SECTION
+ * [INFO]
+ * - Here lies the sync logic using `charm-sync`
+ * - Comment out during jest-testing...
  */
 
-function filterPayload(client: Player, payload: inventorySyncPayload): inventorySyncPayload {
+function filterPayload(client: Player, payload: backpackSyncPayload): backpackSyncPayload {
 	if (payload.type === "init") {
 		return {
 			...payload,
@@ -137,41 +140,41 @@ const syncer = server({
 });
 
 syncer.connect((client, payload) => {
-	inventorySyncRemotes.syncState.fire(client, filterPayload(client, payload));
+	backpackSyncRemotes.syncState.fire(client, filterPayload(client, payload));
 });
 
-inventorySyncRemotes.requestState.connect((client) => {
+backpackSyncRemotes.requestState.connect((client) => {
 	syncer.hydrate(client);
 });
 
-inventorySyncRemotes.equipTool.onRequest((client, tool) => {
+backpackSyncRemotes.equipTool.onRequest((client, tool) => {
 	// Check if they have the tool
 
-	const inventory = retrieve_client(client);
+	const backpack = retrieve_client(client);
 
-	if (!inventory) return false;
+	if (!backpack) return false;
+
+	CollectionService.GetTagged(`BACKPACK_PLUS_${client.Name}`).forEach((tool) => tool.Destroy());
 
 	if (tool === undefined) {
 		equippedRegistry((current) => set(current, client.Name, undefined));
 
-		// Remove model
-		client.Character?.FindFirstChild("EQUIPPED_TOOL_MODEL")?.Destroy();
-
 		return true;
 	}
 
-	const index = inventory.findIndex((V) => V.id === tool.id);
+	const index = backpack.findIndex((V) => V.id === tool.id);
 
 	if (index !== -1 && index !== undefined) {
 		// Set equipped
 		equippedRegistry((current) => set(current, client.Name, tool));
 
-		// Give model
+		// Give tool
 
-		if (tool.model) {
-			const clone = tool.model.Clone();
+		if (tool.tool) {
+			const clone = tool.tool.Clone();
 			clone.Parent = client.Character;
-			clone.Name = "EQUIPPED_TOOL_MODEL";
+
+			CollectionService.AddTag(clone, `BACKPACK_PLUS_${client.Name}`);
 		}
 
 		return true;

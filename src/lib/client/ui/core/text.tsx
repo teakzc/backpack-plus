@@ -21,6 +21,11 @@ interface TextProps extends FrameProps<TextLabel> {
 	richText?: boolean | React.Binding<boolean>;
 }
 
+/**
+ * Creates a textlabel
+ *
+ * @hidden
+ */
 export const TextLabel = forwardRef((props: TextProps, ref: Ref<TextLabel>) => {
 	const px = usePx();
 

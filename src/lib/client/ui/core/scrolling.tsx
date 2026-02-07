@@ -1,4 +1,4 @@
-import React from "@rbxts/react";
+import React, { forwardRef } from "@rbxts/react";
 import { Frame, FrameProps } from "./frame";
 import { usePx } from "../hooks/usePx";
 
@@ -21,11 +21,17 @@ interface ScrollingProps extends FrameProps<ScrollingFrame> {
 	disableInset?: boolean;
 }
 
-export function Scrolling(props: ScrollingProps) {
+/**
+ * Creates a scrolling frame
+ *
+ * @hidden
+ */
+export const Scrolling = forwardRef((props: ScrollingProps, ref: React.Ref<ScrollingFrame>) => {
 	const px = usePx();
 
 	return (
 		<scrollingframe
+			ref={ref}
 			Size={props.size ?? UDim2.fromScale(1, 1)}
 			Position={props.position ?? UDim2.fromScale(0.5, 0.5)}
 			AnchorPoint={props.anchorPoint ?? new Vector2(0.5, 0.5)}
@@ -64,4 +70,4 @@ export function Scrolling(props: ScrollingProps) {
 			)}
 		</scrollingframe>
 	);
-}
+});

@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { tool } from "../../../server";
-import { usePx } from "../hooks/usePx";
 import { useAtom } from "@rbxts/react-charm";
 import { Frame } from "../core/frame";
 import { Button } from "../core/button";
-import { GuiService, TextService, UserInputService } from "@rbxts/services";
-import { dragTool, INVENTORY_PROPERTIES } from "../../core";
+import { GuiService, Players, TextService, UserInputService } from "@rbxts/services";
+import { drag_tool, BACKPACK_PROPERTIES, on_dropped } from "../../core";
 import { TextLabel } from "../core/text";
 import { Image } from "../core/image";
-import { inventorySyncRemotes } from "../../../shared/networking";
-import { draggingState, equippedState, inventorySelectionState, inventoryVisibilityState } from "../../atoms";
-import { useMotion } from "@rbxts/pretty-react-hooks";
+import { backpackSyncRemotes } from "../../../shared/networking";
+import { draggingState, equippedState, backpackSelectionState, inventoryVisibilityState } from "../../atoms";
+import { useMotion, useMouse } from "@rbxts/pretty-react-hooks";
+import { BACKPACK_DIMENSIONS } from "../dimensions";
+import { usePx } from "../hooks/usePx";
 
 interface slotProps extends React.PropsWithChildren {
 	layoutOrder: number;
@@ -19,6 +20,11 @@ interface slotProps extends React.PropsWithChildren {
 	disableIndex?: boolean;
 }
 
+/**
+ * The tool slots
+ *
+ * @hidden
+ */
 export function Slot(props: slotProps) {
 	const px = usePx();
 
@@ -33,6 +39,8 @@ export function Slot(props: slotProps) {
 	const [tooltipSize, setTooltipSize] = useMotion(0);
 
 	const tooltipText = useRef<TextLabel>();
+
+	const mouse = useMouse();
 
 	useEffect(() => {
 		if (props.tool === "drag" || props.tool === "empty") return;
@@ -65,7 +73,7 @@ export function Slot(props: slotProps) {
 		<Frame
 			active={false}
 			layoutOrder={props.layoutOrder}
-			size={UDim2.fromOffset(px(78), px(78))}
+			size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
 			backgroundTransparency={1}
 			clipsDescendants={false}
 		>
@@ -109,17 +117,30 @@ export function Slot(props: slotProps) {
 
 							if (visibility && props.tool !== "empty" && props.tool !== "drag") {
 								// Store the click position relative to the button's top-left
-								const buttonPos = rbx.AbsolutePosition.add(GuiService.GetGuiInset()[0]);
+								const buttonPos = rbx.AbsolutePosition.sub(
+									GuiService.GetInsetArea(Enum.ScreenInsets.None).Min,
+								);
 								const buttonSize = rbx.AbsoluteSize;
+
 								const buttonCenter = new Vector2(
 									buttonPos.X + buttonSize.X / 2,
 									buttonPos.Y + buttonSize.Y / 2,
 								);
 
 								const mousePos = new Vector2(x, y);
+
 								const mouseOffset = mousePos.sub(buttonCenter);
 
-								dragTool(props.tool, mouseOffset);
+								drag_tool(props.tool, mouseOffset);
+
+								const cleanupDropped = on_dropped(props.tool, () => {
+									setDown(false);
+									setHover(false);
+									cleanupDropped();
+
+									Players.LocalPlayer.GetMouse().Icon =
+										"rbxasset://textures/Cursors/KeyboardMouse/ArrowFarCursor.png";
+								});
 							}
 						}
 					});
@@ -136,20 +157,22 @@ export function Slot(props: slotProps) {
 					setHover(true);
 
 					if (!props.disableIndex) {
-						inventorySelectionState(props.index);
+						backpackSelectionState(props.index);
 					}
+
+					Players.LocalPlayer.GetMouse().Icon = "rbxasset://textures/Cursors/KeyboardMouse/ArrowCursor.png";
 				}}
 				onMouseLeave={() => {
 					setHover(false);
 					setDown(false);
 
 					if (!props.disableIndex) {
-						inventorySelectionState(undefined);
+						backpackSelectionState(undefined);
 					}
 				}}
 				onClick={() => {
 					if (props.tool !== "drag" && props.tool !== "empty")
-						inventorySyncRemotes.equipTool.request(equipped?.id === props.tool.id ? undefined : props.tool);
+						backpackSyncRemotes.equipTool.request(equipped?.id === props.tool.id ? undefined : props.tool);
 				}}
 			>
 				<uicorner CornerRadius={new UDim(0, px(16))} />
@@ -173,12 +196,12 @@ export function Slot(props: slotProps) {
 						position={UDim2.fromScale(0, 0)}
 						anchorPoint={new Vector2(0, 0)}
 						textScaled={false}
-						textSize={px(16)}
+						textSize={px(32)}
 						strokeTransparency={0.5}
 						thickness={px(2)}
 						text={tostring(props.index + 1 === 10 ? 0 : props.index + 1)}
 						zIndex={2}
-						font={INVENTORY_PROPERTIES.INVENTORY_FONT}
+						font={BACKPACK_PROPERTIES.BACKPACK_FONT}
 					/>
 				) : undefined}
 
@@ -202,7 +225,7 @@ export function Slot(props: slotProps) {
 							thickness={px(2)}
 							text={props.tool.name}
 							zIndex={2}
-							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
+							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
 						/>
 					) : (
 						<TextLabel
@@ -216,7 +239,7 @@ export function Slot(props: slotProps) {
 							thickness={px(2)}
 							text={`Tool: ${tostring(props.tool.id)}`}
 							zIndex={2}
-							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
+							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
 						/>
 					)
 				) : undefined}

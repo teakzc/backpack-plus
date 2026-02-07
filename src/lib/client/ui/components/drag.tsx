@@ -8,8 +8,17 @@ import { Button } from "../core/button";
 import { Frame } from "../core/frame";
 import { TextLabel } from "../core/text";
 import { Image } from "../core/image";
-import { dropTool, INVENTORY_PROPERTIES } from "../../core";
+import { drop_tool, BACKPACK_PROPERTIES } from "../../core";
+import { BACKPACK_DIMENSIONS } from "../dimensions";
+import { GuiService, Players } from "@rbxts/services";
 
+/**
+ * The tool dragging component with smooth animations while keeping it not buggy by:
+ * - One invisible frame that is locked to mouse
+ * - Visual frame with springs
+ *
+ * @hidden
+ */
 export function Drag() {
 	const px = usePx();
 
@@ -41,32 +50,24 @@ export function Drag() {
 	if (!dragState) return;
 
 	return (
-		<Layer safeZoneBypass={Enum.ScreenInsets.None} displayOrder={5}>
+		<Layer displayOrder={999}>
 			<Button
 				active={false}
-				backgroundTransparency={1}
+				backgroundTransparency={0.5}
 				position={mouse.map((V) => UDim2.fromOffset(V.X, V.Y))}
-				size={UDim2.fromOffset(px(78), px(78))}
+				size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
 				onMouseUp={() => {
-					dropTool();
+					drop_tool();
 				}}
-				// onMouseEnter={() => {
-				// 	if (!realMouse) return;
-				// 	realMouse.Icon = "rbxassetid://111976768366774";
-				// }}
-				// onMouseLeave={() => {
-				// 	if (!realMouse) return;
-				// 	realMouse.Icon = "";
-				// }}
 			>
-				<uiscale Scale={INVENTORY_PROPERTIES.MOBILE ? 1.8 : 1.1} />
+				<uiscale Scale={BACKPACK_PROPERTIES.MOBILE ? 1.8 : 1.1} />
 			</Button>
 
 			<Frame
 				active={false}
 				rotation={rot}
 				position={pos}
-				size={UDim2.fromOffset(px(78), px(78))}
+				size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
 				backgroundTransparency={1}
 			>
 				<Button active={false} backgroundTransparency={0.5} backgroundColor={Color3.fromHSV(0, 0, 0.4)}>
@@ -76,16 +77,16 @@ export function Drag() {
 					{dragState.from === "toolbar" ? (
 						<TextLabel
 							active={false}
-							size={UDim2.fromScale(0.4, 0.4)}
+							size={UDim2.fromScale(0.25, 0.25)}
 							position={UDim2.fromScale(0, 0)}
 							anchorPoint={new Vector2(0, 0)}
 							textScaled={false}
-							textSize={px(24)}
+							textSize={px(32)}
 							strokeTransparency={0.5}
 							thickness={px(2)}
-							text={tostring(dragState.index + 1)}
+							text={tostring(dragState.index + 1 === 10 ? 0 : dragState.index + 1)}
 							zIndex={2}
-							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
+							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
 						/>
 					) : undefined}
 
@@ -108,7 +109,7 @@ export function Drag() {
 							thickness={px(2)}
 							text={dragState.tool.name}
 							zIndex={2}
-							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
+							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
 						/>
 					) : (
 						<TextLabel
@@ -122,7 +123,7 @@ export function Drag() {
 							thickness={px(2)}
 							text={`Tool: ${tostring(dragState.tool.id)}`}
 							zIndex={2}
-							font={INVENTORY_PROPERTIES.INVENTORY_FONT}
+							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
 						/>
 					)}
 
@@ -133,7 +134,6 @@ export function Drag() {
 						image={dragState.tool.image ?? ""}
 					/>
 				</Button>
-				<uiscale Scale={INVENTORY_PROPERTIES.MOBILE ? 1.8 : 1.1} />
 				<uiaspectratioconstraint AspectRatio={1} />
 			</Frame>
 		</Layer>

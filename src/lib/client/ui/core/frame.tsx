@@ -18,6 +18,11 @@ export interface FrameProps<T extends Instance = Frame> extends React.PropsWithC
 	cornerRadius?: UDim | React.Binding<UDim>;
 }
 
+/**
+ * Creates a frame
+ *
+ * @hidden
+ */
 export const Frame = forwardRef((props: FrameProps, ref: Ref<Frame>) => {
 	return (
 		<frame

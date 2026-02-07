@@ -1,37 +1,46 @@
-import { createPortal, createRoot, Root } from "@rbxts/react-roblox";
-import { Players } from "@rbxts/services";
-import { App } from "./ui/app";
+import { Root } from "@rbxts/react-roblox";
 import React from "@rbxts/react";
-import { inventoryVisibilityState } from "./atoms";
-import { dropTool } from "./core";
+import { mountedAtoms } from "./atoms";
+import { BACKPACK_PROPERTIES, toggle_inventory } from "./core";
+import { App } from "./ui/app";
+import { Icon } from "@rbxts/topbar-plus";
 
 /**
  * Renders the inventory
  *
- * @param root The `Instance` to call `createRoot` on
- * @param target PlayerGUI
- * @returns The `Root`
+ * @param root The `Root` to render the backpack on
  */
-export function renderInventory(
-	root: Instance = new Instance("Folder"),
-	target: Instance = Players.LocalPlayer.WaitForChild("PlayerGui"),
-): Root {
-	const createdRoot = createRoot(root);
+export function render_backpack(root: Root) {
+	root.render(<App />);
 
-	createdRoot.render(createPortal(<App />, target));
-
-	return createdRoot;
+	const inventoryToggleIcon = new Icon()
+		.setName("Inventory")
+		.setImage("rbxasset://textures/ui/TopBar/inventoryOn.png", "Selected")
+		.setImage("rbxasset://textures/ui/TopBar/inventoryOff.png", "Deselected")
+		.setOrder(-1)
+		.setCaption("Toggle Inventory")
+		.setImageScale(1)
+		.toggled.Connect(() => {
+			toggle_inventory();
+		});
 }
 
 /**
- * Toggle inventory full display
+ * Mounts a `React.JSX.Element` to the inventory UI
  *
- * @param state Whether to display the full backpack or not
+ * @param component The component to mount
+ * @param location The location to mount the component to
  */
-export function toggleInventory(state: boolean) {
-	inventoryVisibilityState(state);
+export function mount_component(component: React.JSX.Element, location: keyof typeof mountedAtoms) {
+	mountedAtoms[location]((current) => [...current, component]);
+}
 
-	if (!state) {
-		dropTool();
-	}
+/**
+ * Unmounts the `React.JSX.Element` from the inventory UI
+ *
+ * @param component The component to unmount
+ * @param location The location to unmount the component from
+ */
+export function unmount_component(component: React.JSX.Element, location: keyof typeof mountedAtoms) {
+	mountedAtoms[location]((current) => current.filter((c) => c !== component));
 }

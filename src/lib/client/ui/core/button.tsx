@@ -11,6 +11,11 @@ export interface ButtonProps extends FrameProps<ImageButton> {
 	onMouseLeave?: () => void;
 }
 
+/**
+ * Creates a button
+ *
+ * @hidden
+ */
 export const Button = forwardRef((props: ButtonProps) => {
 	const { onClick, onMouseDown, onMouseEnter, onMouseLeave, onMouseUp } = props;
 

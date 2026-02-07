@@ -19,10 +19,16 @@ Workspace.GetPropertyChangedSignal("CurrentCamera").Connect(() => {
 	OnCameraChanged(Workspace.CurrentCamera);
 });
 
+/**
+ * @hidden
+ */
 export function useScreenSize(): Vector2 {
 	return useAtom(screen_size_atom);
 }
 
+/**
+ * @hidden
+ */
 export function GetScreenSizeAtom(): Vector2 {
 	return screen_size_atom();
 }

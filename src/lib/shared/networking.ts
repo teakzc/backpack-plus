@@ -4,9 +4,9 @@ import { Client, createRemotes, remote, Server } from "@rbxts/remo";
 import { tool } from "../server";
 import { t } from "@rbxts/t";
 
-export type clientInventory = tool[];
+export type clientBackpack = tool[];
 export type clientRegistry = {
-	[client: string]: clientInventory;
+	[client: string]: clientBackpack;
 };
 export type equippedRegistry = {
 	[client: string]: tool | undefined;
@@ -16,7 +16,7 @@ export const clientRegistry = atom<clientRegistry>({});
 
 export const equippedRegistry = atom<equippedRegistry>({});
 
-export type inventorySyncPayload = SyncPayload<{
+export type backpackSyncPayload = SyncPayload<{
 	clientRegistry: Atom<clientRegistry>;
 	equippedRegistry: Atom<equippedRegistry>;
 }>;
@@ -24,14 +24,20 @@ export type inventorySyncPayload = SyncPayload<{
 const toolValidator = t.strictInterface({
 	image: t.optional(t.string),
 	tooltip: t.optional(t.string),
-	model: t.optional(t.Instance),
+	tool: t.optional(t.Instance),
 	id: t.number,
 	name: t.optional(t.string),
+	metadata: t.any, // It would be t.map(t.string, t.unknown), but some limitations
 }) as t.check<tool>;
 
-export const inventorySyncRemotes = createRemotes(
+/**
+ * Sync remotes using `@rbxts/remo`!
+ *
+ * @hidden
+ */
+export const backpackSyncRemotes = createRemotes(
 	{
-		syncState: remote<Client, [payload: inventorySyncPayload]>(),
+		syncState: remote<Client, [payload: backpackSyncPayload]>(),
 		requestState: remote<Server>(),
 		equipTool: remote<Server, [tool: tool | undefined]>(t.optional(toolValidator)).returns(t.boolean),
 	},

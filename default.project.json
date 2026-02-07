@@ -1,5 +1,5 @@
 {
-	"name": "tests",
+	"name": "jest test",
 	"globIgnorePaths": [
 		"**/package.json",
 		"**/tsconfig.json"
@@ -9,7 +9,10 @@
 		"ServerScriptService": {
 			"$className": "ServerScriptService",
 			"TS": {
-				"$path": "out/tests"
+				"$path": "out/tests/server"
+			},
+			"JestTests": {
+				"$path": "out/tests/jest"
 			}
 		},
 		"ReplicatedStorage": {
@@ -35,7 +38,7 @@
 			"StarterPlayerScripts": {
 				"$className": "StarterPlayerScripts",
 				"TS": {
-					"$path": "out/client"
+					"$path": "out/tests/client"
 				}
 			}
 		}

@@ -1,12 +1,17 @@
 import React from "@rbxts/react";
 import { Layer } from "./core/layer";
-import { draggingState, inventoryVisibilityState } from "../atoms";
+import { draggingState, inventoryVisibilityState, mountedAtoms } from "../atoms";
 import { useAtom } from "@rbxts/react-charm";
 import { Drag } from "./components/drag";
 import { Toolbar } from "./components/toolbar";
 import { Backpack } from "./components/backpack";
-import { INVENTORY_PROPERTIES } from "../core";
+import { ClickOff } from "./components/clickoff";
 
+/**
+ * The main App component for the inventory UI
+ *
+ * @hidden
+ */
 export function App() {
 	const visibility = useAtom(() => inventoryVisibilityState());
 	useAtom(() => draggingState());
@@ -22,7 +27,11 @@ export function App() {
 			{/* Drag */}
 			{visibility ? <Drag /> : undefined}
 
-			<uiscale Scale={INVENTORY_PROPERTIES.MOBILE ? 1.8 : 1.1} />
+			{/* Mounted Components */}
+			{mountedAtoms.base().map((component) => component)}
+
+			{/* Detect if client clicked off */}
+			{visibility ? <ClickOff /> : undefined}
 		</Layer>
 	);
 }

@@ -24,6 +24,8 @@
 	"rules": {
 		"prettier/prettier": "warn",
 		"roblox-ts/no-any": "off",
-		"roblox-ts/lua-truthiness": "off"
+		"roblox-ts/lua-truthiness": "off",
+		"no-unused-vars": "off",
+    	"@typescript-eslint/no-unused-vars": "off"
 	}
 }

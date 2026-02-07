@@ -4,16 +4,18 @@ import { modify_client, retrieve_client } from "./clients";
 export interface tool {
 	image?: string;
 	tooltip?: string;
-	model?: Tool;
+	tool?: Tool;
 	name?: string;
 	id: number;
+	metadata: { [key: string]: unknown }; // Map<string, unknown>;
 }
 
 export interface toolData {
 	image?: string;
 	tooltip?: string;
 	name?: string;
-	model?: Tool;
+	tool?: Tool;
+	metadata?: { [key: string]: unknown }; // Map<string, unknown>;
 }
 
 /**
@@ -23,7 +25,7 @@ export interface toolData {
  * @param toolData The tool
  * @returns The `id` of the tool
  */
-export function addTool(client: Player, toolData: toolData): number {
+export function add_tool(client: Player, toolData: toolData): number {
 	if (!retrieve_client(client)) {
 		warn("Client is not registered yet!");
 		return -1;
@@ -32,6 +34,7 @@ export function addTool(client: Player, toolData: toolData): number {
 	const data = {
 		...toolData,
 		id: getCount(),
+		metadata: toolData.metadata ?? {}, //new Map<string, unknown>(),
 	};
 
 	modify_client(client, (current) => {
@@ -50,7 +53,7 @@ export function addTool(client: Player, toolData: toolData): number {
  * @param client The client to remove from
  * @param id The tool id to remove
  */
-export function removeTool(client: Player, id: number) {
+export function remove_tool(client: Player, id: number) {
 	if (!retrieve_client(client)) {
 		warn("Client is not registered yet!");
 		return;

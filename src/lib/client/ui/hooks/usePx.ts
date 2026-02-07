@@ -4,6 +4,7 @@ import { GetScreenSizeAtom, useScreenSize } from "./useScreenSize";
 
 /**
  * @see https://discord.com/channels/476080952636997633/476080952636997635/1146857136358432900
+ * @hidden
  */
 function CalculateScale(viewport: Vector2, base_resolution: Vector2, dominant_axis: number) {
 	const width = math.log(viewport.X / base_resolution.X, 2);
@@ -15,6 +16,7 @@ function CalculateScale(viewport: Vector2, base_resolution: Vector2, dominant_ax
 
 /**
  * @param dominant_axis 0 - prefer width, 1 - prefer height, defaults to .5
+ * @hidden
  */
 export function usePx(
 	base_resolution: Vector2 = new Vector2(1920, 1080),
@@ -34,6 +36,7 @@ export function usePx(
  * @param base_resolution The resolution UI was designed for (default 1920x1080)
  * @param dominant_axis Scaling preference (default 1 = height-based)
  * @returns A binding containing the current scale factor
+ * @hidden
  */
 export function usePxBinding(
 	base_resolution: Vector2 = new Vector2(1920, 1080),

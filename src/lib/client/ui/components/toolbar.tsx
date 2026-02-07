@@ -1,15 +1,26 @@
 import React from "@rbxts/react";
 import { Frame } from "../core/frame";
-import { usePx } from "../hooks/usePx";
 import { Div } from "../core/divider";
-import { draggingState, inventoryVisibilityState, toolbarState } from "../../atoms";
+import { draggingState, inventoryVisibilityState, mountedAtoms, toolbarState } from "../../atoms";
 import { Slot } from "./slot";
 import { useAtom } from "@rbxts/react-charm";
+import { BACKPACK_DIMENSIONS } from "../dimensions";
+import { BACKPACK_PROPERTIES } from "../../core";
+import { usePx } from "../hooks/usePx";
 
+/**
+ * Thank you to https://github.com/ryanlua/satchel for the calculations for the toolbar,
+ *
+ * Thank you! thank you! thank you!
+ */
+
+/**
+ * Creates the toolbar
+ *
+ * @hidden
+ */
 export function Toolbar() {
 	const px = usePx();
-
-	print(px(1));
 
 	useAtom(() => inventoryVisibilityState());
 	useAtom(() => draggingState());
@@ -18,9 +29,33 @@ export function Toolbar() {
 
 	return (
 		<Frame
-			anchorPoint={new Vector2(0.5, 1)}
-			position={UDim2.fromScale(0.5, 1)}
-			size={new UDim2(0, px(852), 0, px(90))}
+			anchorPoint={new Vector2(0, 0)}
+			position={
+				new UDim2(
+					0.5,
+					-(
+						BACKPACK_DIMENSIONS.ICON_BUFFER +
+						BACKPACK_PROPERTIES.TOOLBAR_AMOUNT *
+							(BACKPACK_DIMENSIONS.ICON_SIZE + BACKPACK_DIMENSIONS.ICON_BUFFER)
+					) / 2,
+					1,
+					-(
+						BACKPACK_DIMENSIONS.ICON_BUFFER +
+						BACKPACK_DIMENSIONS.ICON_SIZE +
+						BACKPACK_DIMENSIONS.ICON_BUFFER
+					),
+				)
+			}
+			size={
+				new UDim2(
+					0,
+					BACKPACK_DIMENSIONS.ICON_BUFFER +
+						BACKPACK_PROPERTIES.TOOLBAR_AMOUNT *
+							(BACKPACK_DIMENSIONS.ICON_SIZE + BACKPACK_DIMENSIONS.ICON_BUFFER),
+					0,
+					BACKPACK_DIMENSIONS.ICON_BUFFER + BACKPACK_DIMENSIONS.ICON_SIZE + BACKPACK_DIMENSIONS.ICON_BUFFER,
+				)
+			}
 			backgroundTransparency={1}
 		>
 			<Div
@@ -34,6 +69,8 @@ export function Toolbar() {
 					return <Slot layoutOrder={index} index={index} tool={tool} />;
 				})}
 			</Div>
+
+			{mountedAtoms.toolbar().map((component) => component)}
 		</Frame>
 	);
 }
