@@ -8,6 +8,8 @@
 
     A modern Roblox backpack made /w React & inspired by ryanlua/satchel
 
+    [npm package](https://www.npmjs.com/package/@rbxts/backpack-plus)
+
   [![License](https://img.shields.io/github/license/teakzc/backpack-plus?style=for-the-badge)](https://github.com/teakzc/backpack-plus/blob/main/LICENSE)
 </div>
 
@@ -24,9 +26,9 @@
 - ryanlua/satchel for the backpack dimension calculations 🙏
 
 ## 📦 Installation
-[npm](https://www.npmjs.com/package/@rbxts/stagemananger):
+[npm](https://www.npmjs.com/package/@rbxts/backpack-plus):
 ```zsh
-npm add @rbxts/stagemanager
+npm add @rbxts/backpack-plus
 ```
 
 ### Main Dependancies

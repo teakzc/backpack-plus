@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/backpack-plus",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A modern Roblox backpack made /w React & inspired by ryanlua/satchel",
   "main": "out/lib/init.luau",
   "scripts": {
@@ -10,11 +10,10 @@
   },
   "keywords": [
     "Roblox",
-    "Inventory",
     "Backpack"
   ],
   "repository": {
-    "url": "https://github.com/teakzc/backpack-plus"
+    "url": "git+https://github.com/teakzc/backpack-plus.git"
   },
   "author": "teakzc",
   "license": "MIT",
@@ -23,6 +22,8 @@
   "files": [
     "out/lib/index.d.ts",
     "out/lib/init.luau",
+    "out/lib/**",
+    "LICENSE",
     "!**/*.tsbuildinfo"
   ],
   "publishConfig": {
