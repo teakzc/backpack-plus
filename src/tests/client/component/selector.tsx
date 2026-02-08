@@ -88,7 +88,7 @@ export function EXAMPLE_SELECTOR() {
 		<frame
 			AnchorPoint={new Vector2(1, 0.5)}
 			Position={UDim2.fromScale(0, 0.5)}
-			Size={UDim2.fromScale(0.25, 1)}
+			Size={UDim2.fromScale(0.35, 1)}
 			BackgroundTransparency={1}
 			BackgroundColor3={Color3.fromHSV(0, 0, 0.5)}
 		>

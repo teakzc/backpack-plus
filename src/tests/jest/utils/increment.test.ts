@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "@rbxts/jest-globals";
-import { getCount } from "../../../lib/utils/increment";
+import { getId } from "../../../lib/utils/increment";
 
 beforeAll(() => {
 	for (const [key] of pairs(_G)) {
@@ -11,10 +11,6 @@ beforeAll(() => {
 
 describe("increment function", () => {
 	it("should never be equal", () => {
-		expect(getCount()).never.toEqual(getCount());
-	});
-
-	it("should always increment", () => {
-		expect(getCount() + 1).toEqual(getCount());
+		expect(getId()).never.toEqual(getId());
 	});
 });

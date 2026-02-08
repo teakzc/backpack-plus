@@ -16,7 +16,7 @@ import {
 import { tool } from "../../../lib/server/tools";
 import {
 	toolbarState,
-	backpackState,
+	inventoryState,
 	draggingState,
 	backpackSelectionState,
 	filterList,
@@ -30,7 +30,7 @@ beforeAll(() => {
 	}
 });
 
-const createMockTool = (id: number, name?: string): tool => ({
+const createMockTool = (id: string, name?: string): tool => ({
 	id,
 	name: name || `Tool${id}`,
 	image: "rbxasset://textures/ui/GuiImagePlaceholder.png",
@@ -41,7 +41,7 @@ const createMockTool = (id: number, name?: string): tool => ({
 describe("client side backpack", () => {
 	beforeEach(() => {
 		toolbarState([]);
-		backpackState([]);
+		inventoryState([]);
 		draggingState(undefined);
 		backpackSelectionState(undefined);
 		filterList([]);
@@ -94,8 +94,8 @@ describe("client side backpack", () => {
 
 	describe("find_tool", () => {
 		it("should find tool in toolbar", () => {
-			const mockTool = createMockTool(1);
-			const mockTool2 = createMockTool(2);
+			const mockTool = createMockTool("1");
+			const mockTool2 = createMockTool("2");
 			toolbarState(["empty", mockTool2, mockTool]);
 
 			const location = find_tool(mockTool);
@@ -103,16 +103,16 @@ describe("client side backpack", () => {
 		});
 
 		it("should find tool in backpack", () => {
-			const mockTool = createMockTool(1);
-			const mockTool2 = createMockTool(2);
-			backpackState([mockTool2, mockTool]);
+			const mockTool = createMockTool("1");
+			const mockTool2 = createMockTool("2");
+			inventoryState([mockTool2, mockTool]);
 
 			const location = find_tool(mockTool);
 			expect(location).toBe("backpack");
 		});
 
 		it("should return undefined if tool not found", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 
 			const location = find_tool(mockTool);
 			expect(location).toBeUndefined();
@@ -121,7 +121,7 @@ describe("client side backpack", () => {
 
 	describe("drag_tool", () => {
 		it("should drag tool from toolbar", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 			toolbarState(["empty", mockTool, "empty"]);
 
 			drag_tool(mockTool);
@@ -136,9 +136,9 @@ describe("client side backpack", () => {
 		});
 
 		it("should drag tool from backpack", () => {
-			const mockTool = createMockTool(1);
-			const mockTool2 = createMockTool(2);
-			backpackState([mockTool2, mockTool]);
+			const mockTool = createMockTool("1");
+			const mockTool2 = createMockTool("2");
+			inventoryState([mockTool2, mockTool]);
 
 			drag_tool(mockTool);
 
@@ -147,11 +147,11 @@ describe("client side backpack", () => {
 				expect(dragging.tool.id).toBe(mockTool.id);
 				expect(dragging.from).toBe("backpack");
 			}
-			expect(backpackState()[1]).toBe("drag");
+			expect(inventoryState()[1]).toBe("drag");
 		});
 
 		it("should not drag tool if not found", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 
 			drag_tool(mockTool);
 
@@ -161,7 +161,7 @@ describe("client side backpack", () => {
 
 	describe("drop_tool", () => {
 		it("should return tool to original location when cancelled", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 			draggingState({
 				tool: mockTool,
 				from: "toolbar",
@@ -178,7 +178,7 @@ describe("client side backpack", () => {
 		});
 
 		it("should move tool from toolbar to backpack", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 			draggingState({
 				tool: mockTool,
 				from: "toolbar",
@@ -190,7 +190,7 @@ describe("client side backpack", () => {
 
 			drop_tool();
 
-			const backpack = backpackState();
+			const backpack = inventoryState();
 			let found = false;
 			for (const item of backpack) {
 				if (item !== "drag" && item.id === mockTool.id) {
@@ -204,8 +204,8 @@ describe("client side backpack", () => {
 		});
 
 		it("should swap tools in toolbar", () => {
-			const mockTool = createMockTool(1);
-			const mockTool2 = createMockTool(2);
+			const mockTool = createMockTool("1");
+			const mockTool2 = createMockTool("2");
 			draggingState({
 				tool: mockTool,
 				from: "toolbar",
@@ -225,7 +225,7 @@ describe("client side backpack", () => {
 
 	describe("filter functionality", () => {
 		it("should add filter", () => {
-			const filter = (tool: tool) => tool.id > 5;
+			const filter = (tool: tool) => tool.name === "";
 
 			add_filter(filter);
 
@@ -235,7 +235,7 @@ describe("client side backpack", () => {
 		});
 
 		it("should remove filter", () => {
-			const filter = (tool: tool) => tool.id > 5;
+			const filter = (tool: tool) => tool.name === "";
 			add_filter(filter);
 
 			remove_filter(filter);
@@ -245,7 +245,7 @@ describe("client side backpack", () => {
 		});
 
 		it("should clear all filters", () => {
-			add_filter((tool: tool) => tool.id > 5);
+			add_filter((tool: tool) => tool.name === "");
 			add_filter((tool: tool) => tool.name !== undefined);
 
 			clear_filters();
@@ -257,7 +257,7 @@ describe("client side backpack", () => {
 
 	describe("callback functions", () => {
 		it("should register and call on_dropped callback", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 			const callback = jest.fn();
 
 			const clean = on_dropped(mockTool, callback);
@@ -281,7 +281,7 @@ describe("client side backpack", () => {
 		});
 
 		it("should register and call on_dragged callback", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 			const callback = jest.fn();
 
 			const clean = on_dragged(mockTool, callback);
@@ -297,7 +297,7 @@ describe("client side backpack", () => {
 
 	describe("getter functions", () => {
 		it("should get currently dragged tool", () => {
-			const mockTool = createMockTool(1);
+			const mockTool = createMockTool("1");
 			draggingState({
 				tool: mockTool,
 				from: "toolbar",

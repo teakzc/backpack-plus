@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/backpack-plus",
-  "version": "1.0.0",
+  "version": "1.0.11",
   "description": "A modern Roblox backpack made /w React & inspired by ryanlua/satchel",
   "main": "out/lib/init.luau",
   "scripts": {

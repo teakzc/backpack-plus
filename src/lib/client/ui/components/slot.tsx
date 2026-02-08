@@ -138,6 +138,9 @@ export function Slot(props: slotProps) {
 									setHover(false);
 									cleanupDropped();
 
+									setTooltipSize.spring(0);
+									setTooltipSize.set(0);
+
 									Players.LocalPlayer.GetMouse().Icon =
 										"rbxasset://textures/Cursors/KeyboardMouse/ArrowFarCursor.png";
 								});
@@ -192,11 +195,11 @@ export function Slot(props: slotProps) {
 				{props.tool !== "drag" && props.disableIndex !== true ? (
 					<TextLabel
 						active={false}
-						size={UDim2.fromScale(0.25, 0.25)}
+						size={UDim2.fromScale(0.3, 0.3)}
 						position={UDim2.fromScale(0, 0)}
 						anchorPoint={new Vector2(0, 0)}
 						textScaled={false}
-						textSize={px(32)}
+						textSize={16}
 						strokeTransparency={0.5}
 						thickness={px(2)}
 						text={tostring(props.index + 1 === 10 ? 0 : props.index + 1)}
@@ -206,40 +209,35 @@ export function Slot(props: slotProps) {
 				) : undefined}
 
 				{props.tool !== "drag" && props.tool !== "empty" ? (
-					props.tool.image !== undefined && props.tool.image !== "" ? (
+					props.tool.image !== undefined && props.tool.image !== undefined ? (
 						<Image
 							active={false}
 							size={UDim2.fromScale(0.9, 0.9)}
 							backgroundTransparency={1}
 							image={props.tool.image}
 						/>
-					) : props.tool.name !== undefined && props.tool.name !== "" ? (
-						<TextLabel
-							active={false}
-							size={UDim2.fromScale(0.9, 0.5)}
-							position={UDim2.fromScale(0.5, 0.5)}
-							anchorPoint={new Vector2(0.5, 0.5)}
-							textScaled={true}
-							textWrapped={true}
-							strokeTransparency={0.5}
-							thickness={px(2)}
-							text={props.tool.name}
-							zIndex={2}
-							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
-						/>
 					) : (
 						<TextLabel
 							active={false}
-							size={UDim2.fromScale(0.9, 0.5)}
 							position={UDim2.fromScale(0.5, 0.5)}
 							anchorPoint={new Vector2(0.5, 0.5)}
-							textScaled={true}
-							textWrapped={true}
 							strokeTransparency={0.5}
-							thickness={px(2)}
-							text={`Tool: ${tostring(props.tool.id)}`}
+							text={props.tool.name === undefined ? `Tool: ${props.tool.id}` : props.tool.name}
 							zIndex={2}
 							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
+							size={
+								new UDim2(
+									1,
+									-BACKPACK_DIMENSIONS.SLOT_EQUIP_THICKNESS * 2,
+									1,
+									-BACKPACK_DIMENSIONS.SLOT_EQUIP_THICKNESS,
+								)
+							}
+							textScaled={false}
+							textSize={16}
+							thickness={px(2)}
+							textTruncate={Enum.TextTruncate.AtEnd}
+							textWrapped={true}
 						/>
 					)
 				) : undefined}

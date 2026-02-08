@@ -1,12 +1,12 @@
 import { client } from "@rbxts/charm-sync";
 import { clientRegistry, equippedRegistry, backpackSyncRemotes } from "../shared/networking";
-import { atom, computed, observe } from "@rbxts/charm";
+import { atom, computed, observe, subscribe } from "@rbxts/charm";
 import { Players, StarterGui, UserInputService } from "@rbxts/services";
 import { tool } from "../server";
 import { push, removeValue, set } from "@rbxts/sift/out/Array";
 import { equals } from "@rbxts/sift/out/Dictionary";
 import {
-	backpackState,
+	inventoryState,
 	draggingState,
 	equippedState,
 	filterList,
@@ -36,6 +36,25 @@ backpackSyncRemotes.requestState.fire();
 
 // CHARM-SYNC ABOVE
 // CORE FUNCTION BELOW
+
+const backpackState = computed(() => {
+	return {
+		toolbar: toolbarState().map((value) => {
+			return value !== "drag" && value !== "empty" ? value.id : undefined;
+		}),
+		inventory: inventoryState()
+			.map((value) => {
+				return value !== "drag" ? value.id : undefined;
+			})
+			.filterUndefined(),
+	};
+});
+
+subscribe(backpackState, (current) => {
+	backpackSyncRemotes;
+});
+
+// CLIENT TO SERVER TOOLSLOT SYNC
 
 export const BACKPACK_PROPERTIES = {
 	TOOLBAR_AMOUNT: 10,
@@ -141,7 +160,7 @@ observe(backpack, (tool) => {
 
 	if (!fill) {
 		// Is full, so go into inventory
-		backpackState((current) => push(current, newTool));
+		inventoryState((current) => push(current, newTool));
 	}
 
 	return () => {
@@ -165,7 +184,7 @@ observe(backpack, (tool) => {
 			return clone;
 		});
 
-		backpackState((current) => removeValue(current, newTool));
+		inventoryState((current) => removeValue(current, newTool));
 	};
 });
 
@@ -181,7 +200,7 @@ export function find_tool(tool: tool): "toolbar" | "backpack" | undefined {
 	// Find whether it is in toolbar or inventory
 
 	const toolbar = toolbarState().find((V) => (V !== "drag" && V !== "empty" ? equals(V, tool) : false));
-	const backpack = backpackState().find((V) => (V !== "drag" ? equals(V, tool) : false));
+	const backpack = inventoryState().find((V) => (V !== "drag" ? equals(V, tool) : false));
 
 	return toolbar ? "toolbar" : backpack ? "backpack" : undefined;
 }
@@ -222,8 +241,8 @@ export function equip_tool_number(tool: number) {
 	backpackSyncRemotes.equipTool.request(toEquip);
 }
 
-const toolDropState = new Map<number, () => void>();
-const toolDragState = new Map<number, () => void>();
+const toolDropState = new Map<string, () => void>();
+const toolDragState = new Map<string, () => void>();
 
 /**
  * Drags a tool
@@ -248,11 +267,11 @@ export function drag_tool(tool: tool, mouseOffset?: Vector2) {
 
 		toolbarState((current) => set(current, index + 1, "drag"));
 	} else if (location === "backpack") {
-		const index = backpackState().findIndex((V) => (V !== "drag" ? equals(V, tool) : false));
+		const index = inventoryState().findIndex((V) => (V !== "drag" ? equals(V, tool) : false));
 
 		if (index === -1 || index === undefined) return; // Does not exist
 
-		backpackState((current) => set(current, index + 1, "drag"));
+		inventoryState((current) => set(current, index + 1, "drag"));
 	}
 
 	draggingState({
@@ -314,18 +333,18 @@ export function drop_tool() {
 			// But where?
 			// At the original place you dragged it!!!
 
-			const index = backpackState().findIndex((V) => V === "drag");
+			const index = inventoryState().findIndex((V) => V === "drag");
 
 			if (index === -1) return;
 
 			// Replaces the "drag" with the tool
 
-			backpackState((current) => set(current, index + 1, newTool));
+			inventoryState((current) => set(current, index + 1, newTool));
 		} else {
 			// From the TOOLBAR, so now swap the positions and push
 
 			// Add to backpack
-			backpackState((current) => push(current, newTool));
+			inventoryState((current) => push(current, newTool));
 
 			// Remove from toolbar
 
@@ -358,7 +377,7 @@ export function drop_tool() {
 			// From backpack to toolbar
 
 			// Remove backpack
-			backpackState((current) => removeValue(current, "drag"));
+			inventoryState((current) => removeValue(current, "drag"));
 
 			// Add to toolbar
 
@@ -370,11 +389,11 @@ export function drop_tool() {
 		if (data.from === "backpack") {
 			// Return back to the backpack
 
-			const index = backpackState().findIndex((V) => V === "drag");
+			const index = inventoryState().findIndex((V) => V === "drag");
 
 			if (index === -1) return;
 
-			backpackState((current) => set(current, index + 1, data.tool));
+			inventoryState((current) => set(current, index + 1, data.tool));
 		} else if (data.from === "toolbar") {
 			// Put back
 
@@ -481,7 +500,6 @@ const inputs = {
 	Seven: 7,
 	Eight: 8,
 	Nine: 9,
-	Backquote: -1,
 };
 
 /**
@@ -512,15 +530,7 @@ export function initialize_inputs() {
 
 		if (validation === undefined) return;
 
-		if (validation > 9 || validation < 0) {
-			// Not valid! But maybe...
-
-			if (input.KeyCode === Enum.KeyCode.Backquote) {
-				toggle_inventory(!get_visibility());
-			}
-		}
-
-		// Valid!
+		if (validation > 9 || validation < 0) return;
 
 		equip_tool_number(validation);
 	});

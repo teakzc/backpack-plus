@@ -77,11 +77,11 @@ export function Drag() {
 					{dragState.from === "toolbar" ? (
 						<TextLabel
 							active={false}
-							size={UDim2.fromScale(0.25, 0.25)}
+							size={UDim2.fromScale(0.3, 0.3)}
 							position={UDim2.fromScale(0, 0)}
 							anchorPoint={new Vector2(0, 0)}
 							textScaled={false}
-							textSize={px(32)}
+							textSize={16}
 							strokeTransparency={0.5}
 							thickness={px(2)}
 							text={tostring(dragState.index + 1 === 10 ? 0 : dragState.index + 1)}
@@ -90,42 +90,43 @@ export function Drag() {
 						/>
 					) : undefined}
 
-					{dragState.tool.image !== undefined && dragState.tool.image !== "" ? (
-						<Image
-							active={false}
-							size={UDim2.fromScale(0.9, 0.9)}
-							backgroundTransparency={1}
-							image={dragState.tool.image}
-						/>
-					) : dragState.tool.name !== undefined && dragState.tool.name !== "" ? (
-						<TextLabel
-							active={false}
-							size={UDim2.fromScale(0.9, 0.5)}
-							position={UDim2.fromScale(0.5, 0.5)}
-							anchorPoint={new Vector2(0.5, 0.5)}
-							textScaled={true}
-							textWrapped={true}
-							strokeTransparency={0.5}
-							thickness={px(2)}
-							text={dragState.tool.name}
-							zIndex={2}
-							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
-						/>
-					) : (
-						<TextLabel
-							active={false}
-							size={UDim2.fromScale(0.9, 0.5)}
-							position={UDim2.fromScale(0.5, 0.5)}
-							anchorPoint={new Vector2(0.5, 0.5)}
-							textScaled={true}
-							textWrapped={true}
-							strokeTransparency={0.5}
-							thickness={px(2)}
-							text={`Tool: ${tostring(dragState.tool.id)}`}
-							zIndex={2}
-							font={BACKPACK_PROPERTIES.BACKPACK_FONT}
-						/>
-					)}
+					{dragState.tool !== undefined ? (
+						dragState.tool.image !== undefined && dragState.tool.image !== undefined ? (
+							<Image
+								active={false}
+								size={UDim2.fromScale(0.9, 0.9)}
+								backgroundTransparency={1}
+								image={dragState.tool.image}
+							/>
+						) : (
+							<TextLabel
+								active={false}
+								position={UDim2.fromScale(0.5, 0.5)}
+								anchorPoint={new Vector2(0.5, 0.5)}
+								strokeTransparency={0.5}
+								text={
+									dragState.tool.name === undefined
+										? `Tool: ${dragState.tool.id}`
+										: dragState.tool.name
+								}
+								zIndex={2}
+								font={BACKPACK_PROPERTIES.BACKPACK_FONT}
+								size={
+									new UDim2(
+										1,
+										-BACKPACK_DIMENSIONS.SLOT_EQUIP_THICKNESS * 2,
+										1,
+										-BACKPACK_DIMENSIONS.SLOT_EQUIP_THICKNESS,
+									)
+								}
+								textScaled={false}
+								textSize={16}
+								thickness={px(2)}
+								textTruncate={Enum.TextTruncate.AtEnd}
+								textWrapped={true}
+							/>
+						)
+					) : undefined}
 
 					<Image
 						active={false}

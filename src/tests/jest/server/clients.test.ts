@@ -57,7 +57,7 @@ describe("client inventory management", () => {
 				const cloned = table.clone(current);
 
 				cloned.push({
-					id: 123,
+					id: "123",
 					name: "test",
 					metadata: {},
 				});
@@ -80,7 +80,7 @@ describe("client inventory management", () => {
 				const cloned = table.clone(current);
 
 				cloned.push({
-					id: 123,
+					id: "123",
 					metadata: {},
 				});
 
@@ -108,7 +108,7 @@ describe("client inventory management", () => {
 				const cloned = table.clone(current);
 
 				cloned.push({
-					id: 1,
+					id: "1",
 					metadata: {},
 				});
 
@@ -121,7 +121,7 @@ describe("client inventory management", () => {
 				if (!current[0]) return current;
 
 				const cloned = table.clone(current);
-				cloned[0].id = 100;
+				cloned[0].id = "100";
 
 				return cloned;
 			});
@@ -139,7 +139,7 @@ describe("client inventory management", () => {
 				const cloned = table.clone(current);
 
 				cloned.push({
-					id: 1,
+					id: "1",
 					metadata: {},
 				});
 
@@ -163,7 +163,7 @@ describe("client inventory management", () => {
 				const cloned = table.clone(current);
 
 				cloned.push({
-					id: 1,
+					id: "1",
 					metadata: {},
 				});
 
@@ -299,7 +299,7 @@ describe("client inventory management", () => {
 				UserId: 1,
 			} as Player;
 
-			const didRemove = remove_tool(mockClient, 123);
+			const didRemove = remove_tool(mockClient, "123");
 
 			expect(didRemove).toBeNil();
 		});

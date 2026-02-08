@@ -1,13 +1,12 @@
-let counter = 0;
+import { HttpService } from "@rbxts/services";
 
 /**
- * Generate a unique number
+ * Generate a unique id
  *
- * @returns A number that is always incremented
+ * @returns string
  *
  * @hidden
  */
-export function getCount(): number {
-	counter += 1;
-	return counter;
+export function getId(): string {
+	return HttpService.GenerateGUID();
 }

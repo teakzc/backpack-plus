@@ -25,10 +25,15 @@ const toolValidator = t.strictInterface({
 	image: t.optional(t.string),
 	tooltip: t.optional(t.string),
 	tool: t.optional(t.Instance),
-	id: t.number,
+	id: t.string,
 	name: t.optional(t.string),
 	metadata: t.any, // It would be t.map(t.string, t.unknown), but some limitations
 }) as t.check<tool>;
+
+const positionValidator = t.strictInterface({
+	toolbar: t.array(t.string),
+	inventory: t.array(t.string),
+});
 
 /**
  * Sync remotes using `@rbxts/remo`!
@@ -40,6 +45,15 @@ export const backpackSyncRemotes = createRemotes(
 		syncState: remote<Client, [payload: backpackSyncPayload]>(),
 		requestState: remote<Server>(),
 		equipTool: remote<Server, [tool: tool | undefined]>(t.optional(toolValidator)).returns(t.boolean),
+		hydratePositions: remote<
+			Server,
+			[
+				payload: {
+					toolbar: string[];
+					inventory: string[];
+				},
+			]
+		>(positionValidator),
 	},
 	//loggerMiddleware,
 );

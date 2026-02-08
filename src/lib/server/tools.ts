@@ -1,4 +1,4 @@
-import { getCount } from "../utils/increment";
+import { getId } from "../utils/increment";
 import { modify_client, retrieve_client } from "./clients";
 
 export interface tool {
@@ -6,7 +6,7 @@ export interface tool {
 	tooltip?: string;
 	tool?: Tool;
 	name?: string;
-	id: number;
+	id: string;
 	metadata: { [key: string]: unknown }; // Map<string, unknown>;
 }
 
@@ -15,6 +15,7 @@ export interface toolData {
 	tooltip?: string;
 	name?: string;
 	tool?: Tool;
+	id?: string;
 	metadata?: { [key: string]: unknown }; // Map<string, unknown>;
 }
 
@@ -25,15 +26,15 @@ export interface toolData {
  * @param toolData The tool
  * @returns The `id` of the tool
  */
-export function add_tool(client: Player, toolData: toolData): number {
+export function add_tool(client: Player, toolData: toolData): string {
 	if (!retrieve_client(client)) {
 		warn("Client is not registered yet!");
-		return -1;
+		return "";
 	}
 
 	const data = {
 		...toolData,
-		id: getCount(),
+		id: toolData.id ?? getId(),
 		metadata: toolData.metadata ?? {}, //new Map<string, unknown>(),
 	};
 
@@ -53,7 +54,7 @@ export function add_tool(client: Player, toolData: toolData): number {
  * @param client The client to remove from
  * @param id The tool id to remove
  */
-export function remove_tool(client: Player, id: number) {
+export function remove_tool(client: Player, id: string) {
 	if (!retrieve_client(client)) {
 		warn("Client is not registered yet!");
 		return;

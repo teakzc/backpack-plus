@@ -4,7 +4,13 @@ import { TextLabel } from "../core/text";
 import { TextBox } from "../core/textbox";
 import { Scrolling } from "../core/scrolling";
 import { useAtom } from "@rbxts/react-charm";
-import { backpackState, filterList, backpackSelectionState, inventoryVisibilityState, mountedAtoms } from "../../atoms";
+import {
+	inventoryState,
+	filterList,
+	backpackSelectionState,
+	inventoryVisibilityState,
+	mountedAtoms,
+} from "../../atoms";
 import { Slot } from "./slot";
 import { BACKPACK_PROPERTIES } from "../../core";
 import { FuzzyScoreSorting } from "@rbxts/fuzzy-search/out/Sorting/FuzzyScoreSorting";
@@ -56,7 +62,7 @@ function filterBackpack(text: string, backpack: (tool | "drag")[]) {
 export function Backpack() {
 	const px = usePx();
 
-	const backpack = useAtom(() => backpackState());
+	const backpack = useAtom(() => inventoryState());
 	const text = useAtom(() => BACKPACK_PROPERTIES.BACKPACK_TEXT());
 	const visible = useAtom(() => inventoryVisibilityState());
 	const [filter, setFilter] = useState<tool[]>(backpack.filter((V) => V !== "drag"));

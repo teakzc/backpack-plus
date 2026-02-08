@@ -1,9 +1,10 @@
 import { Root } from "@rbxts/react-roblox";
 import React from "@rbxts/react";
-import { mountedAtoms } from "./atoms";
+import { inventoryVisibilityState, mountedAtoms } from "./atoms";
 import { BACKPACK_PROPERTIES, toggle_inventory } from "./core";
 import { App } from "./ui/app";
 import { Icon } from "@rbxts/topbar-plus";
+import { subscribe } from "@rbxts/charm";
 
 /**
  * Renders the inventory
@@ -19,10 +20,28 @@ export function render_backpack(root: Root) {
 		.setImage("rbxasset://textures/ui/TopBar/inventoryOff.png", "Deselected")
 		.setOrder(-1)
 		.setCaption("Toggle Inventory")
-		.setImageScale(1)
-		.toggled.Connect(() => {
-			toggle_inventory();
-		});
+		.bindToggleKey(Enum.KeyCode.Backquote)
+		.setImageScale(1);
+
+	let debounce = true;
+
+	inventoryToggleIcon.toggled.Connect(() => {
+		if (!debounce) return;
+
+		toggle_inventory();
+	});
+
+	subscribe(inventoryVisibilityState, (state) => {
+		debounce = false;
+
+		if (state) {
+			inventoryToggleIcon.select();
+		} else {
+			inventoryToggleIcon.deselect();
+		}
+
+		debounce = true;
+	});
 }
 
 /**

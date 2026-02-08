@@ -4,7 +4,7 @@ import { equippedRegistry } from "../shared/networking";
 import { Players } from "@rbxts/services";
 
 /**
- * @hidden
+ * True when inventory is visible
  */
 export const inventoryVisibilityState = atom<boolean>(false);
 
@@ -16,7 +16,7 @@ export const toolbarState = atom<(tool | "empty" | "drag")[]>([]); // Inside the
 /**
  * @hidden
  */
-export const backpackState = atom<(tool | "drag")[]>([]); // Inside the full inventory
+export const inventoryState = atom<(tool | "drag")[]>([]); // Inside the full inventory
 
 /**
  * @hidden
