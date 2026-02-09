@@ -1,6 +1,6 @@
 import { atom, Atom } from "@rbxts/charm";
 import { SyncPayload } from "@rbxts/charm-sync";
-import { Client, createRemotes, remote, Server } from "@rbxts/remo";
+import { Client, createRemotes, loggerMiddleware, remote, Server } from "@rbxts/remo";
 import { tool } from "../server";
 import { t } from "@rbxts/t";
 
@@ -28,32 +28,27 @@ const toolValidator = t.strictInterface({
 	id: t.string,
 	name: t.optional(t.string),
 	metadata: t.any, // It would be t.map(t.string, t.unknown), but some limitations
+	position: t.optional(t.union(t.number, t.literal("inventory"))),
 }) as t.check<tool>;
 
 const positionValidator = t.strictInterface({
-	toolbar: t.array(t.string),
+	toolbar: t.map(t.string, t.number),
 	inventory: t.array(t.string),
 });
+
+export type idArangement = {
+	toolbar: Map<string, number>;
+	inventory: string[];
+};
 
 /**
  * Sync remotes using `@rbxts/remo`!
  *
  * @hidden
  */
-export const backpackSyncRemotes = createRemotes(
-	{
-		syncState: remote<Client, [payload: backpackSyncPayload]>(),
-		requestState: remote<Server>(),
-		equipTool: remote<Server, [tool: tool | undefined]>(t.optional(toolValidator)).returns(t.boolean),
-		hydratePositions: remote<
-			Server,
-			[
-				payload: {
-					toolbar: string[];
-					inventory: string[];
-				},
-			]
-		>(positionValidator),
-	},
-	//loggerMiddleware,
-);
+export const backpackSyncRemotes = createRemotes({
+	syncState: remote<Client, [payload: backpackSyncPayload]>(),
+	requestState: remote<Server>(),
+	equipTool: remote<Server, [tool: tool | undefined]>(t.optional(toolValidator)).returns(t.boolean),
+	hydratePositions: remote<Server, [payload: idArangement]>(positionValidator),
+});

@@ -5,9 +5,13 @@ import {
 	equippedRegistry,
 	backpackSyncPayload,
 	backpackSyncRemotes,
+	idArangement,
 } from "../shared/networking";
 import { set } from "@rbxts/sift/out/Dictionary";
 import { CollectionService } from "@rbxts/services";
+import { atom } from "@rbxts/charm";
+
+const idArrangementRegistry = atom<Map<string, idArangement>>(new Map());
 
 /**
  * Sets up a client for adding tools to their backpack.
@@ -70,6 +74,13 @@ export function clear_client(client: Player) {
 
 		return cloned;
 	});
+
+	idArrangementRegistry((current) => {
+		const clone = table.clone(current);
+		clone.delete(client.Name);
+
+		return clone;
+	});
 }
 
 /**
@@ -91,6 +102,44 @@ export function remove_client(client: Player) {
  */
 export function remove_all() {
 	clientRegistry({});
+}
+
+/**
+ * [INFO]
+ * This is now the client to server tool updates
+ */
+
+let toolCallback = function (client: Player, arragement: idArangement) {};
+
+backpackSyncRemotes.hydratePositions.connect((client, payload) => {
+	idArrangementRegistry((current) => {
+		const clone = table.clone(current);
+		clone.set(client.Name, payload);
+
+		return clone;
+	});
+
+	toolCallback(client, payload);
+});
+
+/**
+ * Listens to tool arrangement changes that then you can apply updates to your datastore to remember the player's tool arrangement
+ *
+ * Arangement consists of {
+ *     toolbar: {
+ *         [the toolbar slot (0 to 9)]: toolId
+ *     },
+ *     inventory: toolId[] // toolId as in string
+ * }
+ *
+ * For example, if you have a inventory that acts as the source of truth which is synced to create/remove tools to players
+ *
+ * You can use this function to apply updates to the tools to hold the position value, so then next time you can specify what position the tool will be placed in
+ *
+ * @param callback (client, arangement) => void
+ */
+export function on_tool_move(callback: (client: Player, arrangement: idArangement) => void) {
+	toolCallback = callback;
 }
 
 /**

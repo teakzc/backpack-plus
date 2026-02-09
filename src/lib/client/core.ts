@@ -38,10 +38,23 @@ backpackSyncRemotes.requestState.fire();
 // CORE FUNCTION BELOW
 
 const backpackState = computed(() => {
+	const toolbarMap = new Map<string, number>();
+	const toolbar = toolbarState();
+
+	// Sets from 1 to 10
+
+	for (const tool of toolbar) {
+		if (tool === "drag" || tool === "empty") continue;
+
+		const index = toolbar.findIndex((V) => V === tool);
+
+		if (index === -1) continue;
+
+		toolbarMap.set(tool.id, index + 1);
+	}
+
 	return {
-		toolbar: toolbarState().map((value) => {
-			return value !== "drag" && value !== "empty" ? value.id : undefined;
-		}),
+		toolbar: toolbarMap,
 		inventory: inventoryState()
 			.map((value) => {
 				return value !== "drag" ? value.id : undefined;
@@ -51,7 +64,8 @@ const backpackState = computed(() => {
 });
 
 subscribe(backpackState, (current) => {
-	backpackSyncRemotes;
+	print(current, " to be processed");
+	backpackSyncRemotes.hydratePositions.fire(current);
 });
 
 // CLIENT TO SERVER TOOLSLOT SYNC
@@ -137,10 +151,7 @@ export function customize_backpack(data: backpackData) {
 	}
 }
 
-observe(backpack, (tool) => {
-	// Check if we can fill the slots
-
-	const newTool = table.clone(tool);
+function fillBackpack(tool: tool) {
 	const currentState = toolbarState();
 
 	let fill = false;
@@ -149,7 +160,7 @@ observe(backpack, (tool) => {
 		if (currentState[i] === "empty") {
 			// Empty slot, so assign
 			toolbarState((current) => {
-				return set(current, i + 1, newTool);
+				return set(current, i + 1, tool);
 			});
 
 			fill = true;
@@ -160,10 +171,41 @@ observe(backpack, (tool) => {
 
 	if (!fill) {
 		// Is full, so go into inventory
-		inventoryState((current) => push(current, newTool));
+		inventoryState((current) => push(current, tool));
+	}
+}
+
+observe(backpack, (tool) => {
+	// Check if we can fill the slots
+
+	const newTool = table.clone(tool);
+
+	const pos = newTool.position;
+
+	print(toolbarState());
+
+	if (pos !== undefined) {
+		if (pos === "inventory") {
+			newTool.position = undefined;
+			inventoryState((current) => push(current, newTool));
+		} else if (typeIs(pos, "number")) {
+			toolbarState((current) => {
+				if (current[pos] === "empty" || current[pos] === "drag") {
+					// We can fill it
+
+					newTool.position = undefined;
+
+					return set(current, pos, newTool);
+				} else return current;
+			});
+		}
+	} else {
+		fillBackpack(newTool);
 	}
 
 	return () => {
+		// Removes it
+
 		toolbarState((current) => {
 			const clone = table.clone(current);
 

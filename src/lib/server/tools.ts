@@ -8,6 +8,7 @@ export interface tool {
 	name?: string;
 	id: string;
 	metadata: { [key: string]: unknown }; // Map<string, unknown>;
+	position?: number | "inventory";
 }
 
 export interface toolData {
@@ -24,9 +25,10 @@ export interface toolData {
  *
  * @param client The client to add to
  * @param toolData The tool
+ * @param position The positon of the tool to put in
  * @returns The `id` of the tool
  */
-export function add_tool(client: Player, toolData: toolData): string {
+export function add_tool(client: Player, toolData: toolData, position?: number | "inventory"): string {
 	if (!retrieve_client(client)) {
 		warn("Client is not registered yet!");
 		return "";
@@ -36,6 +38,7 @@ export function add_tool(client: Player, toolData: toolData): string {
 		...toolData,
 		id: toolData.id ?? getId(),
 		metadata: toolData.metadata ?? {}, //new Map<string, unknown>(),
+		position: position,
 	};
 
 	modify_client(client, (current) => {
