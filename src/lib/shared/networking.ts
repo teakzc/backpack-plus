@@ -36,7 +36,7 @@ const positionValidator = t.strictInterface({
 	inventory: t.array(t.string),
 });
 
-export type idArangement = {
+export type idArrangement = {
 	toolbar: Map<string, number>;
 	inventory: string[];
 };
@@ -50,5 +50,5 @@ export const backpackSyncRemotes = createRemotes({
 	syncState: remote<Client, [payload: backpackSyncPayload]>(),
 	requestState: remote<Server>(),
 	equipTool: remote<Server, [tool: tool | undefined]>(t.optional(toolValidator)).returns(t.boolean),
-	hydratePositions: remote<Server, [payload: idArangement]>(positionValidator),
+	hydratePositions: remote<Server, [payload: idArrangement]>(positionValidator),
 });

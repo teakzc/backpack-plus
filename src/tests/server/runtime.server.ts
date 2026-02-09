@@ -1,92 +1,72 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { add_tool, register_client, remove_all, remove_client } from "../../lib/server";
+import { add_tool, on_tool_move, register_client, remove_all, remove_client } from "../../lib/server";
 
 print("[INFO]: SERVER RUNTIME INITIALIZED");
+
+on_tool_move((c, asdasd) => {});
 
 Players.PlayerAdded.Connect((client) => {
 	print(`[INFO]: REGISTERING ${client.Name}`);
 
 	register_client(client);
 
-	add_tool(
-		client,
-		{
-			name: "Sword",
-			tooltip: "mighty",
-			metadata: {
-				type: "sword",
-				rarity: "epic",
-			},
-			tool: ReplicatedStorage.ClassicSword,
+	add_tool(client, {
+		name: "Sword",
+		tooltip: "mighty",
+		metadata: {
+			type: "sword",
+			rarity: "epic",
 		},
-		1,
-	);
+		tool: ReplicatedStorage.ClassicSword,
+	});
 
-	add_tool(
-		client,
-		{
-			name: "Murasama",
-			tooltip: "There will be blood!",
-			metadata: {
-				type: "katana",
-				rarity: "epic",
-			},
-			tool: ReplicatedStorage.Sword,
+	add_tool(client, {
+		name: "Murasama",
+		tooltip: "There will be blood!",
+		metadata: {
+			type: "katana",
+			rarity: "epic",
 		},
-		0,
-	);
+		tool: ReplicatedStorage.Sword,
+	});
 
-	add_tool(
-		client,
-		{
-			name: "Spear of Justice",
-			tooltip: "undying",
-			metadata: {
-				type: "spear",
-				rarity: "legendary",
-			},
+	add_tool(client, {
+		name: "nothing?",
+		tooltip: "it may be useful",
+		image: "rbxassetid://113226473170832",
+		metadata: {
+			type: "misc",
+			rarity: "legendary",
 		},
-		3,
-	);
+	});
 
-	add_tool(
-		client,
-		{
-			name: "A NUCLEAR BOMB",
-			tooltip: "i have become death destroyer of worlds",
-			metadata: {
-				type: "explosive",
-				rarity: "legendary",
-			},
+	add_tool(client, {
+		name: "sandwich",
+		tooltip: "yummy!",
+		image: "rbxassetid://74663209541357",
+		metadata: {
+			type: "food",
+			rarity: "legendary",
 		},
-		2,
-	);
+	});
 
-	add_tool(
-		client,
-		{
-			name: "Twilight",
-			tooltip: "there is a monster in the forest",
-			metadata: {
-				type: "sword",
-				rarity: "common",
-			},
+	add_tool(client, {
+		name: "Twilight",
+		tooltip: "there is a monster in the forest",
+		metadata: {
+			type: "sword",
+			rarity: "common",
 		},
-		"inventory",
-	);
+	});
 
-	add_tool(
-		client,
-		{
-			name: "bow",
-			tooltip: "PLACEHOLDER TOOLTIP",
-			metadata: {
-				type: "bow",
-				rarity: "common",
-			},
+	add_tool(client, {
+		name: "bow",
+		tooltip: "PLACEHOLDER TOOLTIP",
+		metadata: {
+			type: "bow",
+			rarity: "common",
 		},
-		"inventory",
-	);
+	});
 });
 
 Players.PlayerRemoving.Connect((client) => {

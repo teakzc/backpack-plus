@@ -41,7 +41,7 @@ const backpackState = computed(() => {
 	const toolbarMap = new Map<string, number>();
 	const toolbar = toolbarState();
 
-	// Sets from 1 to 10
+	// Sets from 0 to 9
 
 	for (const tool of toolbar) {
 		if (tool === "drag" || tool === "empty") continue;
@@ -50,7 +50,7 @@ const backpackState = computed(() => {
 
 		if (index === -1) continue;
 
-		toolbarMap.set(tool.id, index + 1);
+		toolbarMap.set(tool.id, index);
 	}
 
 	return {
@@ -64,7 +64,6 @@ const backpackState = computed(() => {
 });
 
 subscribe(backpackState, (current) => {
-	print(current, " to be processed");
 	backpackSyncRemotes.hydratePositions.fire(current);
 });
 
@@ -181,8 +180,6 @@ observe(backpack, (tool) => {
 	const newTool = table.clone(tool);
 
 	const pos = newTool.position;
-
-	print(toolbarState());
 
 	if (pos !== undefined) {
 		if (pos === "inventory") {

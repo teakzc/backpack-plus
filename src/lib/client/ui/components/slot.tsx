@@ -172,6 +172,9 @@ export function Slot(props: slotProps) {
 					if (!props.disableIndex) {
 						backpackSelectionState(undefined);
 					}
+
+					Players.LocalPlayer.GetMouse().Icon =
+						"rbxasset://textures/Cursors/KeyboardMouse/ArrowFarCursor.png";
 				}}
 				onClick={() => {
 					if (props.tool !== "drag" && props.tool !== "empty")

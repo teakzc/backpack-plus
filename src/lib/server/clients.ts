@@ -5,13 +5,13 @@ import {
 	equippedRegistry,
 	backpackSyncPayload,
 	backpackSyncRemotes,
-	idArangement,
+	idArrangement,
 } from "../shared/networking";
 import { set } from "@rbxts/sift/out/Dictionary";
 import { CollectionService } from "@rbxts/services";
 import { atom } from "@rbxts/charm";
 
-const idArrangementRegistry = atom<Map<string, idArangement>>(new Map());
+const idArrangementRegistry = atom<Map<string, idArrangement>>(new Map());
 
 /**
  * Sets up a client for adding tools to their backpack.
@@ -109,7 +109,7 @@ export function remove_all() {
  * This is now the client to server tool updates
  */
 
-let toolCallback = function (client: Player, arragement: idArangement) {};
+let toolCallback = function (client: Player, arragement: idArrangement) {};
 
 backpackSyncRemotes.hydratePositions.connect((client, payload) => {
 	idArrangementRegistry((current) => {
@@ -125,7 +125,7 @@ backpackSyncRemotes.hydratePositions.connect((client, payload) => {
 /**
  * Listens to tool arrangement changes that then you can apply updates to your datastore to remember the player's tool arrangement
  *
- * Arangement consists of {
+ * Arrangement consists of {
  *     toolbar: {
  *         [the toolbar slot (0 to 9)]: toolId
  *     },
@@ -136,9 +136,9 @@ backpackSyncRemotes.hydratePositions.connect((client, payload) => {
  *
  * You can use this function to apply updates to the tools to hold the position value, so then next time you can specify what position the tool will be placed in
  *
- * @param callback (client, arangement) => void
+ * @param callback (client, arrangement) => void
  */
-export function on_tool_move(callback: (client: Player, arrangement: idArangement) => void) {
+export function on_tool_move(callback: (client: Player, arrangement: idArrangement) => void) {
 	toolCallback = callback;
 }
 

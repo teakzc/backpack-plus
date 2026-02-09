@@ -16,6 +16,7 @@
 - Easy customization by mounting in react components
 - Easily manage player's inventory states by using `atom`s from littensy/charm
 - Attach metadata to `tool`s
+- Preserve toolbar slot arrangement
 - Inventory filtering system that compliments `tool` metadata + fuzzy searching
 - Listen to what the player does (Mouse hover selection, tool dragging & others)
 - Automatic server to client replication using `charm-sync`
@@ -120,4 +121,49 @@ clear_filters(); // Nevermind
 filterList((current) => {
     // Do something with it!
 })
+```
+
+How do you preserve the toolbar arrangement?
+
+Note: If you want to preserve the arrangement you should provide `id` from the source of truth's tool when adding tools
+
+```ts
+import { on_tool_move } from "backpack-plus
+
+function where(id: string, arrangement) {
+    // search through and find
+    return location
+}
+
+// type idArrangement = {
+// 	toolbar: Map<string, number>;
+// 	inventory: string[];
+// };
+
+on_tool_move((client, arrangement: idArrangement) => {
+    // Apply updates to the real inventory
+
+    for (const tool of realInventory) {
+        // save this to datastore of the arrangement
+        const position = where(tool.Id, arrangement) as number | string
+
+        if (position === undefined) continue
+
+        tool.Position = position
+    }
+})
+```
+
+Now we can apply them next time
+
+```ts
+import { add_tool } from "backpack-plus"
+
+for (const tool of realInventory) {
+    add_tool(client, {
+        name: tool.Name,
+        tooltip: tool.Tooltip,
+        tool: tool.Tool,
+    }, tool.Position);
+}
 ```
