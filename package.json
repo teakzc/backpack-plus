@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/backpack-plus",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"description": "A modern Roblox backpack made /w React & inspired by ryanlua/satchel",
 	"main": "out/lib/init.luau",
 	"scripts": {
@@ -57,7 +57,6 @@
 		"@rbxts/ripple": "^0.10.1",
 		"@rbxts/services": "^1.6.0",
 		"@rbxts/sift": "^0.0.11",
-		"@rbxts/t": "^3.2.1",
-		"@rbxts/topbar-plus": "^3.2.5"
+		"@rbxts/t": "^3.2.1"
 	}
 }

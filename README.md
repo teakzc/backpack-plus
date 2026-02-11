@@ -36,7 +36,6 @@ npm add @rbxts/backpack-plus
 
 ### Main Dependancies
 
-- 1ForeverHD/TopbarPlus
 - littensy/charm
 - littensy/remo
 - littensy/rbxts-react
