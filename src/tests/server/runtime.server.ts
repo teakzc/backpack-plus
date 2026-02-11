@@ -1,13 +1,7 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { add_tool, on_tool_move, register_client, remove_all, remove_client } from "../../lib/server";
-
-print("[INFO]: SERVER RUNTIME INITIALIZED");
-
-on_tool_move((c, asdasd) => {});
+import { add_tool, register_client, remove_all, remove_client } from "../../lib/server";
 
 Players.PlayerAdded.Connect((client) => {
-	print(`[INFO]: REGISTERING ${client.Name}`);
-
 	register_client(client);
 
 	add_tool(client, {

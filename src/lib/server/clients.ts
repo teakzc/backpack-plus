@@ -104,23 +104,79 @@ export function remove_all() {
 	clientRegistry({});
 }
 
-/**
- * [INFO]
- * This is now the client to server tool updates
- */
-
 let toolCallback = function (client: Player, arragement: idArrangement) {};
 
-backpackSyncRemotes.hydratePositions.connect((client, payload) => {
-	idArrangementRegistry((current) => {
-		const clone = table.clone(current);
-		clone.set(client.Name, payload);
+/**
+ * Initializes the server
+ */
+export function initialize_backpack_server() {
+	backpackSyncRemotes.hydratePositions.connect((client, payload) => {
+		idArrangementRegistry((current) => {
+			const clone = table.clone(current);
+			clone.set(client.Name, payload);
 
-		return clone;
+			return clone;
+		});
+
+		toolCallback(client, payload);
 	});
 
-	toolCallback(client, payload);
-});
+	const syncer = server({
+		atoms: {
+			clientRegistry: clientRegistry,
+			equippedRegistry: equippedRegistry,
+		},
+		interval: 0,
+		preserveHistory: false,
+		autoSerialize: true,
+	});
+
+	syncer.connect((client, payload) => {
+		backpackSyncRemotes.syncState.fire(client, filterPayload(client, payload));
+	});
+
+	backpackSyncRemotes.requestState.connect((client) => {
+		syncer.hydrate(client);
+	});
+
+	backpackSyncRemotes.equipTool.onRequest((client, tool) => {
+		// Check if they have the tool
+
+		const backpack = retrieve_client(client);
+
+		if (!backpack) return false;
+
+		CollectionService.GetTagged(`BACKPACK_PLUS_${client.Name}`).forEach((tool) => tool.Destroy());
+
+		if (tool === undefined) {
+			equippedRegistry((current) => set(current, client.Name, undefined));
+
+			return true;
+		}
+
+		const index = backpack.findIndex((V) => V.id === tool.id);
+
+		if (index !== -1 && index !== undefined) {
+			// Set equipped
+			equippedRegistry((current) => set(current, client.Name, tool));
+
+			// Give tool
+
+			if (tool.tool) {
+				const clone = tool.tool.Clone();
+				clone.Parent = client.Character;
+
+				CollectionService.AddTag(clone, `BACKPACK_PLUS_${client.Name}`);
+			}
+
+			return true;
+		}
+
+		// Did not find, so no
+
+		return false;
+	});
+}
 
 /**
  * Listens to tool arrangement changes that then you can apply updates to your datastore to remember the player's tool arrangement
@@ -141,12 +197,6 @@ backpackSyncRemotes.hydratePositions.connect((client, payload) => {
 export function on_tool_move(callback: (client: Player, arrangement: idArrangement) => void) {
 	toolCallback = callback;
 }
-
-/**
- * [INFO]
- * - Here lies the sync logic using `charm-sync`
- * - Comment out during jest-testing...
- */
 
 function filterPayload(client: Player, payload: backpackSyncPayload): backpackSyncPayload {
 	if (payload.type === "init") {
@@ -177,59 +227,3 @@ function filterPayload(client: Player, payload: backpackSyncPayload): backpackSy
 		},
 	};
 }
-
-const syncer = server({
-	atoms: {
-		clientRegistry: clientRegistry,
-		equippedRegistry: equippedRegistry,
-	},
-	interval: 0,
-	preserveHistory: false,
-	autoSerialize: true,
-});
-
-syncer.connect((client, payload) => {
-	backpackSyncRemotes.syncState.fire(client, filterPayload(client, payload));
-});
-
-backpackSyncRemotes.requestState.connect((client) => {
-	syncer.hydrate(client);
-});
-
-backpackSyncRemotes.equipTool.onRequest((client, tool) => {
-	// Check if they have the tool
-
-	const backpack = retrieve_client(client);
-
-	if (!backpack) return false;
-
-	CollectionService.GetTagged(`BACKPACK_PLUS_${client.Name}`).forEach((tool) => tool.Destroy());
-
-	if (tool === undefined) {
-		equippedRegistry((current) => set(current, client.Name, undefined));
-
-		return true;
-	}
-
-	const index = backpack.findIndex((V) => V.id === tool.id);
-
-	if (index !== -1 && index !== undefined) {
-		// Set equipped
-		equippedRegistry((current) => set(current, client.Name, tool));
-
-		// Give tool
-
-		if (tool.tool) {
-			const clone = tool.tool.Clone();
-			clone.Parent = client.Character;
-
-			CollectionService.AddTag(clone, `BACKPACK_PLUS_${client.Name}`);
-		}
-
-		return true;
-	}
-
-	// Did not find, so no
-
-	return false;
-});

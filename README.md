@@ -1,4 +1,3 @@
-
 <div align="center">
 
   <img src="https://raw.githubusercontent.com/teakzc/backpack-plus/refs/heads/main/logo.png" alt="questionable artwork" width="256" height="256"/>
@@ -8,10 +7,12 @@
 
     A modern Roblox backpack made /w React & inspired by ryanlua/satchel
 
-  [![License](https://img.shields.io/github/license/teakzc/backpack-plus?style=for-the-badge)](https://github.com/teakzc/backpack-plus/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/teakzc/backpack-plus?style=for-the-badge)](https://github.com/teakzc/backpack-plus/blob/main/LICENSE)
+
 </div>
 
 ## 🎒 What can backpack-plus do?
+
 - Provide a better alternative to Roblox's inventory
 - Easy customization by mounting in react components
 - Easily manage player's inventory states by using `atom`s from littensy/charm
@@ -22,15 +23,19 @@
 - Automatic server to client replication using `charm-sync`
 
 ## 💎 Credits
+
 - ryanlua/satchel for the backpack dimension calculations 🙏
 
 ## 📦 Installation
+
 [npm](https://www.npmjs.com/package/@rbxts/backpack-plus):
+
 ```zsh
 npm add @rbxts/backpack-plus
 ```
 
 ### Main Dependancies
+
 - 1ForeverHD/TopbarPlus
 - littensy/charm
 - littensy/remo
@@ -51,7 +56,9 @@ Start by setting up the server by registing clients
 
 ```ts
 import { Players } from "@rbxts/services";
-import { register_client, remove_client } from "backpack-plus";
+import { register_client, remove_client, initialize_backpack_server } from "backpack-plus";
+
+initialize_backpack_server();
 
 Players.PlayerAdded.Connect((client) => {
 	register_client(client); // Sets up the backpack and replication
@@ -60,7 +67,6 @@ Players.PlayerAdded.Connect((client) => {
 Players.PlayerRemoving.Connect((client) => {
 	remove_client(client);
 });
-
 ```
 
 Now also make sure you initialize the client!
@@ -70,7 +76,7 @@ import { initialize_backpack } from "backpack-plus";
 
 initialize_backpack({
     /**
-     * You can customize the inventory here, and change it via customize_backpack() 
+     * You can customize the inventory here, and change it via customize_backpack()
      */
 });
 
@@ -89,18 +95,18 @@ initialize_inputs(); // Helper function that detects keys 0-9 and opening/closin
 Lets give the player some tools now
 
 ```ts
-import { add_tool, remove_tool } from "backpack-plus"
+import { add_tool, remove_tool } from "backpack-plus";
 
 const toolID = add_tool(client, {
-    name: "Murasama",
-    tooltip: "There will be blood!",
-    metadata: {
-        // Useful for filtering between what type of tools you want to display
-        // For example: weapons, loot, chests etc.
-        type: "sword",
-        rarity: "epic",
-    },
-    tool: ReplicatedStorage.Assets.Murasama, // To be cloned and given to the player
+	name: "Murasama",
+	tooltip: "There will be blood!",
+	metadata: {
+		// Useful for filtering between what type of tools you want to display
+		// For example: weapons, loot, chests etc.
+		type: "sword",
+		rarity: "epic",
+	},
+	tool: ReplicatedStorage.Assets.Murasama, // To be cloned and given to the player
 });
 
 // Maybe we should remove the tool now?
@@ -110,7 +116,7 @@ remove_tool(client, toolID);
 What about adding filters to the inventory?
 
 ```ts
-import { clear_filters, add_filter, filterList } from "backpack-plus"
+import { clear_filters, add_filter, filterList } from "backpack-plus";
 
 add_filter((tool) => tool.metadata.type === "sword"); // I only want to see swords
 
@@ -119,8 +125,8 @@ clear_filters(); // Nevermind
 // Or directly manipulate the filter atom
 
 filterList((current) => {
-    // Do something with it!
-})
+	// Do something with it!
+});
 ```
 
 How do you preserve the toolbar arrangement?
@@ -157,13 +163,17 @@ on_tool_move((client, arrangement: idArrangement) => {
 Now we can apply them next time
 
 ```ts
-import { add_tool } from "backpack-plus"
+import { add_tool } from "backpack-plus";
 
 for (const tool of realInventory) {
-    add_tool(client, {
-        name: tool.Name,
-        tooltip: tool.Tooltip,
-        tool: tool.Tool,
-    }, tool.Position);
+	add_tool(
+		client,
+		{
+			name: tool.Name,
+			tooltip: tool.Tooltip,
+			tool: tool.Tool,
+		},
+		tool.Position,
+	);
 }
 ```

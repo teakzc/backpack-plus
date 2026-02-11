@@ -16,59 +16,6 @@ import {
 	clickOffState,
 } from "./atoms";
 
-export const backpack = computed(() => {
-	return clientRegistry()[Players.LocalPlayer?.Name ?? "MOCK_CLIENT"] ?? [];
-});
-
-const clientSyncer = client({
-	atoms: {
-		clientRegistry: clientRegistry,
-		equippedRegistry: equippedRegistry,
-	},
-	ignoreUnhydrated: true,
-});
-
-backpackSyncRemotes.syncState.connect((payload) => {
-	clientSyncer.sync(payload);
-});
-
-backpackSyncRemotes.requestState.fire();
-
-// CHARM-SYNC ABOVE
-// CORE FUNCTION BELOW
-
-const backpackState = computed(() => {
-	const toolbarMap = new Map<string, number>();
-	const toolbar = toolbarState();
-
-	// Sets from 0 to 9
-
-	for (const tool of toolbar) {
-		if (tool === "drag" || tool === "empty") continue;
-
-		const index = toolbar.findIndex((V) => V === tool);
-
-		if (index === -1) continue;
-
-		toolbarMap.set(tool.id, index);
-	}
-
-	return {
-		toolbar: toolbarMap,
-		inventory: inventoryState()
-			.map((value) => {
-				return value !== "drag" ? value.id : undefined;
-			})
-			.filterUndefined(),
-	};
-});
-
-subscribe(backpackState, (current) => {
-	backpackSyncRemotes.hydratePositions.fire(current);
-});
-
-// CLIENT TO SERVER TOOLSLOT SYNC
-
 export const BACKPACK_PROPERTIES = {
 	TOOLBAR_AMOUNT: 10,
 	SCORE_THRESHOLD: 0.3,
@@ -115,6 +62,107 @@ export function initialize_backpack({
 	toolbarState(slotsSetup as (tool | "empty" | "drag")[]);
 
 	StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false);
+
+	const clientSyncer = client({
+		atoms: {
+			clientRegistry: clientRegistry,
+			equippedRegistry: equippedRegistry,
+		},
+		ignoreUnhydrated: true,
+	});
+
+	backpackSyncRemotes.syncState.connect((payload) => {
+		clientSyncer.sync(payload);
+	});
+
+	backpackSyncRemotes.requestState.fire();
+
+	const backpackState = computed(() => {
+		const toolbarMap = new Map<string, number>();
+		const toolbar = toolbarState();
+
+		// Sets from 1 to 10œ
+
+		for (const tool of toolbar) {
+			if (tool === "drag" || tool === "empty") continue;
+
+			const index = toolbar.findIndex((V) => V === tool);
+
+			if (index === -1) continue;
+
+			toolbarMap.set(tool.id, index + 1);
+		}
+
+		return {
+			toolbar: toolbarMap,
+			inventory: inventoryState()
+				.map((value) => {
+					return value !== "drag" ? value.id : undefined;
+				})
+				.filterUndefined(),
+		};
+	});
+
+	subscribe(backpackState, (current) => {
+		backpackSyncRemotes.hydratePositions.fire(current);
+	});
+
+	const backpack = computed(() => {
+		return clientRegistry()[Players.LocalPlayer?.Name ?? "MOCK_CLIENT"] ?? [];
+	});
+
+	observe(backpack, (tool) => {
+		// Check if we can fill the slots
+
+		const newTool = table.clone(tool);
+
+		const pos = newTool.position;
+
+		if (pos !== undefined) {
+			if (pos === "inventory") {
+				newTool.position = undefined;
+				inventoryState((current) => push(current, newTool));
+			} else if (typeIs(pos, "number")) {
+				toolbarState((current) => {
+					if (current[pos] === "empty" || current[pos] === "drag") {
+						// We can fill it
+
+						newTool.position = undefined;
+
+						return set(current, pos, newTool);
+					} else return current;
+				});
+			}
+		} else {
+			fillBackpack(newTool);
+		}
+
+		return () => {
+			// Removes it
+
+			toolbarState((current) => {
+				const clone = table.clone(current);
+
+				for (let i = 0; i < BACKPACK_PROPERTIES.TOOLBAR_AMOUNT; i++) {
+					const toolCheck = clone[i];
+
+					if (toolCheck === "drag" || toolCheck === "empty") continue;
+
+					if (toolCheck.id !== newTool.id) continue;
+
+					// Tool ID matching
+					// So remove it by assigning empty, not undefined because it might crash out :skull:
+					clone[i] = "empty";
+
+					break;
+				}
+
+				return clone;
+			});
+
+			inventoryState((current) => removeValue(current, newTool));
+		};
+	});
 }
 
 /**
@@ -173,61 +221,6 @@ function fillBackpack(tool: tool) {
 		inventoryState((current) => push(current, tool));
 	}
 }
-
-observe(backpack, (tool) => {
-	// Check if we can fill the slots
-
-	const newTool = table.clone(tool);
-
-	const pos = newTool.position;
-
-	if (pos !== undefined) {
-		if (pos === "inventory") {
-			newTool.position = undefined;
-			inventoryState((current) => push(current, newTool));
-		} else if (typeIs(pos, "number")) {
-			toolbarState((current) => {
-				if (current[pos] === "empty" || current[pos] === "drag") {
-					// We can fill it
-
-					newTool.position = undefined;
-
-					return set(current, pos, newTool);
-				} else return current;
-			});
-		}
-	} else {
-		fillBackpack(newTool);
-	}
-
-	return () => {
-		// Removes it
-
-		toolbarState((current) => {
-			const clone = table.clone(current);
-
-			for (let i = 0; i < BACKPACK_PROPERTIES.TOOLBAR_AMOUNT; i++) {
-				const toolCheck = clone[i];
-
-				if (toolCheck === "drag" || toolCheck === "empty") continue;
-
-				if (toolCheck.id !== newTool.id) continue;
-
-				// Tool ID matching
-				// So remove it by assigning empty, not undefined because it might crash out :skull:
-				clone[i] = "empty";
-
-				break;
-			}
-
-			return clone;
-		});
-
-		inventoryState((current) => removeValue(current, newTool));
-	};
-});
-
-// Backpack Manipulation
 
 /**
  * Find the location of the `tool`
