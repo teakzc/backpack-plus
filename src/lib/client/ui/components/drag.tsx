@@ -1,16 +1,16 @@
+import { useMouse } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { draggingState } from "../../atoms";
-import { usePx } from "../hooks/usePx";
-import { useMotion, useMouse } from "@rbxts/pretty-react-hooks";
-import { Layer } from "../core/layer";
+import { BACKPACK_PROPERTIES, drop_tool } from "../../core";
 import { Button } from "../core/button";
 import { Frame } from "../core/frame";
-import { TextLabel } from "../core/text";
 import { Image } from "../core/image";
-import { drop_tool, BACKPACK_PROPERTIES } from "../../core";
+import { Layer } from "../core/layer";
+import { TextLabel } from "../core/text";
 import { BACKPACK_DIMENSIONS } from "../dimensions";
-import { GuiService, Players } from "@rbxts/services";
+import { usePx } from "../hooks/usePx";
+import { useSpring } from "@rbxts/react-ripple";
 
 /**
  * The tool dragging component with smooth animations while keeping it not buggy by:
@@ -27,7 +27,7 @@ export function Drag() {
 	const mouse = useMouse((V) => {
 		if (!dragState) return;
 		const offset = dragState.offset; // Get the stored offset
-		setPos.spring(UDim2.fromOffset(V.X - offset.X, V.Y - offset.Y), {
+		setPos.setGoal(UDim2.fromOffset(V.X - offset.X, V.Y - offset.Y), {
 			tension: 150,
 			friction: 15,
 		});
@@ -38,14 +38,14 @@ export function Drag() {
 
 		const mousePos = mouse.getValue();
 		const value = UDim2.fromOffset(mousePos.X - dragState.offset.X, mousePos.Y - dragState.offset.Y);
-		setPos.set(value);
-		setPos.spring(value);
+		setPos.setPosition(value);
+		setPos.setGoal(value);
 
-		setRot.spring(0, { tension: 200, friction: 5, mass: 0.5, impulse: 0.2 });
+		setRot.setGoal(0, { tension: 200, friction: 5, mass: 0.5, impulse: 500 });
 	}, [dragState]);
 
-	const [pos, setPos] = useMotion(new UDim2());
-	const [rot, setRot] = useMotion(0);
+	const [pos, setPos] = useSpring(new UDim2());
+	const [rot, setRot] = useSpring(0);
 
 	if (!dragState) return;
 

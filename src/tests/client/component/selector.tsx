@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { add_filter, clear_filters } from "../../../lib";
-import { getBindingValue, useMotion } from "@rbxts/pretty-react-hooks";
+import { getBindingValue } from "@rbxts/pretty-react-hooks";
 import { usePx } from "../../../lib/client/ui/hooks/usePx";
 import { Button } from "./button";
 import { TextLabel } from "../../../lib/client/ui/core/text";
+import { useSpring } from "@rbxts/react-ripple";
 
 export interface selectorButtonProps {
 	color: Color3 | React.Binding<Color3>;
@@ -19,15 +20,15 @@ export function SelectorButtons(props: selectorButtonProps) {
 	const [hovered, setHovered] = useState(false);
 	const [pressed, setPressed] = useState(false);
 
-	const [mainSize, setMainSize] = useMotion(1);
+	const [mainSize, setMainSize] = useSpring(1);
 
 	useEffect(() => {
 		if (pressed) {
-			setMainSize.spring(0.8, { impulse: -0.0045, damping: 0.75, tension: 300 });
+			setMainSize.setGoal(0.8, { impulse: -4.5, dampingRatio: 0.75, tension: 300 });
 		} else if (hovered) {
-			setMainSize.spring(1.2, { friction: 13, tension: 200, impulse: 0.003 });
+			setMainSize.setGoal(1.2, { friction: 13, tension: 200, impulse: 3 });
 		} else {
-			setMainSize.spring(1, { damping: 0.4, tension: 500, velocity: -0.0004 });
+			setMainSize.setGoal(1, { dampingRatio: 0.4, tension: 500, velocity: -0.0004 });
 		}
 	}, [pressed, hovered]);
 
@@ -49,7 +50,7 @@ export function SelectorButtons(props: selectorButtonProps) {
 			onClick={() => {
 				setPressed(false);
 				props.fn();
-				setMainSize.impulse(0.001);
+				setMainSize.impulse(1);
 			}}
 		>
 			<TextLabel strokeTransparency={0.5} size={UDim2.fromScale(0.9, 0.7)} text={props.text} />

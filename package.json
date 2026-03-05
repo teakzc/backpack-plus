@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/backpack-plus",
-	"version": "1.1.2",
+	"version": "1.2.0",
 	"description": "A modern Roblox backpack made /w React & inspired by ryanlua/satchel",
 	"main": "out/lib/init.luau",
 	"scripts": {
@@ -34,6 +34,7 @@
 		"@rbxts/coverage": "^0.1.3",
 		"@rbxts/jest": "^3.13.3-ts.1",
 		"@rbxts/jest-globals": "^3.13.3-ts.1",
+		"@rbxts/topbarplus": "^1.0.9",
 		"@rbxts/types": "^1.0.903",
 		"@typescript-eslint/eslint-plugin": "^8.53.1",
 		"@typescript-eslint/parser": "^8.53.1",
@@ -52,9 +53,10 @@
 		"@rbxts/pretty-react-hooks": "^0.6.4",
 		"@rbxts/react": "^17.3.7-ts.1",
 		"@rbxts/react-charm": "^0.3.0",
+		"@rbxts/react-ripple": "^3.0.1",
 		"@rbxts/react-roblox": "^17.3.7-ts.1",
-		"@rbxts/remo": "^1.5.2",
-		"@rbxts/ripple": "^0.10.1",
+		"@rbxts/remo": "^1.5.3",
+		"@rbxts/ripple": "^0.10.2",
 		"@rbxts/services": "^1.6.0",
 		"@rbxts/sift": "^0.0.11",
 		"@rbxts/t": "^3.2.1"

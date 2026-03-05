@@ -1,5 +1,7 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { add_tool, register_client, remove_all, remove_client } from "../../lib/server";
+import { add_tool, initialize_backpack_server, register_client, remove_all, remove_client } from "../../lib/server";
+
+initialize_backpack_server();
 
 Players.PlayerAdded.Connect((client) => {
 	register_client(client);

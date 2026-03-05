@@ -9,9 +9,10 @@ import { TextLabel } from "../core/text";
 import { Image } from "../core/image";
 import { backpackSyncRemotes } from "../../../shared/networking";
 import { draggingState, equippedState, backpackSelectionState, inventoryVisibilityState } from "../../atoms";
-import { useMotion, useMouse } from "@rbxts/pretty-react-hooks";
+import { useMouse } from "@rbxts/pretty-react-hooks";
 import { BACKPACK_DIMENSIONS } from "../dimensions";
 import { usePx } from "../hooks/usePx";
+import { useSpring } from "@rbxts/react-ripple";
 
 interface slotProps extends React.PropsWithChildren {
 	layoutOrder: number;
@@ -36,7 +37,7 @@ export function Slot(props: slotProps) {
 	const [hover, setHover] = useState(false);
 	const [down, setDown] = useState(false);
 
-	const [tooltipSize, setTooltipSize] = useMotion(0);
+	const [tooltipSize, setTooltipSize] = useSpring(0);
 
 	const tooltipText = useRef<TextLabel>();
 
@@ -55,16 +56,15 @@ export function Slot(props: slotProps) {
 		);
 
 		if (hover) {
-			setTooltipSize.spring(size.X + px(24), {
+			setTooltipSize.setGoal(size.X + px(24), {
 				tension: 200,
 				friction: 25,
 				mass: 0.25,
 			});
 		} else {
-			setTooltipSize.spring(0, {
-				tension: 150,
-				frequency: 0.25,
-				damping: 1,
+			setTooltipSize.setGoal(0, {
+				tension: 30,
+				dampingRatio: 1,
 			});
 		}
 	}, [hover]);
@@ -138,8 +138,8 @@ export function Slot(props: slotProps) {
 									setHover(false);
 									cleanupDropped();
 
-									setTooltipSize.spring(0);
-									setTooltipSize.set(0);
+									setTooltipSize.setGoal(0);
+									setTooltipSize.setPosition(0);
 
 									Players.LocalPlayer.GetMouse().Icon =
 										"rbxasset://textures/Cursors/KeyboardMouse/ArrowFarCursor.png";
