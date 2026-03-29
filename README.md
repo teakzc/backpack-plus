@@ -159,7 +159,7 @@ on_tool_move((client, arrangement: idArrangement) => {
 })
 ```
 
-Now we can apply them next time
+Now we can apply them next time they join the game.
 
 ```ts
 import { add_tool } from "backpack-plus";

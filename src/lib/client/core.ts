@@ -108,7 +108,7 @@ export function initialize_backpack({
 	});
 
 	const backpack = computed(() => {
-		return clientRegistry()[Players.LocalPlayer?.Name ?? "MOCK_CLIENT"] ?? [];
+		return clientRegistry()[Players.LocalPlayer?.Name ?? "MOCK_CLIENT"] ?? {};
 	});
 
 	observe(backpack, (tool) => {
@@ -138,8 +138,6 @@ export function initialize_backpack({
 		}
 
 		return () => {
-			// Removes it
-
 			toolbarState((current) => {
 				const clone = table.clone(current);
 

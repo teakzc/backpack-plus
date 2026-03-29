@@ -4,7 +4,7 @@ import { Client, createRemotes, loggerMiddleware, remote, Server } from "@rbxts/
 import { tool } from "../server";
 import { t } from "@rbxts/t";
 
-export type clientBackpack = tool[];
+export type clientBackpack = { [id: string]: tool };
 export type clientRegistry = {
 	[client: string]: clientBackpack;
 };

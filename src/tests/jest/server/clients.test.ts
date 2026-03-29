@@ -31,7 +31,7 @@ describe("client inventory management", () => {
 
 			register_client(mockClient);
 
-			expect(retrieve_client(mockClient)).toEqual([]);
+			expect(retrieve_client(mockClient)).toEqual({});
 		});
 	});
 
@@ -56,16 +56,16 @@ describe("client inventory management", () => {
 			modify_client(mockClient, (current) => {
 				const cloned = table.clone(current);
 
-				cloned.push({
+				cloned["123"] = {
 					id: "123",
 					name: "test",
 					metadata: {},
-				});
+				};
 
 				return cloned;
 			});
 
-			expect(retrieve_client(mockClient)?.[0].id).toEqual(123);
+			expect(retrieve_client(mockClient)?.["123"].id).toEqual("123");
 		});
 
 		it("should not return removed tools", () => {
@@ -79,19 +79,19 @@ describe("client inventory management", () => {
 			modify_client(mockClient, (current) => {
 				const cloned = table.clone(current);
 
-				cloned.push({
+				cloned["123"] = {
 					id: "123",
 					metadata: {},
-				});
+				};
 
 				return cloned;
 			});
 
 			modify_client(mockClient, () => {
-				return [];
+				return {};
 			});
 
-			expect(retrieve_client(mockClient)).toEqual([]);
+			expect(retrieve_client(mockClient)).toEqual({});
 		});
 	});
 
@@ -107,26 +107,26 @@ describe("client inventory management", () => {
 			modify_client(mockClient, (current) => {
 				const cloned = table.clone(current);
 
-				cloned.push({
+				cloned["1"] = {
 					id: "1",
 					metadata: {},
-				});
+				};
 
 				return cloned;
 			});
 
-			expect(retrieve_client(mockClient)?.[0].id).toEqual(1);
+			expect(retrieve_client(mockClient)?.["1"].id).toEqual("1");
 
 			modify_client(mockClient, (current) => {
-				if (!current[0]) return current;
+				if (!current["1"]) return current;
 
 				const cloned = table.clone(current);
-				cloned[0].id = "100";
+				cloned["1"] = { ...cloned["1"], id: "100" };
 
 				return cloned;
 			});
 
-			expect(retrieve_client(mockClient)?.[0].id).toEqual(100);
+			expect(retrieve_client(mockClient)?.["1"].id).toEqual("100");
 		});
 
 		it("should do nothing if client not registered", () => {
@@ -138,10 +138,10 @@ describe("client inventory management", () => {
 			modify_client(mockClient, (current) => {
 				const cloned = table.clone(current);
 
-				cloned.push({
+				cloned["1"] = {
 					id: "1",
 					metadata: {},
-				});
+				};
 
 				return cloned;
 			});
@@ -162,17 +162,17 @@ describe("client inventory management", () => {
 			modify_client(mockClient, (current) => {
 				const cloned = table.clone(current);
 
-				cloned.push({
+				cloned["1"] = {
 					id: "1",
 					metadata: {},
-				});
+				};
 
 				return cloned;
 			});
 
 			clear_client(mockClient);
 
-			expect(retrieve_client(mockClient)).toEqual([]);
+			expect(retrieve_client(mockClient)).toEqual({});
 		});
 	});
 
@@ -224,7 +224,7 @@ describe("client inventory management", () => {
 
 			register_client(mockClient);
 
-			add_tool(mockClient, {
+			const toolId = add_tool(mockClient, {
 				name: "Hammer",
 				image: "hammer.png",
 				tooltip: "A useful hammer",
@@ -234,10 +234,11 @@ describe("client inventory management", () => {
 
 			expect(tools).never.toBeNil();
 
-			expect(tools?.[0].name).toEqual("Hammer");
-			expect(tools?.[0].image).toEqual("hammer.png");
-			expect(tools?.[0].tooltip).toEqual("A useful hammer");
-			expect(tools?.[0].id).toBeDefined();
+			const addedTool = tools?.[toolId];
+			expect(addedTool?.name).toEqual("Hammer");
+			expect(addedTool?.image).toEqual("hammer.png");
+			expect(addedTool?.tooltip).toEqual("A useful hammer");
+			expect(addedTool?.id).toBeDefined();
 		});
 
 		it("should have seperate ids", () => {
@@ -269,7 +270,7 @@ describe("client inventory management", () => {
 				name: "Hammer",
 			});
 
-			expect(toolId).toEqual(-1);
+			expect(toolId).toEqual("");
 		});
 	});
 
@@ -290,7 +291,7 @@ describe("client inventory management", () => {
 
 			const tools = retrieve_client(mockClient);
 
-			expect(tools?.size()).toEqual(0);
+			expect(tools?.[toolId]).toBeUndefined();
 		});
 
 		it("should not remove tool if client not registered", () => {
@@ -316,9 +317,9 @@ describe("client inventory management", () => {
 				name: "Hammer",
 			});
 
-			expect(() => remove_tool(mockClient, id + 1)).never.toThrow();
+			expect(() => remove_tool(mockClient, id + "nonexistent")).never.toThrow();
 
-			expect(retrieve_client(mockClient)?.size()).toEqual(1);
+			expect(retrieve_client(mockClient)?.[id]).toBeDefined();
 		});
 	});
 });

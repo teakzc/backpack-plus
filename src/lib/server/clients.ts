@@ -21,7 +21,7 @@ const idArrangementRegistry = atom<Map<string, idArrangement>>(new Map());
 export function register_client(client: Player) {
 	clientRegistry((current) => {
 		const cloned = table.clone(current);
-		cloned[client.Name] = [];
+		cloned[client.Name] = {};
 
 		return cloned;
 	});
@@ -70,7 +70,7 @@ export function modify_client(client: Player, modifiedBackpack: (current: client
 export function clear_client(client: Player) {
 	clientRegistry((current) => {
 		const cloned = table.clone(current);
-		cloned[client.Name] = [];
+		cloned[client.Name] = {};
 
 		return cloned;
 	});
@@ -154,9 +154,9 @@ export function initialize_backpack_server() {
 			return true;
 		}
 
-		const index = backpack.findIndex((V) => V.id === tool.id);
+		const found = backpack[tool.id];
 
-		if (index !== -1 && index !== undefined) {
+		if (found !== undefined) {
 			// Set equipped
 			equippedRegistry((current) => set(current, client.Name, tool));
 
@@ -182,10 +182,8 @@ export function initialize_backpack_server() {
  * Listens to tool arrangement changes that then you can apply updates to your datastore to remember the player's tool arrangement
  *
  * Arrangement consists of {
- *     toolbar: {
- *         [the toolbar slot (0 to 9)]: toolId
- *     },
- *     inventory: toolId[] // toolId as in string
+ *     toolbar: Map<toolId, slotNumber>,
+ *     inventory: toolId[]
  * }
  *
  * For example, if you have a inventory that acts as the source of truth which is synced to create/remove tools to players

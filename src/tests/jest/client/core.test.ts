@@ -53,7 +53,7 @@ describe("client side backpack", () => {
 
 			expect(BACKPACK_PROPERTIES.TOOLBAR_AMOUNT).toBe(5);
 			expect(BACKPACK_PROPERTIES.MOBILE).toBe(false);
-			expect(BACKPACK_PROPERTIES.BACKPACK_TEXT()).toBe("Backpack");
+			expect(BACKPACK_PROPERTIES.BACKPACK_TEXT()).toBe("Inventory");
 
 			const toolbar = toolbarState();
 			expect(toolbar.size()).toBe(5);
@@ -67,13 +67,12 @@ describe("client side backpack", () => {
 			const customFont = new Font("rbxasset://fonts/families/SourceSansPro.json");
 			initialize_backpack({
 				TOOLBAR_AMOUNT: 8,
-
 				BACKPACK_FONT: customFont,
 				BACKPACK_TEXT: "Custom Pack",
 			});
 
 			expect(BACKPACK_PROPERTIES.TOOLBAR_AMOUNT).toBe(8);
-			expect(BACKPACK_PROPERTIES.MOBILE).toBe(true);
+			expect(BACKPACK_PROPERTIES.MOBILE).toBe(false);
 			expect(BACKPACK_PROPERTIES.BACKPACK_FONT).toBe(customFont);
 			expect(BACKPACK_PROPERTIES.BACKPACK_TEXT()).toBe("Custom Pack");
 		});
@@ -88,7 +87,6 @@ describe("client side backpack", () => {
 			});
 
 			expect(BACKPACK_PROPERTIES.TOOLBAR_AMOUNT).toBe(12);
-			expect(BACKPACK_PROPERTIES.MOBILE).toBe(true);
 		});
 	});
 

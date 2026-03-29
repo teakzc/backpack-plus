@@ -1,5 +1,12 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { add_tool, initialize_backpack_server, register_client, remove_all, remove_client } from "../../lib/server";
+import {
+	add_tool,
+	initialize_backpack_server,
+	register_client,
+	remove_all,
+	remove_client,
+	remove_tool,
+} from "../../lib/server";
 
 initialize_backpack_server();
 
@@ -16,7 +23,7 @@ Players.PlayerAdded.Connect((client) => {
 		tool: ReplicatedStorage.ClassicSword,
 	});
 
-	add_tool(client, {
+	const id = add_tool(client, {
 		name: "Murasama",
 		tooltip: "There will be blood!",
 		metadata: {
@@ -63,6 +70,10 @@ Players.PlayerAdded.Connect((client) => {
 			rarity: "common",
 		},
 	});
+
+	task.wait(4);
+
+	remove_tool(client, id);
 });
 
 Players.PlayerRemoving.Connect((client) => {

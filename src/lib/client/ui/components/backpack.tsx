@@ -27,22 +27,42 @@ function applyFinalSorting(tools: tool[]) {
 	return tool;
 }
 
-function filterBackpack(text: string, backpack: (tool | "drag")[]) {
+function filterBackpack(text: string, backpack: (tool | "drag")[]): (tool | "drag")[] {
 	const searchText = text;
 
-	const filter = backpack.filter((V) => V !== "drag");
+	const realTools = backpack.filter((V): V is tool => V !== "drag");
 
-	let sort = filter;
+	let sorted = realTools;
 
 	if (searchText !== "") {
-		const toolName = filter.map((tool) => tool.name ?? tool.tooltip ?? `Tool: ${tool.id}`);
+		const toolName = realTools.map((tool) => tool.name ?? tool.tooltip ?? `Tool: ${tool.id}`);
 
-		const sortedResults = FuzzyScoreSorting(toolName, searchText, filter);
+		const sortedResults = FuzzyScoreSorting(toolName, searchText, realTools);
 
-		sort = sortedResults.filter(([score]) => score >= BACKPACK_PROPERTIES.SCORE_THRESHOLD).map(([, tool]) => tool);
+		sorted = sortedResults.filter(([score]) => score >= BACKPACK_PROPERTIES.SCORE_THRESHOLD).map(([, tool]) => tool);
 	}
 
-	return applyFinalSorting(sort);
+	const filtered = applyFinalSorting(sorted);
+
+	// Re-insert drag placeholders at their original positions so tools don't shift
+	const result: (tool | "drag")[] = [];
+	let toolIdx = 0;
+
+	for (let i = 0; i < backpack.size(); i++) {
+		if (backpack[i] === "drag") {
+			result.push("drag");
+		} else if (toolIdx < filtered.size()) {
+			result.push(filtered[toolIdx]);
+			toolIdx++;
+		}
+	}
+
+	while (toolIdx < filtered.size()) {
+		result.push(filtered[toolIdx]);
+		toolIdx++;
+	}
+
+	return result;
 }
 
 /**
@@ -65,7 +85,7 @@ export function Backpack() {
 	const backpack = useAtom(() => inventoryState());
 	const text = useAtom(() => BACKPACK_PROPERTIES.BACKPACK_TEXT());
 	const visible = useAtom(() => inventoryVisibilityState());
-	const [filter, setFilter] = useState<tool[]>(backpack.filter((V) => V !== "drag"));
+	const [filter, setFilter] = useState<(tool | "drag")[]>(filterBackpack("", backpack));
 
 	const filterListAtom = useAtom(() => filterList());
 

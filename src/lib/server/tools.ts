@@ -43,7 +43,7 @@ export function add_tool(client: Player, toolData: toolData, position?: number |
 
 	modify_client(client, (current) => {
 		const cloned = table.clone(current);
-		cloned.push(data);
+		cloned[data.id] = data;
 
 		return cloned;
 	});
@@ -66,10 +66,8 @@ export function remove_tool(client: Player, id: string) {
 	modify_client(client, (current) => {
 		const cloned = table.clone(current);
 
-		const index = cloned.findIndex((tool) => tool.id === id);
-
-		if (index !== -1) {
-			cloned.remove(index);
+		if (cloned[id] !== undefined) {
+			delete cloned[id];
 		} else warn("Tool `id` not found!");
 
 		return cloned;
