@@ -104,7 +104,7 @@ export function remove_all() {
 	clientRegistry({});
 }
 
-let toolCallback = function (client: Player, arragement: idArrangement) {};
+let toolCallbacks: ((client: Player, arrangement: idArrangement) => void)[] = [];
 
 /**
  * Initializes the server
@@ -118,7 +118,7 @@ export function initialize_backpack_server() {
 			return clone;
 		});
 
-		toolCallback(client, payload);
+		toolCallbacks.forEach((cb) => cb(client, payload));
 	});
 
 	const syncer = server({
@@ -193,7 +193,11 @@ export function initialize_backpack_server() {
  * @param callback (client, arrangement) => void
  */
 export function on_tool_move(callback: (client: Player, arrangement: idArrangement) => void) {
-	toolCallback = callback;
+	toolCallbacks.push(callback);
+
+	return () => {
+		toolCallbacks = toolCallbacks.filter((cb) => cb !== callback);
+	};
 }
 
 function filterPayload(client: Player, payload: backpackSyncPayload): backpackSyncPayload {

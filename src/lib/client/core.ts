@@ -199,12 +199,15 @@ export function customize_backpack(data: backpackData) {
 function fillBackpack(tool: tool) {
 	const currentState = toolbarState();
 
+	print("FILL", currentState);
+
 	let fill = false;
 	for (let i = 0; i < BACKPACK_PROPERTIES.TOOLBAR_AMOUNT; i++) {
 		// Iterates `TOOLBAR_AMOUNT` of times from 0 to `TOOLBAR_AMOUNT` - 1
 		if (currentState[i] === "empty") {
 			// Empty slot, so assign
 			toolbarState((current) => {
+				print("SETTING", current);
 				return set(current, i + 1, tool);
 			});
 
