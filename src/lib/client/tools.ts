@@ -1,31 +1,144 @@
+import { UserInputService } from "@rbxts/services";
+import { removeValue, set as setArray } from "@rbxts/sift/out/Array";
+import { set } from "@rbxts/sift/out/Dictionary";
 import { ToolId } from "../shared/types";
-import { clientHotbar, draggingAtom } from "./atoms";
+import { backpackSelectionAtom, clientBackpack, clientBackpackOrder, clientHotbar, draggingAtom } from "./atoms";
+import { RequestEquip } from "./networking";
 
-export function swapToolsId(toolId: ToolId, toolId2: ToolId) {
+export function swapSlots(slot1: number, slot2: number) {
 	clientHotbar((current) => {
-		let foundSlot = -1;
-		let foundSlot2 = -1;
-
-		for (const [slot, id] of current) {
-			if (id === toolId) {
-				foundSlot = slot;
-			}
-
-			if (id === toolId2) {
-				foundSlot2 = slot;
-			}
-		}
-
-		if (foundSlot !== -1 && foundSlot2 !== -1) {
-			const clone = table.clone(current);
-			clone.set(foundSlot, toolId2);
-			clone.set(foundSlot2, toolId);
-
-			return clone;
-		} else return current;
+		const clone = table.clone(current);
+		const a = clone.get(slot1) ?? "Empty";
+		const b = clone.get(slot2) ?? "Empty";
+		clone.set(slot1, b);
+		clone.set(slot2, a);
+		return clone;
 	});
 }
 
-export function dragTool(toolId: ToolId | undefined) {
-	draggingAtom(toolId);
+export function findTool(toolId: ToolId): number | "Backpack" | undefined {
+	const hotbar = clientHotbar();
+	for (const [slot, id] of hotbar) {
+		if (id === toolId) {
+			return slot;
+		}
+	}
+
+	const backpack = clientBackpack().backpack;
+	for (const [slot, id] of backpack) {
+		if (slot === toolId) {
+			return "Backpack";
+		}
+	}
+
+	return undefined;
+}
+
+export function findToolFromSlot(slot: number): ToolId | undefined {
+	const hotbar = clientHotbar();
+	for (const [s, id] of hotbar) {
+		if (s === slot) {
+			return id;
+		}
+	}
+	return undefined;
+}
+
+export function dragTool(toolId: ToolId, offset: Vector2) {
+	const from = findTool(toolId);
+	if (from === undefined) return;
+
+	draggingAtom({ id: toolId, offset: offset, from: from });
+	backpackSelectionAtom(undefined);
+
+	if (typeOf(from) === "number") {
+		clientHotbar((current) => {
+			const clone = table.clone(current);
+
+			for (const [slot, id] of clone) {
+				if (id === toolId) {
+					clone.set(slot, "Drag");
+					break;
+				}
+			}
+
+			return clone;
+		});
+	} else {
+		clientBackpackOrder((current) => {
+			const index = current.findIndex((id) => id === toolId);
+			if (index === -1) return current;
+			return setArray(current, index + 1, "Drag");
+		});
+	}
+
+	const cleanup = UserInputService.InputEnded.Connect((input) => {
+		if (input.UserInputType !== Enum.UserInputType.MouseButton1) return;
+
+		undragTool();
+		cleanup.Disconnect();
+	});
+}
+
+export function undragTool() {
+	const data = draggingAtom();
+	if (data === undefined) return;
+
+	const selection = backpackSelectionAtom();
+	draggingAtom(undefined);
+
+	if (typeIs(data.from, "number")) {
+		if (selection === "Inventory") {
+			clientBackpackOrder((current) => [...current, data.id]);
+			clientHotbar((current) => set(current, data.from, "Empty"));
+
+			return;
+		}
+
+		clientHotbar((current) => set(current, data.from, data.id));
+
+		if (typeIs(selection, "number")) {
+			swapSlots(data.from, selection);
+		}
+	} else {
+		// data.from --> "Backpack"
+
+		if (selection === undefined || selection === "Inventory") {
+			clientBackpackOrder((current) =>
+				setArray(
+					current,
+					current.findIndex((id) => id === "Drag") !== -1 ? current.findIndex((id) => id === "Drag") + 1 : -1,
+					data.id,
+				),
+			);
+
+			return;
+		}
+
+		if (typeIs(selection, "number")) {
+			const displaced = clientHotbar().get(selection);
+
+			if (displaced === undefined || displaced === "Empty") {
+				// Slot is empty — just move tool there
+				clientBackpackOrder((current) => removeValue(current, "Drag"));
+				clientHotbar((current) => set(current, selection, data.id));
+			} else {
+				// Slot is occupied — swap
+				clientBackpackOrder((current) =>
+					setArray(
+						current,
+						current.findIndex((id) => id === "Drag") !== -1
+							? current.findIndex((id) => id === "Drag") + 1
+							: -1,
+						displaced,
+					),
+				);
+				clientHotbar((current) => set(current, selection, data.id));
+			}
+		}
+	}
+}
+
+export function equipTool(toolId: ToolId) {
+	RequestEquip.fire(toolId);
 }

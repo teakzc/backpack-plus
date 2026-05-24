@@ -1,11 +1,16 @@
 import React from "@rbxts/react";
-import { Toolbar } from "./components/Toolbar";
+import { DraggingSlot } from "./components/DraggingSlot";
+import { Hotbar } from "./components/Hotbar";
+import { Inventory } from "./components/Inventory";
 
 export function BackpackPlusApp() {
 	return (
-		<screengui>
+		<screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
 			<stylelink StyleSheet={script.Parent?.WaitForChild("base") as StyleSheet} />
-			<Toolbar />
+
+			<Hotbar />
+			<Inventory />
+			<DraggingSlot />
 		</screengui>
 	);
 }

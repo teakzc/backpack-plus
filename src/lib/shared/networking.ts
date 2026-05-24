@@ -1,17 +1,37 @@
 import { Atom } from "@rbxts/charm";
-import { Client, createRemotes, remote, Server } from "@rbxts/remo";
 import { SyncPayload } from "@rbxts/charm-sync";
-import { ClientBackpacks } from "./types";
+
+import { ToolId, ToolPlus } from "./types";
+
+export type ClientBackpack = {
+	equip: ToolId;
+	backpack: Map<ToolId, ToolPlus>;
+};
+
+export type ClientBackpacks = Map<string, ClientBackpack>;
 
 export type backpackSyncPayload = SyncPayload<{
 	clientBackpacks: Atom<ClientBackpacks>;
 }>;
 
-/**
- * Sync remotes using `@rbxts/remo`
- */
-export const backpackRemotes = createRemotes({
-	syncState: remote<Client, [payload: backpackSyncPayload]>(),
-	requestState: remote<Server>(),
-	requestEquip: remote<Server, [toolId: string]>(),
-});
+export type zapSyncPayload = {
+	["data"]: {
+		["clientBackpacks"]: Map<
+			string,
+			{
+				["backpack"]: Map<
+					string,
+					{
+						["metadata"]: Map<string, unknown>;
+						["name"]: string;
+						["icon"]: string;
+						["tooltip"]: string;
+						["instance"]?: Tool;
+					}
+				>;
+				["equip"]: string;
+			}
+		>;
+	};
+	["type"]: "init" | "patch";
+};

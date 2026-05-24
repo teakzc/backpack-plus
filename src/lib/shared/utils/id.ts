@@ -1,3 +1,5 @@
+const MAX_ID = 2 ** 32;
+
 let id = 0;
 
 /**
@@ -6,6 +8,6 @@ let id = 0;
  */
 export function generateId() {
 	id++;
-	id %= 2 ** 32;
+	id %= MAX_ID;
 	return tostring(id);
 }

@@ -6,5 +6,6 @@
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:www.rsml.style)"
     ]
-  }
+  },
+  "enabledPlugins": {}
 }

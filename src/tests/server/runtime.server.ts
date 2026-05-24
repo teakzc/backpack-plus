@@ -1,5 +1,5 @@
-import { Players } from "@rbxts/services";
-import { giveTool, initializeBackpackServer, registerPlayer } from "../../lib";
+import { Players, ReplicatedStorage } from "@rbxts/services";
+import { giveTool, initializeBackpackServer, registerPlayer } from "../../lib/server";
 
 initializeBackpackServer();
 
@@ -7,9 +7,9 @@ Players.PlayerAdded.Connect((player) => {
 	registerPlayer(player);
 
 	giveTool(player, {
-		name: "Test Tool",
+		name: "Sword",
 		tooltip: "A test tool",
-		icon: "rbxasset://textures/Icons/Tools/Tool.png",
 		metadata: {},
+		instance: ReplicatedStorage.ClassicSword,
 	});
 });

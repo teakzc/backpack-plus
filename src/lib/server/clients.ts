@@ -1,5 +1,6 @@
 import { set } from "@rbxts/sift/out/Dictionary";
-import { ClientBackpack, ToolPlus } from "../shared/types";
+import { ClientBackpack } from "../shared/networking";
+import { ToolPlus } from "../shared/types";
 import { clientBackpacks } from "./atoms";
 
 /**
@@ -8,7 +9,7 @@ import { clientBackpacks } from "./atoms";
  */
 export function registerPlayer(client: Player) {
 	clientBackpacks((current) => {
-		return set(current, client.Name, new Map<string, ToolPlus>());
+		return set(current, client.Name, { backpack: new Map<string, ToolPlus>(), equip: "" });
 	});
 }
 
