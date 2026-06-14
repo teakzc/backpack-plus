@@ -62,15 +62,6 @@ export function SlotContent(props: SlotContentProps) {
 }
 
 export function Slot(props: SlotProps) {
-	if (props.id === "Drag")
-		return (
-			<frame
-				LayoutOrder={props.layoutOrder}
-				Size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
-				BackgroundTransparency={1}
-			/>
-		);
-
 	const toolData = useAtom(() => clientBackpack().backpack.get(props.id));
 	const equipped = useAtom(() => clientBackpack().equip === props.id);
 
@@ -79,6 +70,15 @@ export function Slot(props: SlotProps) {
 		equipped ? ["backpack-SlotButtonEquipped", "backpack-SlotButton"] : ["backpack-SlotButton"],
 		[equipped],
 	);
+
+	if (props.id === "Drag")
+		return (
+			<frame
+				LayoutOrder={props.layoutOrder}
+				Size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
+				BackgroundTransparency={1}
+			/>
+		);
 
 	return (
 		<frame
@@ -104,7 +104,12 @@ export function Slot(props: SlotProps) {
 						if (props.inventory) return;
 						backpackSelectionAtom(undefined);
 					},
-					MouseButton1Down: (rbx, x, y) => {
+					InputBegan: (rbx, input) => {
+						if (
+							input.UserInputType !== Enum.UserInputType.MouseButton1 &&
+							input.UserInputType !== Enum.UserInputType.Touch
+						)
+							return;
 						if (props.id === "Empty" || props.id === "Drag" || !props.visibility) return;
 
 						let flag = false;
@@ -145,10 +150,12 @@ export function Slot(props: SlotProps) {
 								buttonPos.Y + buttonSize.Y / 2,
 							);
 
-							const mousePos = new Vector2(x, y);
+							const mouse = UserInputService.GetMouseLocation();
+
+							const mousePos = new Vector2(mouse.X, mouse.Y);
 							const mouseOffset = mousePos.sub(buttonCenter);
 
-							dragTool(props.id, mouseOffset);
+							dragTool(props.id, mouseOffset, input);
 						};
 					},
 					MouseButton1Click: () => {

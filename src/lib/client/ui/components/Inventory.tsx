@@ -10,6 +10,7 @@ import {
 	clientBackpackOrder,
 	clientHotbar,
 	draggingAtom,
+	filterAtom,
 	inventoryVisibleAtom,
 } from "../../atoms";
 import { backpackSettings } from "../../settings";
@@ -33,15 +34,29 @@ export function Inventory() {
 			hotbarIds.add(id);
 		}
 
+		const bp = clientBackpack().backpack;
+
 		const filtered = backpack.filter((id) => !hotbarIds.has(id) || draggingAtom()?.id !== id);
+
+		const metadatalist = filtered.map((v) => bp.get(v)?.metadata ?? {});
+
+		const filters = filterAtom();
+
+		for (const [id, filter] of filters) {
+			for (const metadata of metadatalist) {
+				filter.filter(metadata);
+			}
+		}
 
 		if (query === "") return filtered;
 
-		const bp = clientBackpack().backpack;
 		const names = filtered.map((id) => bp.get(id)?.name ?? id);
-		return FuzzyScoreSorting(names, query, filtered)
+
+		const fuzzySorted = FuzzyScoreSorting(names, query, filtered)
 			.filter(([score]) => score >= 0.3)
 			.map(([_, id]) => id);
+
+		return fuzzySorted;
 	}, [query]);
 
 	const scrollRef = useRef<ScrollingFrame>();

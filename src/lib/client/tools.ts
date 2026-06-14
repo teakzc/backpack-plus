@@ -16,7 +16,7 @@ export function swapSlots(slot1: number, slot2: number) {
 	});
 }
 
-export function findTool(toolId: ToolId): number | "Backpack" | undefined {
+export function findToolLocation(toolId: ToolId): number | "Backpack" | undefined {
 	const hotbar = clientHotbar();
 	for (const [slot, id] of hotbar) {
 		if (id === toolId) {
@@ -25,30 +25,18 @@ export function findTool(toolId: ToolId): number | "Backpack" | undefined {
 	}
 
 	const backpack = clientBackpack().backpack;
-	for (const [slot, id] of backpack) {
-		if (slot === toolId) {
-			return "Backpack";
-		}
-	}
-
-	return undefined;
+	return backpack.get(toolId) !== undefined ? "Backpack" : undefined;
 }
 
 export function findToolFromSlot(slot: number): ToolId | undefined {
-	const hotbar = clientHotbar();
-	for (const [s, id] of hotbar) {
-		if (s === slot) {
-			return id;
-		}
-	}
-	return undefined;
+	return clientHotbar().get(slot);
 }
 
-export function dragTool(toolId: ToolId, offset: Vector2) {
-	const from = findTool(toolId);
+export function dragTool(toolId: ToolId, offset: Vector2, inputObject?: InputObject) {
+	const from = findToolLocation(toolId);
 	if (from === undefined) return;
 
-	draggingAtom({ id: toolId, offset: offset, from: from });
+	draggingAtom({ id: toolId, offset: offset, from: from, inputObject });
 	backpackSelectionAtom(undefined);
 
 	if (typeOf(from) === "number") {
@@ -73,7 +61,12 @@ export function dragTool(toolId: ToolId, offset: Vector2) {
 	}
 
 	const cleanup = UserInputService.InputEnded.Connect((input) => {
-		if (input.UserInputType !== Enum.UserInputType.MouseButton1) return;
+		// must be left click
+		const click = input.UserInputType === Enum.UserInputType.MouseButton1;
+		// or if touch must be same touch
+		const touch = input.UserInputType === Enum.UserInputType.Touch && input === inputObject;
+
+		if (!click && !touch) return;
 
 		undragTool();
 		cleanup.Disconnect();
@@ -82,6 +75,7 @@ export function dragTool(toolId: ToolId, offset: Vector2) {
 
 export function undragTool() {
 	const data = draggingAtom();
+
 	if (data === undefined) return;
 
 	const selection = backpackSelectionAtom();
@@ -104,13 +98,11 @@ export function undragTool() {
 		// data.from --> "Backpack"
 
 		if (selection === undefined || selection === "Inventory") {
-			clientBackpackOrder((current) =>
-				setArray(
-					current,
-					current.findIndex((id) => id === "Drag") !== -1 ? current.findIndex((id) => id === "Drag") + 1 : -1,
-					data.id,
-				),
-			);
+			clientBackpackOrder((current) => {
+				const check = current.findIndex((id) => id === "Drag") !== -1;
+				if (check) return setArray(current, current.findIndex((id) => id === "Drag") + 1, data.id);
+				return current;
+			});
 
 			return;
 		}
@@ -124,15 +116,12 @@ export function undragTool() {
 				clientHotbar((current) => set(current, selection, data.id));
 			} else {
 				// Slot is occupied — swap
-				clientBackpackOrder((current) =>
-					setArray(
-						current,
-						current.findIndex((id) => id === "Drag") !== -1
-							? current.findIndex((id) => id === "Drag") + 1
-							: -1,
-						displaced,
-					),
-				);
+				clientBackpackOrder((current) => {
+					const check = current.findIndex((id) => id === "Drag") !== -1;
+					if (check) return setArray(current, current.findIndex((id) => id === "Drag") + 1, displaced);
+
+					return current;
+				});
 				clientHotbar((current) => set(current, selection, data.id));
 			}
 		}

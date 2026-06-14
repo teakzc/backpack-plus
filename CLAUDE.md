@@ -54,23 +54,23 @@ src/lib/
 
 - `clientHotbar` is 1-indexed (slots 1–10). When iterating the hotbar map, slot numbers directly correspond to UI positions with no index shift.
 - `generateId()` is a simple global counter mod 2³², not UUID. IDs are unique per server session, not globally unique.
-- RSML stylesheets (`base.rbxm`, `tokens.rbxm`) are binary assets committed to `src/lib/client/ui/`. The client init code attaches them to the `StyleDerive` and `StyleSheet` instances at runtime.
+- Stylesheets (`base.rbxm`, `tokens.rbxm`) are binary assets committed to `src/lib/client/ui/`. The client init code attaches them to the `StyleDerive` and `StyleSheet` instances at runtime.
 - Touch devices default to 6 hotbar slots; keyboard devices default to 10 (set in `defaultSettings`).
 - The backtick key (`` ` ``) toggles inventory visibility (`backpackInputHelper`).
 
 ### Tech stack
 
-| Concern | Library |
-|---|---|
-| UI framework | `@rbxts/react` + `@rbxts/react-roblox` |
-| Reactive state | `@rbxts/charm` (atoms, computed, observe) |
-| React ↔ Charm | `@rbxts/react-charm` (`useAtom`) |
-| State sync | `@rbxts/charm-sync` (server/client syncer) |
-| Networking | `@rbxts/remo` (`createRemotes`) |
-| Animations | `@rbxts/ripple` + `@rbxts/react-ripple` (`useSpring`) |
-| Fuzzy search | `@rbxts/fuzzy-search` |
-| Functional utils | `@rbxts/sift` (Dictionary.set, Array.removeValue) |
-| Compiler | `roblox-ts` → Lua |
+| Concern          | Library                                               |
+| ---------------- | ----------------------------------------------------- |
+| UI framework     | `@rbxts/react` + `@rbxts/react-roblox`                |
+| Reactive state   | `@rbxts/charm` (atoms, computed, observe)             |
+| React ↔ Charm    | `@rbxts/react-charm` (`useAtom`)                      |
+| State sync       | `@rbxts/charm-sync` (server/client syncer)            |
+| Networking       | `@rbxts/remo` (`createRemotes`)                       |
+| Animations       | `@rbxts/ripple` + `@rbxts/react-ripple` (`useSpring`) |
+| Fuzzy search     | `@rbxts/fuzzy-search`                                 |
+| Functional utils | `@rbxts/sift` (Dictionary.set, Array.removeValue)     |
+| Compiler         | `roblox-ts` → Lua                                     |
 
 ## Code style
 
@@ -78,3 +78,43 @@ src/lib/
 - ESLint extends `roblox-ts/recommended-legacy`. `roblox-ts/no-any` and `roblox-ts/lua-truthiness` are disabled.
 - Use `table.clone()` for shallow-copying Roblox Maps before mutation (Lua semantics — Maps are reference types).
 - Avoid JavaScript-only APIs: `Array.from()`, `Object.keys/values/entries()`, `for...in`, `string[index]`, `.charAt()`. Use roblox-ts equivalents or Sift utilities instead.
+
+<!-- code-review-graph MCP tools -->
+
+## MCP Tools: code-review-graph
+
+**IMPORTANT: This project has a knowledge graph. ALWAYS use the
+code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
+the codebase.** The graph is faster, cheaper (fewer tokens), and gives
+you structural context (callers, dependents, test coverage) that file
+scanning cannot.
+
+### When to use graph tools FIRST
+
+- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
+- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
+- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
+- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
+- **Architecture questions**: `get_architecture_overview` + `list_communities`
+
+Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+
+### Key Tools
+
+| Tool                        | Use when                                               |
+| --------------------------- | ------------------------------------------------------ |
+| `detect_changes`            | Reviewing code changes — gives risk-scored analysis    |
+| `get_review_context`        | Need source snippets for review — token-efficient      |
+| `get_impact_radius`         | Understanding blast radius of a change                 |
+| `get_affected_flows`        | Finding which execution paths are impacted             |
+| `query_graph`               | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes`     | Finding functions/classes by name or keyword           |
+| `get_architecture_overview` | Understanding high-level codebase structure            |
+| `refactor_tool`             | Planning renames, finding dead code                    |
+
+### Workflow
+
+1. The graph auto-updates on file changes (via hooks).
+2. Use `detect_changes` for code review.
+3. Use `get_affected_flows` to understand impact.
+4. Use `query_graph` pattern="tests_for" to check coverage.

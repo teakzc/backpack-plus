@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "rbxtsc",
 		"watch": "rbxtsc -w",
+		"dev": "rbxtsc build --type game --watch",
 		"prepublishOnly": "npm run build"
 	},
 	"keywords": [

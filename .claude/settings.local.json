@@ -4,8 +4,12 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
-      "WebFetch(domain:www.rsml.style)"
+      "WebFetch(domain:www.rsml.style)",
+      "Bash(npm run *)"
     ]
   },
-  "enabledPlugins": {}
+  "enabledPlugins": {},
+  "enabledMcpjsonServers": [
+    "code-review-graph"
+  ]
 }

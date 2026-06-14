@@ -1,7 +1,8 @@
 import { set } from "@rbxts/sift/out/Dictionary";
 import { ClientBackpack } from "../shared/networking";
-import { ToolPlus } from "../shared/types";
+import { ToolId, ToolPlus } from "../shared/types";
 import { clientBackpacks } from "./atoms";
+import { toolClientMap, toolMap, toolRegistry } from "./data";
 
 /**
  * Registers a player's backpack data
@@ -18,6 +19,16 @@ export function registerPlayer(client: Player) {
  * @param client The player to unregister
  */
 export function unregisterPlayer(client: Player) {
+	const toolIds = getBackpack(client)?.backpack;
+	if (toolIds) {
+		for (const [id] of toolIds) {
+			toolRegistry.get(id)?.Destroy();
+			toolRegistry.delete(id);
+			toolMap.delete(id);
+			toolClientMap.delete(id);
+		}
+	}
+
 	clientBackpacks((current) => {
 		return set(current, client.Name, undefined);
 	});
@@ -38,4 +49,12 @@ export function modifyPlayer(client: Player, callback: (backpack: ClientBackpack
 
 		return set(current, client.Name, callback(clientBackpack));
 	});
+}
+
+export function getBackpack(client: Player) {
+	return clientBackpacks().get(client.Name);
+}
+
+export function getClientOwnership(toolId: ToolId) {
+	return toolClientMap.get(toolId);
 }

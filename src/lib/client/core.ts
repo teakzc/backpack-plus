@@ -11,6 +11,7 @@ import {
 	clientBackpack,
 	clientBackpackOrder,
 	clientHotbar,
+	draggingAtom,
 	inventoryVisibleAtom,
 } from "./atoms";
 import { RequestState, SyncState } from "./networking";
@@ -27,7 +28,7 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	let hotbarSlot = -1;
 
 	const clientHotbarValue = clientHotbar();
-	for (let slot = 1; slot <= 10; slot++) {
+	for (let slot = 1; slot <= backpackSettings().slots; slot++) {
 		// clientHotbarValue is a Map, so it is not shifted from 1 to 0 index.
 		// We can thus directly index it with the slot number.
 		if (clientHotbarValue.get(slot) === undefined || clientHotbarValue.get(slot) === "Empty") {
@@ -46,10 +47,20 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 		clientHotbar((current) => {
 			for (const [slot, id] of current) {
 				if (id === toolId) return set(current, slot, "Empty");
+				if (id === "Drag") {
+					const data = draggingAtom();
+					if (data?.from === slot) return set(current, slot, "Empty");
+				}
 			}
 
 			return current;
 		});
+
+		const dragging = draggingAtom();
+		if (dragging?.id === toolId) {
+			draggingAtom(undefined);
+			print("debug", draggingAtom());
+		}
 
 		clientBackpackOrder((current) => removeValue(current, toolId));
 	};
@@ -103,7 +114,7 @@ export function initializeBackpackClient() {
 }
 
 const inputs = {
-	Zero: 0,
+	Zero: 10,
 	One: 1,
 	Two: 2,
 	Three: 3,
@@ -115,8 +126,13 @@ const inputs = {
 	Nine: 9,
 };
 
+/**
+ * Helper function for equipping tools from 0-9
+ * @param toggleBackquote Whether to bind `Backquote` to open inventory
+ * @returns Disconnect function
+ */
 export function backpackInputHelper(toggleBackquote?: boolean) {
-	UserInputService.InputBegan.Connect((input, GPE) => {
+	const connection = UserInputService.InputBegan.Connect((input, GPE) => {
 		if (GPE) return;
 
 		if (input.KeyCode === Enum.KeyCode.Backquote && toggleBackquote) inventoryVisibleAtom((current) => !current);
@@ -127,19 +143,14 @@ export function backpackInputHelper(toggleBackquote?: boolean) {
 		const validation = inputs[input.KeyCode.Name as keyof typeof inputs] as number | undefined;
 
 		if (validation === undefined) return;
-		if (validation > 9 || validation < 0) return;
+		if (validation > 10 || validation < 1) return;
 
 		const id = findToolFromSlot(validation);
+
 		if (id) {
 			equipTool(id);
 		}
 	});
-}
 
-/**
- * [TODO]
- * To my future self, who will carry the burden of the everflaming torch.
- * Please reconcile equip tool and squiggly line toggle visiblity and topbar plus.
- * And then implement equips
- * And add battery included backpack modules like cmd bar lol xd?
- */
+	return () => connection.Disconnect();
+}
