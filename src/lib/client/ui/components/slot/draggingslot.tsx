@@ -2,12 +2,13 @@ import { useMouse } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { useSpring } from "@rbxts/react-ripple";
-import { clientBackpack, draggingAtom } from "../../atoms";
-import { BACKPACK_DIMENSIONS } from "../constants";
-import { useTags } from "../hooks";
-import { SlotContent } from "./Slot";
+import { clientBackpack, draggingAtom } from "../../../atoms";
+import { draggingSlotDecoratorsAtom } from "../../../decorating";
+import { BACKPACK_DIMENSIONS } from "../../constants";
+import { useTags, useTokens } from "../../hooks";
+import BackpackSlotContent from "./content";
 
-export function DraggingSlot() {
+export default function BackpackDraggingSlot() {
 	const [pos, setPos] = useSpring(new UDim2());
 
 	const mouse = useMouse((V) => {
@@ -42,6 +43,10 @@ export function DraggingSlot() {
 
 	const dragRef = useTags(equipped ? ["backpack-SlotButtonEquipped"] : [], [equipped]);
 
+	const style = useTokens()?.GetAttribute("LightColor");
+
+	const decorators = useAtom(draggingSlotDecoratorsAtom);
+
 	if (!drag) return;
 	if (!data) return;
 
@@ -54,14 +59,24 @@ export function DraggingSlot() {
 			Transparency={0.5}
 			Image={data.icon}
 			ref={dragRef}
+			BackgroundColor3={typeIs(style, "Color3") ? style : undefined}
 		>
-			<SlotContent
+			<BackpackSlotContent
 				visibility={true}
 				layoutOrder={drag.from !== "Backpack" ? drag.from : -1}
 				icon={data.icon}
 				name={data.name}
 				id={drag.id}
 			/>
+
+			{decorators.map((decorator, index) => (
+				<React.Fragment key={`slot-decorator-${index}`}>
+					{decorator(data, {
+						from: drag.from,
+						equipped: equipped,
+					})}
+				</React.Fragment>
+			))}
 		</imagebutton>
 	);
 }

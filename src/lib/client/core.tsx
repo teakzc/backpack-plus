@@ -1,6 +1,6 @@
 import { observe } from "@rbxts/charm";
 import { client } from "@rbxts/charm-sync";
-import { GuiService, StarterGui, UserInputService } from "@rbxts/services";
+import { StarterGui, UserInputService } from "@rbxts/services";
 import { removeValue } from "@rbxts/sift/out/Array";
 import { set } from "@rbxts/sift/out/Dictionary";
 import { backpackSyncPayload } from "../shared/networking";
@@ -15,7 +15,7 @@ import {
 	inventoryVisibleAtom,
 } from "./atoms";
 import { RequestState, SyncState } from "./networking";
-import { applySettings, backpackSettings, BackpackSettings } from "./settings";
+import { BackpackSettings, applySettings, backpackSettings } from "./settings";
 import { equipTool, findToolFromSlot } from "./tools";
 
 export function configureBackpack(settings: Partial<BackpackSettings>) {
@@ -96,21 +96,7 @@ export function initializeBackpackClient() {
 
 	observe(() => clientBackpack().backpack, observeBackpack);
 
-	const uiFolder = script.Parent?.WaitForChild("ui");
-	if (uiFolder === undefined) return;
-
-	const base = uiFolder.WaitForChild("base");
-	if (base === undefined) return;
-
-	const styleDerive = base.FindFirstChildOfClass("StyleDerive");
-	if (styleDerive === undefined) return;
-
-	const tokens = uiFolder.FindFirstChild("tokens");
-	if (tokens === undefined) return;
-
-	styleDerive.StyleSheet = tokens as StyleSheet;
-
-	tokens.SetAttribute("TextSize", GuiService.IsTenFootInterface() ? "$TextSizeBig" : "$TextSizeSmall");
+	print(`backpack-plus @ v2.0.0 loaded successfully!`);
 }
 
 const inputs = {

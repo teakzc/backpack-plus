@@ -234,10 +234,10 @@ local returns = {
 			["data"]: ({
 				["clientBackpacks"]: ({ [(string)]: ({
 					["backpack"]: (({ [(string)]: ({
-						["metadata"]: ({ [(string)]: ((unknown)) }),
-						["name"]: (string),
-						["icon"]: (string),
-						["tooltip"]: (string),
+						["metadata"]: (({ [(string)]: ((unknown)) })?),
+						["name"]: ((string)?),
+						["icon"]: ((string)?),
+						["tooltip"]: ((string)?),
 						["instance"]: ((Tool)?),
 					}) })?),
 					["equip"]: ((string)?),
@@ -280,48 +280,60 @@ local returns = {
 						buffer.writeu16(outgoing_buff, outgoing_apos, len_5)
 						alloc(len_5)
 						buffer.writestring(outgoing_buff, outgoing_apos, k_2, len_5)
-						local len_pos_3
-						local len_6 = 0
-						for k_3, v_3 in v_2["metadata"] do
-							if len_6 == 0 then
-								len_pos_3 = alloc(2)
-							end
-							local bool_4 = 0
-							local bool_4_pos_1 = alloc(1)
-							len_6 = len_6 + 1
-							local len_7 = #k_3
-							alloc(2)
-							buffer.writeu16(outgoing_buff, outgoing_apos, len_7)
-							alloc(len_7)
-							buffer.writestring(outgoing_buff, outgoing_apos, k_3, len_7)
-							if v_3 ~= nil then
-								bool_4 = bit32.bor(bool_4, 0b0000000000000001)
-								table.insert(outgoing_inst, v_3)
-							end
-							buffer.writeu8(outgoing_buff, bool_4_pos_1, bool_4)
-						end
-						if len_pos_3 then
-							buffer.writeu16(outgoing_buff, len_pos_3, len_6 - 1)
-						else
+						if v_2["metadata"] ~= nil then
 							bool_3 = bit32.bor(bool_3, 0b0000000000000001)
+							local len_pos_3
+							local len_6 = 0
+							for k_3, v_3 in v_2["metadata"] do
+								if len_6 == 0 then
+									len_pos_3 = alloc(2)
+								end
+								local bool_4 = 0
+								local bool_4_pos_1 = alloc(1)
+								len_6 = len_6 + 1
+								local len_7 = #k_3
+								alloc(2)
+								buffer.writeu16(outgoing_buff, outgoing_apos, len_7)
+								alloc(len_7)
+								buffer.writestring(outgoing_buff, outgoing_apos, k_3, len_7)
+								if v_3 ~= nil then
+									bool_4 = bit32.bor(bool_4, 0b0000000000000001)
+									table.insert(outgoing_inst, v_3)
+								end
+								buffer.writeu8(outgoing_buff, bool_4_pos_1, bool_4)
+							end
+							if len_pos_3 then
+								buffer.writeu16(outgoing_buff, len_pos_3, len_6 - 1)
+							else
+								bool_3 = bit32.bor(bool_3, 0b0000000000000010)
+							end
 						end
-						local len_8 = #v_2["name"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_8)
-						alloc(len_8)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_2["name"], len_8)
-						local len_9 = #v_2["icon"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_9)
-						alloc(len_9)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_2["icon"], len_9)
-						local len_10 = #v_2["tooltip"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_10)
-						alloc(len_10)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_2["tooltip"], len_10)
+						if v_2["name"] ~= nil then
+							bool_3 = bit32.bor(bool_3, 0b0000000000000100)
+							local len_8 = #v_2["name"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_8)
+							alloc(len_8)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_2["name"], len_8)
+						end
+						if v_2["icon"] ~= nil then
+							bool_3 = bit32.bor(bool_3, 0b0000000000001000)
+							local len_9 = #v_2["icon"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_9)
+							alloc(len_9)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_2["icon"], len_9)
+						end
+						if v_2["tooltip"] ~= nil then
+							bool_3 = bit32.bor(bool_3, 0b0000000000010000)
+							local len_10 = #v_2["tooltip"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_10)
+							alloc(len_10)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_2["tooltip"], len_10)
+						end
 						if v_2["instance"] ~= nil then
-							bool_3 = bit32.bor(bool_3, 0b0000000000000010)
+							bool_3 = bit32.bor(bool_3, 0b0000000000100000)
 							assert(v_2["instance"]:IsA("Tool"), "received instance is not of the Tool class!")
 							table.insert(outgoing_inst, v_2["instance"])
 						end
@@ -362,10 +374,10 @@ local returns = {
 			["data"]: ({
 				["clientBackpacks"]: ({ [(string)]: ({
 					["backpack"]: (({ [(string)]: ({
-						["metadata"]: ({ [(string)]: ((unknown)) }),
-						["name"]: (string),
-						["icon"]: (string),
-						["tooltip"]: (string),
+						["metadata"]: (({ [(string)]: ((unknown)) })?),
+						["name"]: ((string)?),
+						["icon"]: ((string)?),
+						["tooltip"]: ((string)?),
 						["instance"]: ((Tool)?),
 					}) })?),
 					["equip"]: ((string)?),
@@ -408,48 +420,60 @@ local returns = {
 						buffer.writeu16(outgoing_buff, outgoing_apos, len_15)
 						alloc(len_15)
 						buffer.writestring(outgoing_buff, outgoing_apos, k_5, len_15)
-						local len_pos_6
-						local len_16 = 0
-						for k_6, v_6 in v_5["metadata"] do
-							if len_16 == 0 then
-								len_pos_6 = alloc(2)
-							end
-							local bool_8 = 0
-							local bool_8_pos_1 = alloc(1)
-							len_16 = len_16 + 1
-							local len_17 = #k_6
-							alloc(2)
-							buffer.writeu16(outgoing_buff, outgoing_apos, len_17)
-							alloc(len_17)
-							buffer.writestring(outgoing_buff, outgoing_apos, k_6, len_17)
-							if v_6 ~= nil then
-								bool_8 = bit32.bor(bool_8, 0b0000000000000001)
-								table.insert(outgoing_inst, v_6)
-							end
-							buffer.writeu8(outgoing_buff, bool_8_pos_1, bool_8)
-						end
-						if len_pos_6 then
-							buffer.writeu16(outgoing_buff, len_pos_6, len_16 - 1)
-						else
+						if v_5["metadata"] ~= nil then
 							bool_7 = bit32.bor(bool_7, 0b0000000000000001)
+							local len_pos_6
+							local len_16 = 0
+							for k_6, v_6 in v_5["metadata"] do
+								if len_16 == 0 then
+									len_pos_6 = alloc(2)
+								end
+								local bool_8 = 0
+								local bool_8_pos_1 = alloc(1)
+								len_16 = len_16 + 1
+								local len_17 = #k_6
+								alloc(2)
+								buffer.writeu16(outgoing_buff, outgoing_apos, len_17)
+								alloc(len_17)
+								buffer.writestring(outgoing_buff, outgoing_apos, k_6, len_17)
+								if v_6 ~= nil then
+									bool_8 = bit32.bor(bool_8, 0b0000000000000001)
+									table.insert(outgoing_inst, v_6)
+								end
+								buffer.writeu8(outgoing_buff, bool_8_pos_1, bool_8)
+							end
+							if len_pos_6 then
+								buffer.writeu16(outgoing_buff, len_pos_6, len_16 - 1)
+							else
+								bool_7 = bit32.bor(bool_7, 0b0000000000000010)
+							end
 						end
-						local len_18 = #v_5["name"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_18)
-						alloc(len_18)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_5["name"], len_18)
-						local len_19 = #v_5["icon"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_19)
-						alloc(len_19)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_5["icon"], len_19)
-						local len_20 = #v_5["tooltip"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_20)
-						alloc(len_20)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_5["tooltip"], len_20)
+						if v_5["name"] ~= nil then
+							bool_7 = bit32.bor(bool_7, 0b0000000000000100)
+							local len_18 = #v_5["name"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_18)
+							alloc(len_18)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_5["name"], len_18)
+						end
+						if v_5["icon"] ~= nil then
+							bool_7 = bit32.bor(bool_7, 0b0000000000001000)
+							local len_19 = #v_5["icon"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_19)
+							alloc(len_19)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_5["icon"], len_19)
+						end
+						if v_5["tooltip"] ~= nil then
+							bool_7 = bit32.bor(bool_7, 0b0000000000010000)
+							local len_20 = #v_5["tooltip"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_20)
+							alloc(len_20)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_5["tooltip"], len_20)
+						end
 						if v_5["instance"] ~= nil then
-							bool_7 = bit32.bor(bool_7, 0b0000000000000010)
+							bool_7 = bit32.bor(bool_7, 0b0000000000100000)
 							assert(v_5["instance"]:IsA("Tool"), "received instance is not of the Tool class!")
 							table.insert(outgoing_inst, v_5["instance"])
 						end
@@ -497,10 +521,10 @@ local returns = {
 			["data"]: ({
 				["clientBackpacks"]: ({ [(string)]: ({
 					["backpack"]: (({ [(string)]: ({
-						["metadata"]: ({ [(string)]: ((unknown)) }),
-						["name"]: (string),
-						["icon"]: (string),
-						["tooltip"]: (string),
+						["metadata"]: (({ [(string)]: ((unknown)) })?),
+						["name"]: ((string)?),
+						["icon"]: ((string)?),
+						["tooltip"]: ((string)?),
 						["instance"]: ((Tool)?),
 					}) })?),
 					["equip"]: ((string)?),
@@ -543,48 +567,60 @@ local returns = {
 						buffer.writeu16(outgoing_buff, outgoing_apos, len_25)
 						alloc(len_25)
 						buffer.writestring(outgoing_buff, outgoing_apos, k_8, len_25)
-						local len_pos_9
-						local len_26 = 0
-						for k_9, v_9 in v_8["metadata"] do
-							if len_26 == 0 then
-								len_pos_9 = alloc(2)
-							end
-							local bool_12 = 0
-							local bool_12_pos_1 = alloc(1)
-							len_26 = len_26 + 1
-							local len_27 = #k_9
-							alloc(2)
-							buffer.writeu16(outgoing_buff, outgoing_apos, len_27)
-							alloc(len_27)
-							buffer.writestring(outgoing_buff, outgoing_apos, k_9, len_27)
-							if v_9 ~= nil then
-								bool_12 = bit32.bor(bool_12, 0b0000000000000001)
-								table.insert(outgoing_inst, v_9)
-							end
-							buffer.writeu8(outgoing_buff, bool_12_pos_1, bool_12)
-						end
-						if len_pos_9 then
-							buffer.writeu16(outgoing_buff, len_pos_9, len_26 - 1)
-						else
+						if v_8["metadata"] ~= nil then
 							bool_11 = bit32.bor(bool_11, 0b0000000000000001)
+							local len_pos_9
+							local len_26 = 0
+							for k_9, v_9 in v_8["metadata"] do
+								if len_26 == 0 then
+									len_pos_9 = alloc(2)
+								end
+								local bool_12 = 0
+								local bool_12_pos_1 = alloc(1)
+								len_26 = len_26 + 1
+								local len_27 = #k_9
+								alloc(2)
+								buffer.writeu16(outgoing_buff, outgoing_apos, len_27)
+								alloc(len_27)
+								buffer.writestring(outgoing_buff, outgoing_apos, k_9, len_27)
+								if v_9 ~= nil then
+									bool_12 = bit32.bor(bool_12, 0b0000000000000001)
+									table.insert(outgoing_inst, v_9)
+								end
+								buffer.writeu8(outgoing_buff, bool_12_pos_1, bool_12)
+							end
+							if len_pos_9 then
+								buffer.writeu16(outgoing_buff, len_pos_9, len_26 - 1)
+							else
+								bool_11 = bit32.bor(bool_11, 0b0000000000000010)
+							end
 						end
-						local len_28 = #v_8["name"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_28)
-						alloc(len_28)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_8["name"], len_28)
-						local len_29 = #v_8["icon"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_29)
-						alloc(len_29)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_8["icon"], len_29)
-						local len_30 = #v_8["tooltip"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_30)
-						alloc(len_30)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_8["tooltip"], len_30)
+						if v_8["name"] ~= nil then
+							bool_11 = bit32.bor(bool_11, 0b0000000000000100)
+							local len_28 = #v_8["name"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_28)
+							alloc(len_28)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_8["name"], len_28)
+						end
+						if v_8["icon"] ~= nil then
+							bool_11 = bit32.bor(bool_11, 0b0000000000001000)
+							local len_29 = #v_8["icon"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_29)
+							alloc(len_29)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_8["icon"], len_29)
+						end
+						if v_8["tooltip"] ~= nil then
+							bool_11 = bit32.bor(bool_11, 0b0000000000010000)
+							local len_30 = #v_8["tooltip"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_30)
+							alloc(len_30)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_8["tooltip"], len_30)
+						end
 						if v_8["instance"] ~= nil then
-							bool_11 = bit32.bor(bool_11, 0b0000000000000010)
+							bool_11 = bit32.bor(bool_11, 0b0000000000100000)
 							assert(v_8["instance"]:IsA("Tool"), "received instance is not of the Tool class!")
 							table.insert(outgoing_inst, v_8["instance"])
 						end
@@ -634,10 +670,10 @@ local returns = {
 			["data"]: ({
 				["clientBackpacks"]: ({ [(string)]: ({
 					["backpack"]: (({ [(string)]: ({
-						["metadata"]: ({ [(string)]: ((unknown)) }),
-						["name"]: (string),
-						["icon"]: (string),
-						["tooltip"]: (string),
+						["metadata"]: (({ [(string)]: ((unknown)) })?),
+						["name"]: ((string)?),
+						["icon"]: ((string)?),
+						["tooltip"]: ((string)?),
 						["instance"]: ((Tool)?),
 					}) })?),
 					["equip"]: ((string)?),
@@ -680,48 +716,60 @@ local returns = {
 						buffer.writeu16(outgoing_buff, outgoing_apos, len_35)
 						alloc(len_35)
 						buffer.writestring(outgoing_buff, outgoing_apos, k_11, len_35)
-						local len_pos_12
-						local len_36 = 0
-						for k_12, v_12 in v_11["metadata"] do
-							if len_36 == 0 then
-								len_pos_12 = alloc(2)
-							end
-							local bool_16 = 0
-							local bool_16_pos_1 = alloc(1)
-							len_36 = len_36 + 1
-							local len_37 = #k_12
-							alloc(2)
-							buffer.writeu16(outgoing_buff, outgoing_apos, len_37)
-							alloc(len_37)
-							buffer.writestring(outgoing_buff, outgoing_apos, k_12, len_37)
-							if v_12 ~= nil then
-								bool_16 = bit32.bor(bool_16, 0b0000000000000001)
-								table.insert(outgoing_inst, v_12)
-							end
-							buffer.writeu8(outgoing_buff, bool_16_pos_1, bool_16)
-						end
-						if len_pos_12 then
-							buffer.writeu16(outgoing_buff, len_pos_12, len_36 - 1)
-						else
+						if v_11["metadata"] ~= nil then
 							bool_15 = bit32.bor(bool_15, 0b0000000000000001)
+							local len_pos_12
+							local len_36 = 0
+							for k_12, v_12 in v_11["metadata"] do
+								if len_36 == 0 then
+									len_pos_12 = alloc(2)
+								end
+								local bool_16 = 0
+								local bool_16_pos_1 = alloc(1)
+								len_36 = len_36 + 1
+								local len_37 = #k_12
+								alloc(2)
+								buffer.writeu16(outgoing_buff, outgoing_apos, len_37)
+								alloc(len_37)
+								buffer.writestring(outgoing_buff, outgoing_apos, k_12, len_37)
+								if v_12 ~= nil then
+									bool_16 = bit32.bor(bool_16, 0b0000000000000001)
+									table.insert(outgoing_inst, v_12)
+								end
+								buffer.writeu8(outgoing_buff, bool_16_pos_1, bool_16)
+							end
+							if len_pos_12 then
+								buffer.writeu16(outgoing_buff, len_pos_12, len_36 - 1)
+							else
+								bool_15 = bit32.bor(bool_15, 0b0000000000000010)
+							end
 						end
-						local len_38 = #v_11["name"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_38)
-						alloc(len_38)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_11["name"], len_38)
-						local len_39 = #v_11["icon"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_39)
-						alloc(len_39)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_11["icon"], len_39)
-						local len_40 = #v_11["tooltip"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_40)
-						alloc(len_40)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_11["tooltip"], len_40)
+						if v_11["name"] ~= nil then
+							bool_15 = bit32.bor(bool_15, 0b0000000000000100)
+							local len_38 = #v_11["name"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_38)
+							alloc(len_38)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_11["name"], len_38)
+						end
+						if v_11["icon"] ~= nil then
+							bool_15 = bit32.bor(bool_15, 0b0000000000001000)
+							local len_39 = #v_11["icon"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_39)
+							alloc(len_39)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_11["icon"], len_39)
+						end
+						if v_11["tooltip"] ~= nil then
+							bool_15 = bit32.bor(bool_15, 0b0000000000010000)
+							local len_40 = #v_11["tooltip"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_40)
+							alloc(len_40)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_11["tooltip"], len_40)
+						end
 						if v_11["instance"] ~= nil then
-							bool_15 = bit32.bor(bool_15, 0b0000000000000010)
+							bool_15 = bit32.bor(bool_15, 0b0000000000100000)
 							assert(v_11["instance"]:IsA("Tool"), "received instance is not of the Tool class!")
 							table.insert(outgoing_inst, v_11["instance"])
 						end
@@ -769,10 +817,10 @@ local returns = {
 			["data"]: ({
 				["clientBackpacks"]: ({ [(string)]: ({
 					["backpack"]: (({ [(string)]: ({
-						["metadata"]: ({ [(string)]: ((unknown)) }),
-						["name"]: (string),
-						["icon"]: (string),
-						["tooltip"]: (string),
+						["metadata"]: (({ [(string)]: ((unknown)) })?),
+						["name"]: ((string)?),
+						["icon"]: ((string)?),
+						["tooltip"]: ((string)?),
 						["instance"]: ((Tool)?),
 					}) })?),
 					["equip"]: ((string)?),
@@ -815,48 +863,60 @@ local returns = {
 						buffer.writeu16(outgoing_buff, outgoing_apos, len_45)
 						alloc(len_45)
 						buffer.writestring(outgoing_buff, outgoing_apos, k_14, len_45)
-						local len_pos_15
-						local len_46 = 0
-						for k_15, v_15 in v_14["metadata"] do
-							if len_46 == 0 then
-								len_pos_15 = alloc(2)
-							end
-							local bool_20 = 0
-							local bool_20_pos_1 = alloc(1)
-							len_46 = len_46 + 1
-							local len_47 = #k_15
-							alloc(2)
-							buffer.writeu16(outgoing_buff, outgoing_apos, len_47)
-							alloc(len_47)
-							buffer.writestring(outgoing_buff, outgoing_apos, k_15, len_47)
-							if v_15 ~= nil then
-								bool_20 = bit32.bor(bool_20, 0b0000000000000001)
-								table.insert(outgoing_inst, v_15)
-							end
-							buffer.writeu8(outgoing_buff, bool_20_pos_1, bool_20)
-						end
-						if len_pos_15 then
-							buffer.writeu16(outgoing_buff, len_pos_15, len_46 - 1)
-						else
+						if v_14["metadata"] ~= nil then
 							bool_19 = bit32.bor(bool_19, 0b0000000000000001)
+							local len_pos_15
+							local len_46 = 0
+							for k_15, v_15 in v_14["metadata"] do
+								if len_46 == 0 then
+									len_pos_15 = alloc(2)
+								end
+								local bool_20 = 0
+								local bool_20_pos_1 = alloc(1)
+								len_46 = len_46 + 1
+								local len_47 = #k_15
+								alloc(2)
+								buffer.writeu16(outgoing_buff, outgoing_apos, len_47)
+								alloc(len_47)
+								buffer.writestring(outgoing_buff, outgoing_apos, k_15, len_47)
+								if v_15 ~= nil then
+									bool_20 = bit32.bor(bool_20, 0b0000000000000001)
+									table.insert(outgoing_inst, v_15)
+								end
+								buffer.writeu8(outgoing_buff, bool_20_pos_1, bool_20)
+							end
+							if len_pos_15 then
+								buffer.writeu16(outgoing_buff, len_pos_15, len_46 - 1)
+							else
+								bool_19 = bit32.bor(bool_19, 0b0000000000000010)
+							end
 						end
-						local len_48 = #v_14["name"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_48)
-						alloc(len_48)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_14["name"], len_48)
-						local len_49 = #v_14["icon"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_49)
-						alloc(len_49)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_14["icon"], len_49)
-						local len_50 = #v_14["tooltip"]
-						alloc(2)
-						buffer.writeu16(outgoing_buff, outgoing_apos, len_50)
-						alloc(len_50)
-						buffer.writestring(outgoing_buff, outgoing_apos, v_14["tooltip"], len_50)
+						if v_14["name"] ~= nil then
+							bool_19 = bit32.bor(bool_19, 0b0000000000000100)
+							local len_48 = #v_14["name"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_48)
+							alloc(len_48)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_14["name"], len_48)
+						end
+						if v_14["icon"] ~= nil then
+							bool_19 = bit32.bor(bool_19, 0b0000000000001000)
+							local len_49 = #v_14["icon"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_49)
+							alloc(len_49)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_14["icon"], len_49)
+						end
+						if v_14["tooltip"] ~= nil then
+							bool_19 = bit32.bor(bool_19, 0b0000000000010000)
+							local len_50 = #v_14["tooltip"]
+							alloc(2)
+							buffer.writeu16(outgoing_buff, outgoing_apos, len_50)
+							alloc(len_50)
+							buffer.writestring(outgoing_buff, outgoing_apos, v_14["tooltip"], len_50)
+						end
 						if v_14["instance"] ~= nil then
-							bool_19 = bit32.bor(bool_19, 0b0000000000000010)
+							bool_19 = bit32.bor(bool_19, 0b0000000000100000)
 							assert(v_14["instance"]:IsA("Tool"), "received instance is not of the Tool class!")
 							table.insert(outgoing_inst, v_14["instance"])
 						end

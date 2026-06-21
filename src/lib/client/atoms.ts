@@ -33,10 +33,6 @@ export const inventoryVisibleAtom = atom<boolean>(false);
 
 export const backpackSelectionAtom = atom<number | "Inventory" | undefined>(undefined);
 
-export type BackpackFilterFn = <T = Record<string, unknown>>(metadata: T) => boolean;
-export interface BackcpackFilter {
-	priority: number;
-	filter: BackpackFilterFn;
-}
+export type BackpackFilterFn<T = Record<string, unknown>> = (metadata: T) => boolean;
 
-export const filterAtom = atom(new Map<string, BackcpackFilter>());
+export const filterAtom = atom(new Map<string, BackpackFilterFn>());

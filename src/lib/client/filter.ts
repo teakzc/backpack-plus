@@ -1,7 +1,7 @@
 import { set } from "@rbxts/sift/out/Dictionary";
-import { BackcpackFilter, filterAtom } from "./atoms";
+import { BackpackFilterFn, filterAtom } from "./atoms";
 
-export function addFilter(key: string, filter: BackcpackFilter) {
+export function addFilter<T = Record<string, unknown>>(key: string, filter: BackpackFilterFn<T>) {
 	filterAtom((current) => set(current, key, filter));
 }
 
@@ -14,5 +14,5 @@ export function getFilter(key: string) {
 }
 
 export function clearFilter() {
-	filterAtom(new Map<string, BackcpackFilter>());
+	filterAtom(new Map<string, BackpackFilterFn>());
 }

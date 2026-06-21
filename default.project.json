@@ -25,6 +25,9 @@
 			},
 			"Package": {
 				"$path": "out/lib"
+			},
+			"Storybook": {
+				"$path": "out/tests/storybook"
 			}
 		},
 		"StarterPlayer": {

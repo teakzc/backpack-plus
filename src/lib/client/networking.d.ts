@@ -5,10 +5,10 @@ export declare const SyncState: {
 		["data"]: {
 			["clientBackpacks"]: Map<string, {
 				["backpack"]?: Map<string, {
-					["metadata"]: Map<string, unknown>,
-					["name"]: string,
-					["icon"]: string,
-					["tooltip"]: string,
+					["metadata"]?: Map<string, unknown> | undefined,
+					["name"]?: string | undefined,
+					["icon"]?: string | undefined,
+					["tooltip"]?: string | undefined,
 					["instance"]?: Tool | undefined,
 				}> | undefined,
 				["equip"]?: string | undefined,
