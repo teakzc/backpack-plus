@@ -5,6 +5,13 @@ import { ToolId } from "../shared/types";
 import { backpackSelectionAtom, clientBackpack, clientBackpackOrder, clientHotbar, draggingAtom } from "./atoms";
 import { RequestEquip } from "./networking";
 
+/**
+ * Swaps two tool slots in the hotbar.
+ *
+ * @param slot1 Position of the first tool.
+ * @param slot2 Position of the second tool.
+ * @client
+ */
 export function swapSlots(slot1: number, slot2: number) {
 	clientHotbar((current) => {
 		const clone = table.clone(current);
@@ -16,7 +23,17 @@ export function swapSlots(slot1: number, slot2: number) {
 	});
 }
 
-export function findToolLocation(toolId: ToolId): number | "Backpack" | undefined {
+/**
+ * Finds the tool's location
+ *
+ * number: slot in hotbar
+ * "Inventory": inventory
+ *
+ * @param toolId The `ToolId` to find.
+ * @returns The location.
+ * @client
+ */
+export function findToolLocation(toolId: ToolId): number | "Inventory" | undefined {
 	const hotbar = clientHotbar();
 	for (const [slot, id] of hotbar) {
 		if (id === toolId) {
@@ -25,13 +42,30 @@ export function findToolLocation(toolId: ToolId): number | "Backpack" | undefine
 	}
 
 	const backpack = clientBackpack().backpack;
-	return backpack.get(toolId) !== undefined ? "Backpack" : undefined;
+	return backpack.get(toolId) !== undefined ? "Inventory" : undefined;
 }
 
-export function findToolFromSlot(slot: number): ToolId | undefined {
+/**
+ * Finds the `ToolId` from the slot number in the hotbar
+ *
+ * `ToolId` can also be "Empty" or "Drag" depending.
+ *
+ * @param slot Slot number in the hotbar
+ * @returns `ToolId` or undefined if there is no tool.
+ * @client
+ */
+export function findToolFromSlot(slot: number): ToolId | "Drag" | "Drag" | undefined {
 	return clientHotbar().get(slot);
 }
 
+/**
+ * Starts dragging a tool.
+ *
+ * @param toolId The tool to drag.
+ * @param offset Mouse offet from slot for calculations.
+ * @param inputObject The current dragging `InputObject` to dfferientiate mobile touches.
+ * @client
+ */
 export function dragTool(toolId: ToolId, offset: Vector2, inputObject?: InputObject) {
 	const from = findToolLocation(toolId);
 	if (from === undefined) return;
@@ -73,6 +107,10 @@ export function dragTool(toolId: ToolId, offset: Vector2, inputObject?: InputObj
 	});
 }
 
+/**
+ * Undrags the currently dragged tool.
+ * @client
+ */
 export function undragTool() {
 	const data = draggingAtom();
 
@@ -95,8 +133,6 @@ export function undragTool() {
 			swapSlots(data.from, selection);
 		}
 	} else {
-		// data.from --> "Backpack"
-
 		if (selection === undefined || selection === "Inventory") {
 			clientBackpackOrder((current) => {
 				const check = current.findIndex((id) => id === "Drag") !== -1;
@@ -128,6 +164,12 @@ export function undragTool() {
 	}
 }
 
+/**
+ * Sends a event to the server to equip a tool
+ *
+ * @param toolId The tool to equip.
+ * @client
+ */
 export function equipTool(toolId: ToolId) {
 	RequestEquip.fire(toolId);
 }

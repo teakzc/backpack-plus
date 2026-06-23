@@ -2,13 +2,16 @@ import React, { useRef, useState } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { backpackSelectionAtom, inventoryVisibleAtom } from "../../../atoms";
 import { inventoryDecoratorsAtom } from "../../../decorating";
-import { backpackSettings } from "../../../settings";
+import { backpackSettingsAtom } from "../../../settings";
 import { BACKPACK_DIMENSIONS } from "../../constants";
 import InventoryScrollingFrame from "./scrolling";
 
+/**
+ * @hidden
+ */
 export default function Inventory() {
 	const visibility = useAtom(inventoryVisibleAtom);
-	const settings = useAtom(backpackSettings);
+	const settings = useAtom(backpackSettingsAtom);
 
 	const [query, setQuery] = useState("");
 
@@ -24,8 +27,6 @@ export default function Inventory() {
 	const toolbarWidth = ICON_BUFFER + settings.slots * slotStep;
 	const toolbarHeight = ICON_BUFFER + ICON_SIZE + ICON_BUFFER;
 	const inventoryHeight = toolbarHeight * INVENTORY_ROWS + INVENTORY_HEADER;
-
-	print(decorators);
 
 	return (
 		<frame

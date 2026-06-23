@@ -6,6 +6,10 @@ import { modifyPlayer } from "./clients";
 import { RequestEquip, RequestState, SyncState } from "./networking";
 import { holdTool } from "./tools";
 
+/**
+ * Initializes the backpack-plus server
+ * @server
+ */
 export function initializeBackpackServer() {
 	const syncer = server({
 		atoms: {

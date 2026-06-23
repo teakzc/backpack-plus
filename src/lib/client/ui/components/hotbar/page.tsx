@@ -1,12 +1,15 @@
 import React from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { hotbarDecoratorsAtom } from "../../../decorating";
-import { backpackSettings } from "../../../settings";
+import { backpackSettingsAtom } from "../../../settings";
 import { BACKPACK_DIMENSIONS } from "../../constants";
 import BackpackHotbarContent from "./content";
 
+/**
+ * @hidden
+ */
 export default function BackpackHotbar() {
-	const settings = useAtom(backpackSettings);
+	const settings = useAtom(backpackSettingsAtom);
 
 	const decorators = useAtom(hotbarDecoratorsAtom);
 

@@ -15,12 +15,8 @@ import {
 	inventoryVisibleAtom,
 } from "./atoms";
 import { RequestState, SyncState } from "./networking";
-import { BackpackSettings, applySettings, backpackSettings } from "./settings";
+import { backpackSettingsAtom } from "./settings";
 import { equipTool, findToolFromSlot } from "./tools";
-
-export function configureBackpack(settings: Partial<BackpackSettings>) {
-	applySettings(settings);
-}
 
 function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	// Find for free slot.
@@ -28,7 +24,7 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	let hotbarSlot = -1;
 
 	const clientHotbarValue = clientHotbar();
-	for (let slot = 1; slot <= backpackSettings().slots; slot++) {
+	for (let slot = 1; slot <= backpackSettingsAtom().slots; slot++) {
 		// clientHotbarValue is a Map, so it is not shifted from 1 to 0 index.
 		// We can thus directly index it with the slot number.
 		if (clientHotbarValue.get(slot) === undefined || clientHotbarValue.get(slot) === "Empty") {
@@ -59,20 +55,23 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 		const dragging = draggingAtom();
 		if (dragging?.id === toolId) {
 			draggingAtom(undefined);
-			print("debug", draggingAtom());
 		}
 
 		clientBackpackOrder((current) => removeValue(current, toolId));
 	};
 }
 
+/**
+ * Initializes the backpack-plus client.
+ * @client
+ */
 export function initializeBackpackClient() {
 	StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false);
 
 	clientHotbar((current) => {
 		const clone = table.clone(current);
 
-		for (let i = 1; i <= backpackSettings().slots; i++) {
+		for (let i = 1; i <= backpackSettingsAtom().slots; i++) {
 			if (!clone.has(i)) {
 				clone.set(i, "Empty");
 			}
@@ -113,9 +112,10 @@ const inputs = {
 };
 
 /**
- * Helper function for equipping tools from 0-9
- * @param toggleBackquote Whether to bind `Backquote` to open inventory
- * @returns Disconnect function
+ * Helper function for equipping tools from 0-9.
+ * @param toggleBackquote Whether to bind `Backquote` to open inventory.
+ * @returns Cleanup function.
+ * @client
  */
 export function backpackInputHelper(toggleBackquote?: boolean) {
 	const connection = UserInputService.InputBegan.Connect((input, GPE) => {

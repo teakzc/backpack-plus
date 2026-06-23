@@ -3,14 +3,7 @@ import React, { useEffect } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { VRService } from "@rbxts/services";
 import { ToolId } from "../../../../shared/types";
-import {
-	clientBackpack,
-	clientBackpackOrder,
-	clientHotbar,
-	draggingAtom,
-	filterAtom,
-	inventoryVisibleAtom,
-} from "../../../atoms";
+import { clientBackpack, clientBackpackOrder, clientHotbar, filterAtom, inventoryVisibleAtom } from "../../../atoms";
 import { BACKPACK_DIMENSIONS } from "../../constants";
 import { useTokens } from "../../hooks";
 import BackpackSlot from "../slot/page";
@@ -21,10 +14,12 @@ interface InventoryScrollingFrameProps {
 	query: string | React.Binding<string>;
 }
 
+/**
+ * @hidden
+ */
 export default function InventoryScrollingFrame(props: InventoryScrollingFrameProps) {
 	const tokens = useTokens();
 	const visibility = useAtom(inventoryVisibleAtom);
-	const drag = useAtom(draggingAtom);
 	const backpackData = useAtom(clientBackpack);
 
 	const { ICON_SIZE, ICON_BUFFER, INVENTORY_HEADER_SIZE } = BACKPACK_DIMENSIONS;

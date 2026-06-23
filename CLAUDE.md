@@ -6,115 +6,121 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm run build        # compile TypeScript → Lua via rbxtsc
-npm run watch        # compile in watch mode
+npm run watch        # compile in watch mode (rbxtsc -w)
+npm run dev          # compile as a game place, watch mode
 npx eslint src/      # lint
 ```
 
-There are no automated test scripts — tests run inside Roblox Studio using the compiled output from `default.project.json`.
-
-To test: build the project, sync with Rojo into a Roblox Studio place using `default.project.json`, then play the game. The client test script is at `src/tests/client/runtime.client.tsx` and the server test script is at `src/tests/server/runtime.server.ts`.
+There are no automated test scripts that run outside Roblox. Tests are written with `@rbxts/jest` and execute inside Roblox Studio using the compiled output. To test: build the project, sync into a Studio place with Rojo (`default.project.json`), then play. The client test entry is `src/tests/client/runtime.client.tsx` and the server test entry is `src/tests/server/runtime.server.ts`.
 
 ## Architecture
 
-**backpack-plus** is a published npm package (`@rbxts/backpack-plus`) that replaces the default Roblox inventory/backpack UI. It compiles TypeScript to Lua via roblox-ts and runs inside Roblox.
+**backpack-plus** (`@rbxts/backpack-plus`, v2.0.0-rc.1) is a published npm package that replaces the default Roblox inventory/backpack UI. It compiles TypeScript to Lua via roblox-ts and runs inside Roblox. Inspired by `ryanlua/satchel`.
 
 ### Module layout
 
 ```
 src/lib/
-├── client/          # Client-side state and UI
-│   ├── core.ts      # initializeBackpackClient(), configureBackpack(), backpackInputHelper()
-│   ├── atoms.ts     # All Charm atoms (reactive state)
-│   ├── settings.ts  # BackpackSettings atom (slots count)
-│   ├── tools.ts     # dragTool(), undragTool(), swapSlots(), findTool()
+├── client/
+│   ├── core.tsx        # initializeBackpackClient(), configureBackpack(), backpackInputHelper()
+│   ├── atoms.ts        # Charm atoms (clientBackpack, clientHotbar, draggingAtom, filterAtom, ...)
+│   ├── settings.ts     # backpackSettings atom + applySettings() (slot count)
+│   ├── tools.ts        # dragTool(), undragTool(), swapSlots(), equipTool(), findTool* helpers
+│   ├── filter.ts       # addFilter(), removeFilter(), getFilter(), clearFilter()
+│   ├── networking.luau / networking.d.ts  # Zap-generated client remotes (SyncState, RequestState, RequestEquip)
+│   ├── decorating/     # Plugin-style UI extension points (see "Decorating" below)
+│   │   ├── slot.ts         # registerSlotDecorator(), SlotDecorator, ToolContext
+│   │   ├── hotbar.ts       # registerHotbarDecorator(), HotbarDecorator
+│   │   ├── inventory.tsx   # registerInventoryDecorator(), InventoryDecorator, default header/search
+│   │   └── draggingslot.ts # dragging-slot decorators
 │   └── ui/
-│       ├── App.tsx  # Root React component — mounts Hotbar, Inventory, DraggingSlot
-│       ├── constants.ts  # BACKPACK_DIMENSIONS layout constants
-│       ├── components/   # Hotbar, Inventory, Slot, DraggingSlot
-│       └── hooks/        # useStyle, useTags
+│       ├── App.tsx     # BackpackPlusApp — StrictMode + ErrorBoundary, mounts Hotbar/Inventory/DraggingSlot
+│       ├── constants.ts # BACKPACK_DIMENSIONS layout constants
+│       ├── components/  # hotbar/, inventory/, slot/, searchbox, styleprovider
+│       ├── error/       # errorboundary.tsx, errorhandler.tsx
+│       └── hooks/       # useStyle, useTags
 ├── server/
-│   ├── core.ts      # initializeBackpackServer() — charm-sync server setup
-│   ├── atoms.ts     # clientBackpacks atom (source of truth)
-│   ├── clients.ts   # registerPlayer(), unregisterPlayer(), modifyPlayer()
-│   └── tools.ts     # giveTool(), removeTool(), updateTool()
+│   ├── core.ts         # initializeBackpackServer() — charm-sync server + equip handling
+│   ├── atoms.ts        # clientBackpacks atom (source of truth)
+│   ├── clients.ts      # registerPlayer(), unregisterPlayer(), modifyPlayer(), getBackpack(), getClientOwnership()
+│   ├── tools.ts        # giveTool(), removeTool(), updateTool(), holdTool()
+│   ├── data.ts         # toolMap, toolClientMap, toolRegistry (server-only tool bookkeeping)
+│   └── networking.luau / networking.d.ts  # Zap-generated server remotes
 └── shared/
-    ├── types.ts     # ToolPlus, ToolId, ClientBackpack, ClientBackpacks
-    ├── networking.ts # backpackRemotes (remo) + backpackSyncPayload type
-    └── utils/id.ts  # generateId() — counter-based unique IDs
+    ├── types.ts        # ToolPlus, ToolId
+    ├── networking.ts   # ClientBackpack, ClientBackpacks, backpackSyncPayload, zapSyncPayload
+    └── utils/
+        ├── id.ts        # generateId() — counter-based unique IDs
+        └── fuzzyscore.luau / .d.ts  # fuzzy search scoring helper
 ```
 
 ### State flow
 
-- **Server** owns `clientBackpacks` atom (a `Map<playerName, Map<toolId, ToolPlus>>`). Tools are added/removed server-side via `giveTool` / `removeTool`.
-- **charm-sync** (`@rbxts/charm-sync`) replicates the server atom to clients via `backpackRemotes.syncState`. Each client only receives its own slice (filtered in `filterPayload`).
-- **Client** mirrors its slice in `_clientBackpacks`, derives `clientBackpack` (computed atom for local player), and uses `observe` to assign arriving tools to `clientHotbar` (Map<slot, ToolId|"Drag"|"Empty">) or `clientBackpackOrder` (overflow array).
-- **UI** (React + `@rbxts/react-charm`) reads these atoms reactively. `draggingAtom` tracks in-flight drag state; `inventoryVisibleAtom` toggles the inventory panel; `backpackSelectionAtom` tracks which slot the user is hovering during a drag.
+- **Server** owns the `clientBackpacks` atom — a `Map<playerName, ClientBackpack>` where `ClientBackpack = { equip: ToolId; backpack: Map<ToolId, ToolPlus> }`. Tools are added/removed server-side via `giveTool` / `removeTool` / `updateTool`. The server also keeps `toolMap` / `toolClientMap` / `toolRegistry` (in `server/data.ts`) for the actual `Tool` instances.
+- **charm-sync** (`@rbxts/charm-sync`) replicates the server atom to clients. `initializeBackpackServer` connects the syncer and fires `SyncState`; `filterPayload` narrows each payload to only that client's slice before sending.
+- **Client** mirrors its slice in `_clientBackpacks`, derives `clientBackpack` (computed atom for the local player), and uses `observe` (in `observeBackpack`) to assign arriving tools to `clientHotbar` (`Map<slot, ToolId|"Drag"|"Empty">`) or `clientBackpackOrder` (overflow array).
+- **Equip** is request/response: client calls `equipTool` → `RequestEquip.fire(toolId)`; server toggles `equip` and calls `holdTool` to parent the `Tool` to the character (or back to `backpackplus-storage`).
+- **UI** (React + `@rbxts/react-charm`) reads atoms reactively via `useAtom`. `draggingAtom` tracks in-flight drag state, `inventoryVisibleAtom` toggles the inventory panel, `backpackSelectionAtom` tracks the slot being hovered during a drag.
+
+### Networking (Zap, not remo)
+
+Remotes are **generated by [Zap](https://github.com/red-blox/zap)** and committed as `networking.luau` + `networking.d.ts` on both client and server (the old `@rbxts/remo` setup is gone). They communicate over a `backpack-plus_ZAP_REMOTES` folder in `ReplicatedStorage`. The exposed events are `SyncState` (server→client state sync), `RequestState` (client→server hydrate request), and `RequestEquip` (client→server equip toggle). Do not hand-edit the generated `.luau`/`.d.ts` — regenerate from the Zap definition if the wire format changes.
+
+### Decorating (extension API)
+
+The UI exposes plugin-style decorator registries (atoms of arrays) so consumers can inject custom elements without forking:
+
+- `registerSlotDecorator(fn)` — renders per slot; receives `(tool, ToolContext)` where `ToolContext` carries `location`, `equipped`, `dragged`, `hovered` (a `React.Binding<boolean>`).
+- `registerHotbarDecorator(fn)` — renders extra elements in the hotbar frame.
+- `registerInventoryDecorator(region, fn)` — `region` is `"header" | "absolute" | "footer"`; `InventoryContext` provides `setQuery` / `query`. The default header (title + search box) is itself a registered decorator and can be overridden.
+- Dragging-slot decorators live in `decorating/draggingslot.ts`.
+
+Each `register*` returns a cleanup function that removes the decorator.
+
+### Filtering
+
+`client/filter.ts` maintains `filterAtom`, a `Map<string, BackpackFilterFn>`. `addFilter(key, fn)` / `removeFilter(key)` register predicates keyed by string; the inventory grid applies them to each tool's `metadata`. `BackpackFilterFn<T>` is `(metadata: T) => boolean`.
+
+### Public API surface
+
+`src/lib/index.ts` re-exports `shared/types`. Consumers import client APIs from the client entry (`atoms`, `core`, `filter`, `settings`, `tools`, `ui/App`) and server APIs from the server entry (`atoms`, `clients`, `core`, `tools`).
 
 ### Key design constraints
 
-- `clientHotbar` is 1-indexed (slots 1–10). When iterating the hotbar map, slot numbers directly correspond to UI positions with no index shift.
-- `generateId()` is a simple global counter mod 2³², not UUID. IDs are unique per server session, not globally unique.
-- Stylesheets (`base.rbxm`, `tokens.rbxm`) are binary assets committed to `src/lib/client/ui/`. The client init code attaches them to the `StyleDerive` and `StyleSheet` instances at runtime.
-- Touch devices default to 6 hotbar slots; keyboard devices default to 10 (set in `defaultSettings`).
-- The backtick key (`` ` ``) toggles inventory visibility (`backpackInputHelper`).
+- `clientHotbar` is 1-indexed (slots 1–10). Because it is a `Map`, slot numbers map directly to UI positions with no index shift — iterate it without subtracting 1.
+- `generateId()` is a global counter mod 2³² stringified, not a UUID. IDs are unique per server session, not globally.
+- Touch-only devices default to 6 hotbar slots; keyboard devices default to 10 (`defaultSettings` in `settings.ts`).
+- The backtick key (`` ` ``) toggles inventory visibility when `backpackInputHelper(true)` is used; keys 0–9 equip hotbar slots.
+- Held `Tool` instances are tagged `backpack-<PlayerName>` (CollectionService) and parked in a `backpackplus-storage` folder in `ReplicatedStorage` when not equipped.
 
 ### Tech stack
 
 | Concern          | Library                                               |
 | ---------------- | ----------------------------------------------------- |
 | UI framework     | `@rbxts/react` + `@rbxts/react-roblox`                |
-| Reactive state   | `@rbxts/charm` (atoms, computed, observe)             |
+| Reactive state   | `@rbxts/charm` (atom, computed, observe)              |
 | React ↔ Charm    | `@rbxts/react-charm` (`useAtom`)                      |
 | State sync       | `@rbxts/charm-sync` (server/client syncer)            |
-| Networking       | `@rbxts/remo` (`createRemotes`)                       |
-| Animations       | `@rbxts/ripple` + `@rbxts/react-ripple` (`useSpring`) |
-| Fuzzy search     | `@rbxts/fuzzy-search`                                 |
-| Functional utils | `@rbxts/sift` (Dictionary.set, Array.removeValue)     |
-| Compiler         | `roblox-ts` → Lua                                     |
+| Networking       | Zap (generated `networking.luau` + `.d.ts`)           |
+| React hooks      | `@rbxts/pretty-react-hooks`                           |
+| Animations       | `@rbxts/react-ripple`                                 |
+| Functional utils | `@rbxts/sift` (Dictionary.set, Array.removeValue/set) |
+| Testing          | `@rbxts/jest` (+ `@isentinel/jest-roblox`)            |
+| Compiler         | `roblox-ts` 3.x → Lua                                 |
 
 ## Code style
 
-- Prettier: 4-space tab width, tabs (not spaces), 120 char print width, trailing commas.
-- ESLint extends `roblox-ts/recommended-legacy`. `roblox-ts/no-any` and `roblox-ts/lua-truthiness` are disabled.
-- Use `table.clone()` for shallow-copying Roblox Maps before mutation (Lua semantics — Maps are reference types).
+- Prettier: 4-space tab width, tabs (not spaces), 120 char print width, trailing commas. `prettier-plugin-organize-imports` sorts imports.
+- ESLint extends `@teakzc/eslint-config` (roblox-ts based).
+- Use `table.clone()` for shallow-copying Roblox Maps before mutation (Lua semantics — Maps are reference types). Sift's `set` returns a new map/array and is preferred for atom updates.
 - Avoid JavaScript-only APIs: `Array.from()`, `Object.keys/values/entries()`, `for...in`, `string[index]`, `.charAt()`. Use roblox-ts equivalents or Sift utilities instead.
+- `@hidden` JSDoc marks internal symbols that should not appear in the published API.
 
-<!-- code-review-graph MCP tools -->
+## MCP Tools: code intelligence
 
-## MCP Tools: code-review-graph
+This project is indexed by two knowledge-graph MCP servers. **Prefer them over Grep/Glob/Read for exploration** — they are faster, cheaper, and give structural context (callers, dependents, impact).
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+- **codegraph** — `codegraph_explore` is the primary tool: one call returns verbatim source of relevant symbols grouped by file. Also `codegraph_search`, `codegraph_callers`, `codegraph_callees`, `codegraph_impact`, `codegraph_files`.
+- **code-review-graph** — use `detect_changes` + `get_review_context` for code review, `get_impact_radius` / `get_affected_flows` for blast radius, `query_graph` for callers/callees/imports/tests.
 
-### When to use graph tools FIRST
-
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
-
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
-
-### Key Tools
-
-| Tool                        | Use when                                               |
-| --------------------------- | ------------------------------------------------------ |
-| `detect_changes`            | Reviewing code changes — gives risk-scored analysis    |
-| `get_review_context`        | Need source snippets for review — token-efficient      |
-| `get_impact_radius`         | Understanding blast radius of a change                 |
-| `get_affected_flows`        | Finding which execution paths are impacted             |
-| `query_graph`               | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes`     | Finding functions/classes by name or keyword           |
-| `get_architecture_overview` | Understanding high-level codebase structure            |
-| `refactor_tool`             | Planning renames, finding dead code                    |
-
-### Workflow
-
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
+Fall back to Grep/Glob/Read only when the graph doesn't cover what you need.

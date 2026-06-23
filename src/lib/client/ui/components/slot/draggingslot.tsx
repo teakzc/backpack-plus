@@ -8,6 +8,9 @@ import { BACKPACK_DIMENSIONS } from "../../constants";
 import { useTags, useTokens } from "../../hooks";
 import BackpackSlotContent from "./content";
 
+/**
+ * @hidden
+ */
 export default function BackpackDraggingSlot() {
 	const [pos, setPos] = useSpring(new UDim2());
 
@@ -63,7 +66,7 @@ export default function BackpackDraggingSlot() {
 		>
 			<BackpackSlotContent
 				visibility={true}
-				layoutOrder={drag.from !== "Backpack" ? drag.from : -1}
+				layoutOrder={drag.from !== "Inventory" ? drag.from : -1}
 				icon={data.icon}
 				name={data.name}
 				id={drag.id}

@@ -4,6 +4,7 @@ import { BackpackSlotProps } from "./page";
 
 /**
  * @hidden
+ * @client
  */
 export function backpackSlotInputBegan(props: BackpackSlotProps, rbx: ImageButton, input: InputObject) {
 	if (input.UserInputType !== Enum.UserInputType.MouseButton1 && input.UserInputType !== Enum.UserInputType.Touch)

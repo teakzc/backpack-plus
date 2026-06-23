@@ -7,6 +7,7 @@ import { toolClientMap, toolMap, toolRegistry } from "./data";
 /**
  * Registers a player's backpack data
  * @param client The player to register
+ * @server
  */
 export function registerPlayer(client: Player) {
 	clientBackpacks((current) => {
@@ -15,8 +16,9 @@ export function registerPlayer(client: Player) {
 }
 
 /**
- * Unregisters a player's backpack data
+ * Unregisters a player's backpack data, and removes data from registries to clear up memory.
  * @param client The player to unregister
+ * @server
  */
 export function unregisterPlayer(client: Player) {
 	const toolIds = getBackpack(client)?.backpack;
@@ -38,6 +40,7 @@ export function unregisterPlayer(client: Player) {
  * Modifies a player's backpack data
  * @param client The player to modify
  * @param callback The callback to modify the backpack
+ * @server
  */
 export function modifyPlayer(client: Player, callback: (backpack: ClientBackpack) => ClientBackpack) {
 	clientBackpacks((current) => {
@@ -51,10 +54,23 @@ export function modifyPlayer(client: Player, callback: (backpack: ClientBackpack
 	});
 }
 
+/**
+ * Returns the client's backpack
+ *
+ * @param client
+ * @returns `ClientBackpack`
+ * @server
+ */
 export function getBackpack(client: Player) {
 	return clientBackpacks().get(client.Name);
 }
 
-export function getClientOwnership(toolId: ToolId) {
+/**
+ * Gets the client that owns the `ToolId`
+ * @param toolId The tool to check
+ * @returns The `Player` or undefined.
+ * @server
+ */
+export function getClientOwnership(toolId: ToolId): Player | undefined {
 	return toolClientMap.get(toolId);
 }

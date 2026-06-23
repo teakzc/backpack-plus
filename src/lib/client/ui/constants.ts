@@ -1,5 +1,9 @@
 import { GuiService, UserInputService } from "@rbxts/services";
 
+/**
+ * @hidden
+ * @client
+ */
 export const BACKPACK_DIMENSIONS = {
 	SCROLL_OFFSET: 40,
 	ICON_BUFFER: 5,

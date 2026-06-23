@@ -11,13 +11,16 @@ interface BackpackSlotContentProps {
 	id: string;
 }
 
+/**
+ * @hidden
+ */
 export default function BackpackSlotContent(props: BackpackSlotContentProps) {
 	const slotRef = useTags(["backpack-WeightBold", "backpack-SlotNumber"]);
 	const textRef = useTags(["backpack-SlotName"]);
 
 	return (
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1} BorderSizePixel={0}>
-			{props.inventory !== true && props.visibility ? (
+			{props.inventory !== true ? (
 				<textlabel
 					ref={slotRef}
 					Size={UDim2.fromScale(0.4, 0.4)}

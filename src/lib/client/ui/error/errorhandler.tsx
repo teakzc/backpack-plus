@@ -2,8 +2,8 @@ import React from "@rbxts/react";
 import { ErrorBoundary } from "./errorboundary";
 
 /**
- * Wraps backpack UI so a thrown error is logged and the subtree is removed
- * rather than crashing the rest of the player's GUI.
+ * @hidden
+ * @client
  */
 export function ErrorHandler({ children }: React.PropsWithChildren) {
 	return (

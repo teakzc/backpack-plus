@@ -9,6 +9,9 @@ interface BackpackSlotTooltipProps {
 	hover: React.Binding<boolean>;
 }
 
+/**
+ * @hidden
+ */
 export default function BackpackSlotTooltip(props: BackpackSlotTooltipProps) {
 	const [tooltipSize, setTooltipSize] = useSpring(0);
 	const tooltipRef = useRef<TextLabel>();

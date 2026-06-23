@@ -5,6 +5,8 @@ let id = 0;
 /**
  * Generates a unique ID
  * @returns A unique ID
+ *
+ * @hidden
  */
 export function generateId() {
 	id++;

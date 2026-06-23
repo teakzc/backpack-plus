@@ -15,6 +15,10 @@ interface ErrorBoundaryState {
 	err?: unknown;
 }
 
+/**
+ * @hidden
+ * @client
+ */
 @ReactComponent
 export class ErrorBoundary extends Component<React.PropsWithChildren<ErrorBoundaryProps>, ErrorBoundaryState> {
 	public state: ErrorBoundaryState = {

@@ -4,6 +4,7 @@ import { clientBackpack, draggingAtom, filterAtom } from "../../../atoms";
 
 /**
  * @hidden
+ * @client
  */
 export function filterInventory(
 	backpack: ToolId[],
@@ -24,6 +25,7 @@ export function filterInventory(
 
 /**
  * @hidden
+ * @client
  */
 export function fuzzyFilterInventory(
 	filtered: ToolId[],

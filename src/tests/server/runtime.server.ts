@@ -16,9 +16,6 @@ Players.PlayerAdded.Connect((player) => {
 	});
 
 	task.wait(5);
-
-	print("Changing!");
-
 	updateTool(player, id, (tool) => ({
 		...tool,
 		metadata: {

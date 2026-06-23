@@ -5,7 +5,7 @@
   <h1 align="center"><b>backpack-plus</b></h1>
   <p align="center"></p>
 
-    A modern Roblox backpack made /w React & inspired by ryanlua/satchel
+    A modern Roblox backpack UI & custom server-side made /w React & inspired by ryanlua/satchel
 
 [![License](https://img.shields.io/github/license/teakzc/backpack-plus?style=for-the-badge)](https://github.com/teakzc/backpack-plus/blob/main/LICENSE)
 
@@ -13,14 +13,14 @@
 
 ## 🎒 What can backpack-plus do?
 
-- Provide a better alternative to Roblox's inventory
-- Easy customization by mounting in react components
-- Easily manage player's inventory states by using `atom`s from littensy/charm
-- Attach metadata to `tool`s
-- Preserve toolbar slot arrangement
-- Inventory filtering system that compliments `tool` metadata + fuzzy searching
-- Listen to what the player does (Mouse hover selection, tool dragging & others)
+- Provide a better alternative to Roblox's inventory UI
+- Easy customization with stylesheets and decorating with React components
+- Easily manage backpack states with `littensy/charm`
+- Attach metadata to tools for querying and used for custom decorating.
+- Inventory querying system that works with metadata, using fuzzy searching
 - Automatic server to client replication using `charm-sync`
+
+Backpack-plus does not just replace the CoreGui backpack, but also the server side. Instead of raw `Tool` instances, backpack-plus provides API to add, modify and remove tools and handling everything for you.
 
 ## 💎 Credits
 
@@ -37,13 +37,8 @@ npm add @rbxts/backpack-plus
 ### Main Dependancies
 
 - littensy/charm
-- littensy/remo
 - littensy/rbxts-react
 - littensy/ripple
-
-## Quick side note
-
-This is my first actual actual package so I hope it is not badly written, and if so don't hesitate to give any criticism. I will be using this for all my games so any bugs will be squashed immediantly too.
 
 ## 🗃️ Documentation
 

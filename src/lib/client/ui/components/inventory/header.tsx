@@ -1,11 +1,11 @@
 import React from "@rbxts/react";
 import { BACKPACK_DIMENSIONS } from "../../constants";
 
-interface InventoryHeaderProps {
+interface BackpackPlusInventoryHeaderProps {
 	text: string | React.Binding<string>;
 }
 
-export default function InventoryHeader(props: InventoryHeaderProps) {
+export default function BackpackPlusInventoryHeader(props: BackpackPlusInventoryHeaderProps) {
 	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS } = BACKPACK_DIMENSIONS;
 
 	const headerInner = INVENTORY_HEADER_SIZE - SEARCH_BUFFER_PIXELS * 2;

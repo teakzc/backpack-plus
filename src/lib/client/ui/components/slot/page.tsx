@@ -22,6 +22,9 @@ export interface BackpackSlotProps {
 	inventory?: boolean;
 }
 
+/**
+ * @hidden
+ */
 export default function BackpackSlot(props: BackpackSlotProps) {
 	const [hover, setHover] = useBinding(false);
 

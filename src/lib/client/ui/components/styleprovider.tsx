@@ -1,6 +1,9 @@
 import React, { useEffect } from "@rbxts/react";
 import { GuiService } from "@rbxts/services";
 
+/**
+ * @hidden
+ */
 export default function BackpackStyleProvider() {
 	useEffect(() => {
 		const uiFolder = script.Parent?.Parent?.Parent?.WaitForChild("ui");

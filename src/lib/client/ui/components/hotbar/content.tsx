@@ -4,6 +4,9 @@ import { ToolId } from "../../../../shared/types";
 import { clientBackpack, clientHotbar, inventoryVisibleAtom } from "../../../atoms";
 import BackpackSlot from "../slot/page";
 
+/**
+ * @hidden
+ */
 export default function BackpackHotbarContent() {
 	const visibility = useAtom(inventoryVisibleAtom);
 	const backpackData = useAtom(clientBackpack);

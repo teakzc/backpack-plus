@@ -1,6 +1,10 @@
 import { useCallback, useRef } from "@rbxts/react";
 import { CollectionService } from "@rbxts/services";
 
+/**
+ * @hidden
+ * @client
+ */
 export function useTags<T extends Instance>(tags: string[], dependencies?: unknown[]) {
 	const current = useRef<T | undefined>(undefined);
 

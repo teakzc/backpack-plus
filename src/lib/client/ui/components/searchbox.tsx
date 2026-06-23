@@ -1,23 +1,23 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
-import React, { useRef } from "@rbxts/react";
+import React, { useState } from "@rbxts/react";
 import { BACKPACK_DIMENSIONS } from "../constants";
 
-interface InventorySearchBoxProps {
+interface BackpackPlusInventorySearchBoxProps {
 	onQuery: (query: string) => void;
 	placeholder?: string | React.Binding<string>;
 	alignment?: Enum.TextXAlignment;
 }
 
-export default function InventorySearchBox(props: InventorySearchBoxProps) {
+export default function BackpackPlusInventorySearchBox(props: BackpackPlusInventorySearchBoxProps) {
 	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS, SEARCH_TEXT_OFFSET } =
 		BACKPACK_DIMENSIONS;
 
 	const headerInner = INVENTORY_HEADER_SIZE - SEARCH_BUFFER_PIXELS * 2;
 
-	const textRef = useRef<TextBox>();
+	const [textBox, setTextBox] = useState<TextBox>();
 
-	useEventListener(textRef.current?.GetPropertyChangedSignal("Text"), () => {
-		props.onQuery(textRef.current?.Text ?? "");
+	useEventListener(textBox?.GetPropertyChangedSignal("Text"), () => {
+		props.onQuery(textBox?.Text ?? "");
 	});
 
 	return (
@@ -30,7 +30,7 @@ export default function InventorySearchBox(props: InventorySearchBoxProps) {
 			<uicorner CornerRadius={new UDim(0, 3)} />
 
 			<textbox
-				ref={textRef}
+				ref={setTextBox}
 				AnchorPoint={new Vector2(0, 0.5)}
 				PlaceholderText={props.placeholder ?? "Search"}
 				Text={""}
