@@ -15,7 +15,7 @@ import {
 	inventoryVisibleAtom,
 } from "./atoms";
 import { RequestState, SyncState } from "./networking";
-import { backpackSettingsAtom } from "./settings";
+import { backpackSettingsAtom, initializeBackpackSettings } from "./settings";
 import { equipTool, findToolFromSlot } from "./tools";
 
 function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
@@ -68,17 +68,9 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 export function initializeBackpackClient() {
 	StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false);
 
-	clientHotbar((current) => {
-		const clone = table.clone(current);
-
-		for (let i = 1; i <= backpackSettingsAtom().slots; i++) {
-			if (!clone.has(i)) {
-				clone.set(i, "Empty");
-			}
-		}
-
-		return clone;
-	});
+	// Wires every setting module: seeds the hotbar slots from the current `slots`
+	// value and keeps all settings reactive to runtime `applySettings` changes.
+	initializeBackpackSettings();
 
 	const syncer = client({
 		atoms: {

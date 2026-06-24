@@ -10,3 +10,4 @@ const root = createRoot(new Instance("Folder", Players.LocalPlayer.WaitForChild(
 root.render(createPortal(<BackpackPlusApp />, Players.LocalPlayer.WaitForChild("PlayerGui")));
 
 backpackInputHelper(true);
+

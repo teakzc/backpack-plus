@@ -25,3 +25,4 @@ Players.PlayerAdded.Connect((player) => {
 });
 
 Players.PlayerRemoving.Connect((client) => unregisterPlayer(client));
+
