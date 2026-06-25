@@ -2,7 +2,6 @@ import React from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { hotbarDecoratorsAtom } from "../../../decorating";
 import { backpackSettingsAtom } from "../../../settings";
-import { BACKPACK_DIMENSIONS } from "../../constants";
 import BackpackHotbarContent from "./content";
 
 /**
@@ -13,7 +12,7 @@ export default function BackpackHotbar() {
 
 	const decorators = useAtom(hotbarDecoratorsAtom);
 
-	const { ICON_SIZE, ICON_BUFFER } = BACKPACK_DIMENSIONS;
+	const { ICON_SIZE, ICON_BUFFER } = settings.dimensions;
 	const width = ICON_BUFFER + settings.slots * (ICON_SIZE + ICON_BUFFER);
 	const height = ICON_BUFFER + ICON_SIZE + ICON_BUFFER;
 

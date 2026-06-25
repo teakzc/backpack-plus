@@ -1,8 +1,9 @@
 import React from "@rbxts/react";
-import { BACKPACK_DIMENSIONS } from "../../constants";
+import { useAtom } from "@rbxts/react-charm";
+import { backpackSettingsAtom } from "../../../settings";
 
 export default function BackpackPlusInventoryContent(props: React.PropsWithChildren) {
-	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS } = BACKPACK_DIMENSIONS;
+	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS } = useAtom(() => backpackSettingsAtom().dimensions);
 
 	const headerInner = INVENTORY_HEADER_SIZE - SEARCH_BUFFER_PIXELS * 2;
 

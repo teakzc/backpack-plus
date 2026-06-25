@@ -1,8 +1,9 @@
 import { useBindingListener } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useRef } from "@rbxts/react";
+import { useAtom } from "@rbxts/react-charm";
 import { useSpring } from "@rbxts/react-ripple";
 import { TextService } from "@rbxts/services";
-import { BACKPACK_DIMENSIONS } from "../../constants";
+import { backpackSettingsAtom } from "../../../settings";
 
 interface BackpackSlotTooltipProps {
 	tooltip: string;
@@ -15,6 +16,8 @@ interface BackpackSlotTooltipProps {
 export default function BackpackSlotTooltip(props: BackpackSlotTooltipProps) {
 	const [tooltipSize, setTooltipSize] = useSpring(0);
 	const tooltipRef = useRef<TextLabel>();
+
+	const { ICON_SIZE } = useAtom(() => backpackSettingsAtom().dimensions);
 
 	useEffect(() => {}, [props.hover]);
 
@@ -44,9 +47,9 @@ export default function BackpackSlotTooltip(props: BackpackSlotTooltipProps) {
 
 	return (
 		<frame
-			Position={new UDim2(0.5, 0, 0, -BACKPACK_DIMENSIONS.ICON_SIZE * 0.15)}
+			Position={new UDim2(0.5, 0, 0, -ICON_SIZE * 0.15)}
 			AnchorPoint={new Vector2(0.5, 1)}
-			Size={tooltipSize.map((V) => new UDim2(0, V, 0, BACKPACK_DIMENSIONS.ICON_SIZE * 0.35))}
+			Size={tooltipSize.map((V) => new UDim2(0, V, 0, ICON_SIZE * 0.35))}
 			ClipsDescendants={true}
 		>
 			<textlabel

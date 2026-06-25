@@ -3,7 +3,6 @@ import { useAtom } from "@rbxts/react-charm";
 import { backpackSelectionAtom, inventoryVisibleAtom } from "../../../atoms";
 import { inventoryDecoratorsAtom } from "../../../decorating";
 import { backpackSettingsAtom } from "../../../settings";
-import { BACKPACK_DIMENSIONS } from "../../constants";
 import InventoryScrollingFrame from "./scrolling";
 
 /**
@@ -21,7 +20,7 @@ export default function Inventory() {
 
 	if (!visibility) return undefined;
 
-	const { ICON_SIZE, ICON_BUFFER, INVENTORY_ROWS, INVENTORY_HEADER, SEARCH_BUFFER_PIXELS } = BACKPACK_DIMENSIONS;
+	const { ICON_SIZE, ICON_BUFFER, INVENTORY_ROWS, INVENTORY_HEADER, SEARCH_BUFFER_PIXELS } = settings.dimensions;
 
 	const slotStep = ICON_SIZE + ICON_BUFFER;
 	const toolbarWidth = ICON_BUFFER + settings.slots * slotStep;

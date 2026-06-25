@@ -35,7 +35,6 @@ src/lib/
 │   │   └── draggingslot.ts # dragging-slot decorators
 │   └── ui/
 │       ├── App.tsx     # BackpackPlusApp — StrictMode + ErrorBoundary, mounts Hotbar/Inventory/DraggingSlot
-│       ├── constants.ts # BACKPACK_DIMENSIONS layout constants
 │       ├── components/  # hotbar/, inventory/, slot/, searchbox, styleprovider
 │       ├── error/       # errorboundary.tsx, errorhandler.tsx
 │       └── hooks/       # useStyle, useTags

@@ -3,8 +3,8 @@ import { useAtom } from "@rbxts/react-charm";
 import { ToolId, ToolPlus } from "../../../../shared/types";
 import { backpackSelectionAtom, inventoryVisibleAtom } from "../../../atoms";
 import { slotDecoratorsAtom } from "../../../decorating";
+import { backpackSettingsAtom } from "../../../settings";
 import { equipTool } from "../../../tools";
-import { BACKPACK_DIMENSIONS } from "../../constants";
 import { useTags } from "../../hooks";
 import BackpackSlotContent from "./content";
 import { backpackSlotInputBegan } from "./input";
@@ -35,6 +35,7 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 	);
 
 	const decorators = useAtom(slotDecoratorsAtom);
+	const { ICON_SIZE } = useAtom(() => backpackSettingsAtom().dimensions);
 
 	useAtom(() => {
 		inventoryVisibleAtom();
@@ -45,7 +46,7 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 		return (
 			<frame
 				LayoutOrder={props.layoutOrder}
-				Size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
+				Size={UDim2.fromOffset(ICON_SIZE, ICON_SIZE)}
 				BackgroundTransparency={1}
 			/>
 		);
@@ -53,7 +54,7 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 	return (
 		<frame
 			ref={slotFrameRef}
-			Size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
+			Size={UDim2.fromOffset(ICON_SIZE, ICON_SIZE)}
 			BackgroundTransparency={1}
 			ClipsDescendants={false}
 			LayoutOrder={props.layoutOrder}

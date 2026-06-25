@@ -4,7 +4,7 @@ import { useAtom } from "@rbxts/react-charm";
 import { VRService } from "@rbxts/services";
 import { ToolId } from "../../../../shared/types";
 import { clientBackpack, clientBackpackOrder, clientHotbar, filterAtom, inventoryVisibleAtom } from "../../../atoms";
-import { BACKPACK_DIMENSIONS } from "../../constants";
+import { backpackSettingsAtom } from "../../../settings";
 import { useTokens } from "../../hooks";
 import BackpackSlot from "../slot/page";
 import { filterInventory, fuzzyFilterInventory } from "./utils";
@@ -21,8 +21,9 @@ export default function InventoryScrollingFrame(props: InventoryScrollingFramePr
 	const tokens = useTokens();
 	const visibility = useAtom(inventoryVisibleAtom);
 	const backpackData = useAtom(clientBackpack);
+	const dimensions = useAtom(() => backpackSettingsAtom().dimensions);
 
-	const { ICON_SIZE, ICON_BUFFER, INVENTORY_HEADER_SIZE } = BACKPACK_DIMENSIONS;
+	const { ICON_SIZE, ICON_BUFFER, INVENTORY_HEADER_SIZE } = dimensions;
 	const IsVr = VRService.VREnabled;
 
 	const inventory = useAtom(() => {
@@ -48,13 +49,12 @@ export default function InventoryScrollingFrame(props: InventoryScrollingFramePr
 		const frame = props.scrollRef.current;
 		if (!frame) return;
 
-		const { ICON_SIZE, ICON_BUFFER } = BACKPACK_DIMENSIONS;
 		const countX = math.floor(frame.AbsoluteSize.X / (ICON_SIZE + ICON_BUFFER));
 		const maxRow = math.ceil(inventory.size() / math.max(countX, 1));
 		const canvasSizeY = maxRow * (ICON_SIZE + ICON_BUFFER) + ICON_BUFFER;
 
 		frame.CanvasSize = UDim2.fromOffset(0, canvasSizeY);
-	}, [inventory, visibility]);
+	}, [inventory, visibility, ICON_SIZE, ICON_BUFFER]);
 
 	return (
 		<scrollingframe
@@ -65,7 +65,7 @@ export default function InventoryScrollingFrame(props: InventoryScrollingFramePr
 					1,
 					((tokens?.GetAttribute("ScrollingBarSize") as number) ?? 8) + 1,
 					1,
-					-INVENTORY_HEADER_SIZE - (IsVr ? 2 * BACKPACK_DIMENSIONS.INVENTORY_ARROWS_BUFFER_VR : 0),
+					-INVENTORY_HEADER_SIZE - (IsVr ? 2 * dimensions.INVENTORY_ARROWS_BUFFER_VR : 0),
 				)
 			}
 		>

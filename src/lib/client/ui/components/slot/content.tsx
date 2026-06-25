@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
-import { BACKPACK_DIMENSIONS } from "../../constants";
+import { useAtom } from "@rbxts/react-charm";
+import { backpackSettingsAtom } from "../../../settings";
 import { useTags } from "../../hooks";
 
 interface BackpackSlotContentProps {
@@ -17,6 +18,8 @@ interface BackpackSlotContentProps {
 export default function BackpackSlotContent(props: BackpackSlotContentProps) {
 	const slotRef = useTags(["backpack-WeightBold", "backpack-SlotNumber"]);
 	const textRef = useTags(["backpack-SlotName"]);
+
+	const { SLOT_EQUIP_THICKNESS } = useAtom(() => backpackSettingsAtom().dimensions);
 
 	return (
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1} BorderSizePixel={0}>
@@ -37,12 +40,7 @@ export default function BackpackSlotContent(props: BackpackSlotContentProps) {
 					Position={UDim2.fromScale(0.5, 0.5)}
 					AnchorPoint={new Vector2(0.5, 0.5)}
 					Size={
-						new UDim2(
-							1,
-							-BACKPACK_DIMENSIONS.SLOT_EQUIP_THICKNESS * 2,
-							1,
-							-BACKPACK_DIMENSIONS.SLOT_EQUIP_THICKNESS * 2,
-						)
+						new UDim2(1, -SLOT_EQUIP_THICKNESS * 2, 1, -SLOT_EQUIP_THICKNESS * 2)
 					}
 					Text={props?.name || props.id}
 				/>

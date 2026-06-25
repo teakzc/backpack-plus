@@ -1,6 +1,7 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useState } from "@rbxts/react";
-import { BACKPACK_DIMENSIONS } from "../constants";
+import { useAtom } from "@rbxts/react-charm";
+import { backpackSettingsAtom } from "../../settings";
 
 interface BackpackPlusInventorySearchBoxProps {
 	onQuery: (query: string) => void;
@@ -9,8 +10,9 @@ interface BackpackPlusInventorySearchBoxProps {
 }
 
 export default function BackpackPlusInventorySearchBox(props: BackpackPlusInventorySearchBoxProps) {
-	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS, SEARCH_TEXT_OFFSET } =
-		BACKPACK_DIMENSIONS;
+	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS, SEARCH_TEXT_OFFSET } = useAtom(
+		() => backpackSettingsAtom().dimensions,
+	);
 
 	const headerInner = INVENTORY_HEADER_SIZE - SEARCH_BUFFER_PIXELS * 2;
 

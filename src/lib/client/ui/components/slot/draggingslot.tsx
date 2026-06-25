@@ -4,7 +4,7 @@ import { useAtom } from "@rbxts/react-charm";
 import { useSpring } from "@rbxts/react-ripple";
 import { clientBackpack, draggingAtom } from "../../../atoms";
 import { draggingSlotDecoratorsAtom } from "../../../decorating";
-import { BACKPACK_DIMENSIONS } from "../../constants";
+import { backpackSettingsAtom } from "../../../settings";
 import { useTags, useTokens } from "../../hooks";
 import BackpackSlotContent from "./content";
 
@@ -49,6 +49,7 @@ export default function BackpackDraggingSlot() {
 	const style = useTokens()?.GetAttribute("LightColor");
 
 	const decorators = useAtom(draggingSlotDecoratorsAtom);
+	const { ICON_SIZE } = useAtom(() => backpackSettingsAtom().dimensions);
 
 	if (!drag) return;
 	if (!data) return;
@@ -58,7 +59,7 @@ export default function BackpackDraggingSlot() {
 			Active={false}
 			Position={pos}
 			AnchorPoint={new Vector2(0.5, 0.5)}
-			Size={UDim2.fromOffset(BACKPACK_DIMENSIONS.ICON_SIZE, BACKPACK_DIMENSIONS.ICON_SIZE)}
+			Size={UDim2.fromOffset(ICON_SIZE, ICON_SIZE)}
 			Transparency={0.5}
 			Image={data.icon}
 			ref={dragRef}
