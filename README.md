@@ -11,6 +11,10 @@
 
 </div>
 
+## IMPORTANT
+
+Please do not use backpack-plus as of now, as it is currently poorly written. Fear not, the rewrite version will be coming soon.
+
 ## 🎒 What can backpack-plus do?
 
 - Provide a better alternative to Roblox's inventory
