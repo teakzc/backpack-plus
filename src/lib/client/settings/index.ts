@@ -3,6 +3,7 @@ import { deviceSettingModule } from "./configs/device";
 import { dimensionsSettingModule } from "./configs/dimensions";
 import { inputTypeSettingModule } from "./configs/inputtype";
 import { slotSettingModule } from "./configs/slots";
+import { togglekeySettingModule } from "./configs/togglekey";
 import { viewportXSettingModule } from "./configs/viewport";
 import { BackpackSettingsValues, SettingModule } from "./types";
 
@@ -24,7 +25,14 @@ function build(module: AnySettingModule) {
 	}
 }
 
-const modules = [deviceSettingModule, viewportXSettingModule, slotSettingModule, dimensionsSettingModule, inputTypeSettingModule] as const;
+const modules = [
+	deviceSettingModule,
+	viewportXSettingModule,
+	slotSettingModule,
+	dimensionsSettingModule,
+	inputTypeSettingModule,
+	togglekeySettingModule,
+] as const;
 
 for (const module of modules) build(module as AnySettingModule);
 

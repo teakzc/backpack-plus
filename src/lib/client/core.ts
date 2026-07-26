@@ -5,18 +5,11 @@ import { removeValue } from "@rbxts/sift/out/Array";
 import { set } from "@rbxts/sift/out/Dictionary";
 import { backpackSyncPayload } from "../shared/networking";
 import { ToolId, ToolPlus } from "../shared/types";
-import {
-	_clientBackpacks,
-	backpackSelectionAtom,
-	clientBackpack,
-	clientBackpackOrder,
-	clientHotbar,
-	draggingAtom,
-	inventoryVisibleAtom,
-} from "./atoms";
+import { _clientBackpacks, clientBackpack, clientBackpackOrder, clientHotbar, draggingAtom } from "./atoms";
+import { initializeTopbarIcon } from "./icon";
+import { consoleInputHelper, gamepadInputHelper, keyboardInputHelper } from "./inputs";
 import { RequestState, SyncState } from "./networking";
 import { backpackSettingsAtom } from "./settings";
-import { equipTool, findToolFromSlot } from "./tools";
 
 function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	// Find for free slot.
@@ -61,12 +54,19 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	};
 }
 
+let initialized = false;
+
 /**
- * Initializes the backpack-plus client.
+ * Initializes the backpack-plus client. Calling it again is a no-op.
  * @client
  */
 export function initializeBackpackClient() {
+	if (initialized) return;
+	initialized = true;
+
 	StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false);
+
+	initializeTopbarIcon();
 
 	const syncer = client({
 		atoms: {
@@ -83,48 +83,13 @@ export function initializeBackpackClient() {
 
 	observe(() => clientBackpack().backpack, observeBackpack);
 
-	print(`backpack-plus @ v2.0.0 loaded successfully!`);
-}
+	UserInputService.InputBegan.Connect((input, gpe) => {
+		if (gpe) return;
 
-const inputs = {
-	Zero: 10,
-	One: 1,
-	Two: 2,
-	Three: 3,
-	Four: 4,
-	Five: 5,
-	Six: 6,
-	Seven: 7,
-	Eight: 8,
-	Nine: 9,
-};
-
-/**
- * Helper function for equipping tools from 0-9.
- * @param toggleBackquote Whether to bind `Backquote` to open inventory.
- * @returns Cleanup function.
- * @client
- */
-export function backpackInputHelper(toggleBackquote?: boolean) {
-	const connection = UserInputService.InputBegan.Connect((input, GPE) => {
-		if (GPE) return;
-
-		if (input.KeyCode === Enum.KeyCode.Backquote && toggleBackquote) inventoryVisibleAtom((current) => !current);
-
-		if (input.UserInputType === Enum.UserInputType.MouseButton1 || input.UserInputType === Enum.UserInputType.Touch)
-			if (backpackSelectionAtom() === undefined) inventoryVisibleAtom(false);
-
-		const validation = inputs[input.KeyCode.Name as keyof typeof inputs] as number | undefined;
-
-		if (validation === undefined) return;
-		if (validation > 10 || validation < 1) return;
-
-		const id = findToolFromSlot(validation);
-
-		if (id) {
-			equipTool(id);
-		}
+		keyboardInputHelper(input);
+		consoleInputHelper(input);
+		gamepadInputHelper(input);
 	});
 
-	return () => connection.Disconnect();
+	print(`backpack-plus @ v2.0.0-rc.1 loaded successfully!`);
 }

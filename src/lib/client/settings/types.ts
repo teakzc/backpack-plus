@@ -20,6 +20,7 @@ export type BackpackSettingsValues = {
 	slots: number;
 	dimensions: BackpackDimensions;
 	inputType: "default" | "gamepad";
+	togglekey: Enum.KeyCode;
 };
 
 export type SettingModule<K extends keyof BackpackSettingsValues> = {

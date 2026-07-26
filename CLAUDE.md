@@ -22,9 +22,11 @@ There are no automated test scripts that run outside Roblox. Tests are written w
 ```
 src/lib/
 ├── client/
-│   ├── core.tsx        # initializeBackpackClient(), configureBackpack(), backpackInputHelper()
-│   ├── atoms.ts        # Charm atoms (clientBackpack, clientHotbar, draggingAtom, filterAtom, ...)
-│   ├── settings.ts     # backpackSettings atom + applySettings() (slot count)
+│   ├── core.ts         # initializeBackpackClient() — syncer, observer, input wiring (idempotent)
+│   ├── atoms.ts        # Charm atoms (clientBackpack, clientHotbar, draggingAtom, filterAtom, consoleSwapAtom, ...)
+│   ├── icon.ts         # TopBarPlus inventory topbar icon, bound to the togglekey setting
+│   ├── inputs/         # keyboard.ts (0–9 equip, click-outside close), console.ts (L1/R1 cycling), gamepad.ts (B/X + focus helpers)
+│   ├── settings/       # setting modules (configs/: device, viewport, slots, dimensions, inputtype, togglekey) gathered into backpackSettingsAtom
 │   ├── tools.ts        # dragTool(), undragTool(), swapSlots(), equipTool(), findTool* helpers
 │   ├── filter.ts       # addFilter(), removeFilter(), getFilter(), clearFilter()
 │   ├── networking.luau / networking.d.ts  # Zap-generated client remotes (SyncState, RequestState, RequestEquip)
@@ -59,7 +61,7 @@ src/lib/
 - **charm-sync** (`@rbxts/charm-sync`) replicates the server atom to clients. `initializeBackpackServer` connects the syncer and fires `SyncState`; `filterPayload` narrows each payload to only that client's slice before sending.
 - **Client** mirrors its slice in `_clientBackpacks`, derives `clientBackpack` (computed atom for the local player), and uses `observe` (in `observeBackpack`) to assign arriving tools to `clientHotbar` (`Map<slot, ToolId|"Drag"|"Empty">`) or `clientBackpackOrder` (overflow array).
 - **Equip** is request/response: client calls `equipTool` → `RequestEquip.fire(toolId)`; server toggles `equip` and calls `holdTool` to parent the `Tool` to the character (or back to `backpackplus-storage`).
-- **UI** (React + `@rbxts/react-charm`) reads atoms reactively via `useAtom`. `draggingAtom` tracks in-flight drag state, `inventoryVisibleAtom` toggles the inventory panel, `backpackSelectionAtom` tracks the slot being hovered during a drag.
+- **UI** (React + `@rbxts/react-charm`) reads atoms reactively via `useAtom`. `draggingAtom` tracks in-flight drag state, `inventoryVisibleAtom` toggles the inventory panel, `backpackSelectionAtom` tracks the slot being hovered during a drag, and `consoleSwapAtom` holds the "picked up" source during a gamepad A-button swap.
 
 ### Networking (Zap, not remo)
 
@@ -88,8 +90,8 @@ Each `register*` returns a cleanup function that removes the decorator.
 
 - `clientHotbar` is 1-indexed (slots 1–10). Because it is a `Map`, slot numbers map directly to UI positions with no index shift — iterate it without subtracting 1.
 - `generateId()` is a global counter mod 2³² stringified, not a UUID. IDs are unique per server session, not globally.
-- Touch-only devices default to 6 hotbar slots; keyboard devices default to 10 (`defaultSettings` in `settings.ts`).
-- The backtick key (`` ` ``) toggles inventory visibility when `backpackInputHelper(true)` is used; keys 0–9 equip hotbar slots.
+- Phones default to 6 hotbar slots; other devices default to 10 (`slots` setting module, derived from the `device` module).
+- The inventory is toggled through the TopBarPlus topbar icon; its toggle key comes from the `togglekey` setting (default `` ` ``). Keys 0–9 equip hotbar slots. On gamepad: L1/R1 cycle the equipped tool, A picks up/swaps slots inside the inventory, X moves a hotbar tool to the inventory, B cancels a pickup or closes the inventory.
 - Held `Tool` instances are tagged `backpack-<PlayerName>` (CollectionService) and parked in a `backpackplus-storage` folder in `ReplicatedStorage` when not equipped.
 
 ### Tech stack
@@ -103,6 +105,7 @@ Each `register*` returns a cleanup function that removes the decorator.
 | Networking       | Zap (generated `networking.luau` + `.d.ts`)           |
 | React hooks      | `@rbxts/pretty-react-hooks`                           |
 | Animations       | `@rbxts/react-ripple`                                 |
+| Topbar icon      | `@rbxts/topbarplus`                                   |
 | Functional utils | `@rbxts/sift` (Dictionary.set, Array.removeValue/set) |
 | Testing          | `@rbxts/jest` (+ `@isentinel/jest-roblox`)            |
 | Compiler         | `roblox-ts` 3.x → Lua                                 |

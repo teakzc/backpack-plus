@@ -14,11 +14,21 @@ export function BackpackPlusApp() {
 		<StrictMode>
 			<ErrorBoundary>
 				<screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
-					<BackpackStyleProvider />
-
-					<BackpackHotbar />
-					<Inventory />
-					<BackpackDraggingSlot />
+					<frame
+						Size={UDim2.fromScale(1, 1)}
+						BackgroundTransparency={1}
+						BorderSizePixel={0}
+						SelectionGroup={true}
+						SelectionBehaviorUp={Enum.SelectionBehavior.Stop}
+						SelectionBehaviorDown={Enum.SelectionBehavior.Stop}
+						SelectionBehaviorLeft={Enum.SelectionBehavior.Stop}
+						SelectionBehaviorRight={Enum.SelectionBehavior.Stop}
+					>
+						<BackpackStyleProvider />
+						<BackpackHotbar />
+						<Inventory />
+						<BackpackDraggingSlot />
+					</frame>
 				</screengui>
 			</ErrorBoundary>
 		</StrictMode>

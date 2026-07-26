@@ -1,12 +1,12 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { giveTool, initializeBackpackServer, registerPlayer, unregisterPlayer, updateTool } from "../../lib/server";
+import { giveTool, initializeBackpackServer, registerPlayer, unregisterPlayer } from "../../lib/server";
 
 initializeBackpackServer();
 
 Players.PlayerAdded.Connect((player) => {
 	registerPlayer(player);
 
-	const id = giveTool(player, {
+	giveTool(player, {
 		name: "Sword",
 		tooltip: "A test tool",
 		metadata: {
@@ -15,14 +15,33 @@ Players.PlayerAdded.Connect((player) => {
 		instance: ReplicatedStorage.ClassicSword,
 	});
 
-	task.wait(5);
-	updateTool(player, id, (tool) => ({
-		...tool,
+	giveTool(player, {
+		name: "Cake",
+		tooltip: "lie",
 		metadata: {
-			lvl: 25,
+			lvl: 10,
 		},
-	}));
+		instance: ReplicatedStorage.Sword,
+	});
+
+	giveTool(player, {
+		name: "Axe",
+		tooltip: "oooh",
+
+		metadata: {
+			lvl: 10,
+		},
+		instance: ReplicatedStorage.Sword,
+	});
+
+	giveTool(player, {
+		name: "Diamond",
+		tooltip: "Shiny!",
+		metadata: {
+			lvl: 10,
+		},
+		instance: ReplicatedStorage.Sword,
+	});
 });
 
 Players.PlayerRemoving.Connect((client) => unregisterPlayer(client));
-

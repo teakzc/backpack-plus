@@ -1,5 +1,5 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
-import React, { useState } from "@rbxts/react";
+import React, { useEffect, useState } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { backpackSettingsAtom } from "../../settings";
 
@@ -13,6 +13,7 @@ export default function BackpackPlusInventorySearchBox(props: BackpackPlusInvent
 	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS, SEARCH_TEXT_OFFSET } = useAtom(
 		() => backpackSettingsAtom().dimensions,
 	);
+	const inputType = useAtom(() => backpackSettingsAtom().inputType);
 
 	const headerInner = INVENTORY_HEADER_SIZE - SEARCH_BUFFER_PIXELS * 2;
 
@@ -21,6 +22,15 @@ export default function BackpackPlusInventorySearchBox(props: BackpackPlusInvent
 	useEventListener(textBox?.GetPropertyChangedSignal("Text"), () => {
 		props.onQuery(textBox?.Text ?? "");
 	});
+
+	// Clear any leftover search when switching to gamepad, so the grid isn't
+	// left filtered by a query the player can no longer edit.
+	useEffect(() => {
+		if (inputType === "gamepad") props.onQuery("");
+	}, [inputType]);
+
+	// No text entry on console — hide the search box entirely on gamepad.
+	if (inputType === "gamepad") return undefined;
 
 	return (
 		<frame

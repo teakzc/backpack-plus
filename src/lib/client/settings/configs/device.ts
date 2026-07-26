@@ -18,5 +18,4 @@ function getDevice() {
 export const deviceSettingModule: SettingModule<"device"> = {
 	key: "device",
 	atom: computed(getDevice),
-	effect: (v) => print(v),
 };

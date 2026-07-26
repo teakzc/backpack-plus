@@ -77,3 +77,10 @@ export type BackpackFilterFn<T = Record<string, unknown>> = (metadata: T) => boo
  * @client
  */
 export const filterAtom = atom(new Map<string, BackpackFilterFn>());
+
+/**
+ * The "picked up" source during a console (A-button) swap.
+ * A hotbar slot number (tool or empty), or an inventory tool id. Undefined when nothing is held.
+ * @client
+ */
+export const consoleSwapAtom = atom<number | ToolId | undefined>();

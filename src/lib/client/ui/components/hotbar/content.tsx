@@ -30,7 +30,7 @@ export default function BackpackHotbarContent() {
 		return (
 			<BackpackSlot
 				visibility={visibility}
-				key={`${slot}-${id}`}
+				key={`slot-${slot}`}
 				layoutOrder={slot}
 				id={id}
 				data={data}

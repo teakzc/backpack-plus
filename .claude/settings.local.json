@@ -8,8 +8,11 @@
       "Bash(npm run *)"
     ]
   },
-  "enabledPlugins": {},
   "enabledMcpjsonServers": [
+    "code-review-graph"
+  ],
+  "enabledPlugins": {},
+  "disabledMcpjsonServers": [
     "code-review-graph"
   ]
 }

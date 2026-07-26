@@ -10,15 +10,12 @@ export const dimensionsSettingModule: SettingModule<"dimensions"> = {
 		// Console (10-foot interface) uses larger icons; phone (touch-only) uses fewer inventory rows.
 		const isConsole = device === "console";
 		const isPhone = device === "phone";
-		const isTablet = device === "tablet";
-
-		print(isPhone, isTablet);
 
 		return {
 			SCROLL_OFFSET: 40,
 			ICON_BUFFER: 5,
 			ICON_SIZE: isConsole ? 100 : 60,
-			INVENTORY_ROWS: isPhone && !isTablet ? 2 : 4,
+			INVENTORY_ROWS: isPhone ? 2 : 4,
 			INVENTORY_HEADER: 40,
 			SEARCH_WIDTH_PIXELS: 200,
 			SEARCH_BUFFER_PIXELS: 5,

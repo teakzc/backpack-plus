@@ -3,9 +3,10 @@ import React from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { useSpring } from "@rbxts/react-ripple";
 import { clientBackpack, draggingAtom } from "../../../atoms";
-import { draggingSlotDecoratorsAtom } from "../../../decorating";
+import { draggingSlotDecoratorsAtom } from "../../../decorating/draggingslot";
 import { backpackSettingsAtom } from "../../../settings";
-import { useTags, useTokens } from "../../hooks";
+import { useTokens } from "../../hooks/useStyle";
+import { useTags } from "../../hooks/useTags";
 import BackpackSlotContent from "./content";
 
 /**
@@ -62,6 +63,7 @@ export default function BackpackDraggingSlot() {
 			Size={UDim2.fromOffset(ICON_SIZE, ICON_SIZE)}
 			Transparency={0.5}
 			Image={data.icon}
+			Selectable={false}
 			ref={dragRef}
 			BackgroundColor3={typeIs(style, "Color3") ? style : undefined}
 		>

@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { backpackSettingsAtom } from "../../../settings";
-import { useTags } from "../../hooks";
+import { useTags } from "../../hooks/useTags";
 
 interface BackpackSlotContentProps {
 	visibility: boolean;
@@ -19,11 +19,12 @@ export default function BackpackSlotContent(props: BackpackSlotContentProps) {
 	const slotRef = useTags(["backpack-WeightBold", "backpack-SlotNumber"]);
 	const textRef = useTags(["backpack-SlotName"]);
 
-	const { SLOT_EQUIP_THICKNESS } = useAtom(() => backpackSettingsAtom().dimensions);
+	const settings = useAtom(backpackSettingsAtom);
+	const { SLOT_EQUIP_THICKNESS } = settings.dimensions;
 
 	return (
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1} BorderSizePixel={0}>
-			{props.inventory !== true ? (
+			{props.inventory !== true && settings.inputType !== "gamepad" ? (
 				<textlabel
 					ref={slotRef}
 					Size={UDim2.fromScale(0.4, 0.4)}
@@ -39,9 +40,7 @@ export default function BackpackSlotContent(props: BackpackSlotContentProps) {
 					ref={textRef}
 					Position={UDim2.fromScale(0.5, 0.5)}
 					AnchorPoint={new Vector2(0.5, 0.5)}
-					Size={
-						new UDim2(1, -SLOT_EQUIP_THICKNESS * 2, 1, -SLOT_EQUIP_THICKNESS * 2)
-					}
+					Size={new UDim2(1, -SLOT_EQUIP_THICKNESS * 2, 1, -SLOT_EQUIP_THICKNESS * 2)}
 					Text={props?.name || props.id}
 				/>
 			) : undefined}

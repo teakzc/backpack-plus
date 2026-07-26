@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
-import { hotbarDecoratorsAtom } from "../../../decorating";
+import { hotbarDecoratorsAtom } from "../../../decorating/hotbar";
 import { backpackSettingsAtom } from "../../../settings";
 import BackpackHotbarContent from "./content";
 

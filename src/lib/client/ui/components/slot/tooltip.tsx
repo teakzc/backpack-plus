@@ -1,5 +1,5 @@
 import { useBindingListener } from "@rbxts/pretty-react-hooks";
-import React, { useEffect, useRef } from "@rbxts/react";
+import React, { useRef } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { useSpring } from "@rbxts/react-ripple";
 import { TextService } from "@rbxts/services";
@@ -18,8 +18,6 @@ export default function BackpackSlotTooltip(props: BackpackSlotTooltipProps) {
 	const tooltipRef = useRef<TextLabel>();
 
 	const { ICON_SIZE } = useAtom(() => backpackSettingsAtom().dimensions);
-
-	useEffect(() => {}, [props.hover]);
 
 	useBindingListener(props.hover, (hover) => {
 		if (!tooltipRef.current) return;

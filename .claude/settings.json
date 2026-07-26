@@ -24,5 +24,8 @@
         ]
       }
     ]
+  },
+  "worktree": {
+    "bgIsolation": "none"
   }
 }

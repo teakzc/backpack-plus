@@ -5,7 +5,7 @@ import { VRService } from "@rbxts/services";
 import { ToolId } from "../../../../shared/types";
 import { clientBackpack, clientBackpackOrder, clientHotbar, filterAtom, inventoryVisibleAtom } from "../../../atoms";
 import { backpackSettingsAtom } from "../../../settings";
-import { useTokens } from "../../hooks";
+import { useTokens } from "../../hooks/useStyle";
 import BackpackSlot from "../slot/page";
 import { filterInventory, fuzzyFilterInventory } from "./utils";
 
@@ -89,7 +89,9 @@ export default function InventoryScrollingFrame(props: InventoryScrollingFramePr
 						<BackpackSlot
 							visibility={visibility}
 							inventory={true}
-							key={`inventory-${id}`}
+							// Keyed by grid position (not tool id) so the button instance
+							// survives console swaps and gamepad selection isn't lost.
+							key={`inventory-${index}`}
 							layoutOrder={index}
 							id={id}
 							equipped={backpackData.equip === id}
