@@ -1,5 +1,5 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { giveTool, initializeBackpackServer, registerPlayer, unregisterPlayer } from "../../lib/server";
+import { giveTool, initializeBackpackServer, registerPlayer, unregisterPlayer } from "@/server";
 
 initializeBackpackServer();
 

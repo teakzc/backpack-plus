@@ -1,6 +1,6 @@
 import { atom } from "@rbxts/charm";
 import { Workspace } from "@rbxts/services";
-import { SettingModule } from "../types";
+import { SettingModule } from "@/client/settings/types";
 
 export const viewportXSettingModule: SettingModule<"viewportX"> = {
 	key: "viewportX",
@@ -15,6 +15,7 @@ export const viewportXSettingModule: SettingModule<"viewportX"> = {
 
 			write(camera.ViewportSize.X);
 			camera.GetPropertyChangedSignal("ViewportSize").Connect(() => {
+				print("viewport change", camera?.ViewportSize.X);
 				write((camera as Camera).ViewportSize.X);
 			});
 		});

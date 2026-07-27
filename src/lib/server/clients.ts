@@ -1,8 +1,8 @@
+import { server } from "@rbxts/charm-sync";
 import { set } from "@rbxts/sift/out/Dictionary";
-import { ClientBackpack } from "../shared/networking";
-import { ToolId, ToolPlus } from "../shared/types";
-import { clientBackpacks } from "./atoms";
-import { toolClientMap, toolMap, toolRegistry } from "./data";
+import { ClientBackpack, ToolId, ToolPlus } from "@/shared/types";
+import { getClientBackpacks, setClientBackpacks } from "@/server/charm";
+import { toolClientMap, toolMap, toolRegistry } from "@/server/data";
 
 /**
  * Registers a player's backpack data
@@ -10,7 +10,7 @@ import { toolClientMap, toolMap, toolRegistry } from "./data";
  * @server
  */
 export function registerPlayer(client: Player) {
-	clientBackpacks((current) => {
+	setClientBackpacks((current) => {
 		return set(current, client.Name, { backpack: new Map<string, ToolPlus>(), equip: "" });
 	});
 }
@@ -31,9 +31,11 @@ export function unregisterPlayer(client: Player) {
 		}
 	}
 
-	clientBackpacks((current) => {
+	setClientBackpacks((current) => {
 		return set(current, client.Name, undefined);
 	});
+
+	server.removeClient(client);
 }
 
 /**
@@ -43,7 +45,7 @@ export function unregisterPlayer(client: Player) {
  * @server
  */
 export function modifyPlayer(client: Player, callback: (backpack: ClientBackpack) => ClientBackpack) {
-	clientBackpacks((current) => {
+	setClientBackpacks((current) => {
 		const clientBackpack = current.get(client.Name);
 
 		if (!clientBackpack) {
@@ -62,7 +64,7 @@ export function modifyPlayer(client: Player, callback: (backpack: ClientBackpack
  * @server
  */
 export function getBackpack(client: Player) {
-	return clientBackpacks().get(client.Name);
+	return getClientBackpacks().get(client.Name);
 }
 
 /**

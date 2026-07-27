@@ -1,23 +1,30 @@
+import {
+	getClientBackpack,
+	getClientHotbar,
+	getDraggingState,
+	setClientBackpack,
+	setClientBackpackOrder,
+	setClientHotbar,
+	setDraggingState,
+} from "@/client/charm";
+import { getBackpackSettings } from "@/client/settings";
 import { observe } from "@rbxts/charm";
 import { client } from "@rbxts/charm-sync";
-import { StarterGui, UserInputService } from "@rbxts/services";
+import { Players, StarterGui, UserInputService } from "@rbxts/services";
 import { removeValue } from "@rbxts/sift/out/Array";
 import { set } from "@rbxts/sift/out/Dictionary";
-import { backpackSyncPayload } from "../shared/networking";
-import { ToolId, ToolPlus } from "../shared/types";
-import { _clientBackpacks, clientBackpack, clientBackpackOrder, clientHotbar, draggingAtom } from "./atoms";
-import { initializeTopbarIcon } from "./icon";
-import { consoleInputHelper, gamepadInputHelper, keyboardInputHelper } from "./inputs";
-import { RequestState, SyncState } from "./networking";
-import { backpackSettingsAtom } from "./settings";
+import { SyncBackpackGetter, ToolId, ToolPlus } from "@/shared/types";
+import { initializeTopbarIcon } from "@/client/icon";
+import { consoleInputHelper, gamepadInputHelper, keyboardInputHelper } from "@/client/inputs";
+import { RequestState, SyncState } from "@/client/networking";
 
 function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	// Find for free slot.
 
 	let hotbarSlot = -1;
 
-	const clientHotbarValue = clientHotbar();
-	for (let slot = 1; slot <= backpackSettingsAtom().slots; slot++) {
+	const clientHotbarValue = getClientHotbar();
+	for (let slot = 1; slot <= getBackpackSettings().slots; slot++) {
 		// clientHotbarValue is a Map, so it is not shifted from 1 to 0 index.
 		// We can thus directly index it with the slot number.
 		if (clientHotbarValue.get(slot) === undefined || clientHotbarValue.get(slot) === "Empty") {
@@ -27,17 +34,17 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	}
 
 	if (hotbarSlot !== -1) {
-		clientHotbar((current) => set(current, hotbarSlot, toolId));
+		setClientHotbar((current) => set(current, hotbarSlot, toolId));
 	} else {
-		clientBackpackOrder((current) => [...current, toolId]);
+		setClientBackpackOrder((current) => [...current, toolId]);
 	}
 
 	return () => {
-		clientHotbar((current) => {
+		setClientHotbar((current) => {
 			for (const [slot, id] of current) {
 				if (id === toolId) return set(current, slot, "Empty");
 				if (id === "Drag") {
-					const data = draggingAtom();
+					const data = getDraggingState();
 					if (data?.from === slot) return set(current, slot, "Empty");
 				}
 			}
@@ -45,12 +52,12 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 			return current;
 		});
 
-		const dragging = draggingAtom();
+		const dragging = getDraggingState();
 		if (dragging?.id === toolId) {
-			draggingAtom(undefined);
+			setDraggingState(undefined);
 		}
 
-		clientBackpackOrder((current) => removeValue(current, toolId));
+		setClientBackpackOrder((current) => removeValue(current, toolId));
 	};
 }
 
@@ -68,20 +75,17 @@ export function initializeBackpackClient() {
 
 	initializeTopbarIcon();
 
-	const syncer = client({
-		atoms: {
-			clientBackpacks: _clientBackpacks,
-		},
-		ignoreUnhydrated: true,
+	client.addSignals({
+		[`backpackplus-${Players.LocalPlayer.Name}`]: setClientBackpack,
 	});
 
 	SyncState.setCallback((payload) => {
-		syncer.sync(payload as unknown as backpackSyncPayload);
+		client.patch<SyncBackpackGetter, false>(payload);
 	});
 
 	RequestState.fire();
 
-	observe(() => clientBackpack().backpack, observeBackpack);
+	observe(() => getClientBackpack().backpack, observeBackpack);
 
 	UserInputService.InputBegan.Connect((input, gpe) => {
 		if (gpe) return;

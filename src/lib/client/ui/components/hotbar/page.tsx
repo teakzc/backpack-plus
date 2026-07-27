@@ -1,16 +1,16 @@
+import { getBackpackSettings } from "@/client/settings";
 import React from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
-import { hotbarDecoratorsAtom } from "../../../decorating/hotbar";
-import { backpackSettingsAtom } from "../../../settings";
-import BackpackHotbarContent from "./content";
+import { useSignalState } from "@rbxts/react-charm";
+import { hotbarDecoratorsAtom } from "@/client/decorating/hotbar";
+import BackpackHotbarContent from "@/client/ui/components/hotbar/content";
 
 /**
  * @hidden
  */
 export default function BackpackHotbar() {
-	const settings = useAtom(backpackSettingsAtom);
+	const settings = useSignalState(getBackpackSettings);
 
-	const decorators = useAtom(hotbarDecoratorsAtom);
+	const decorators = useSignalState(hotbarDecoratorsAtom);
 
 	const { ICON_SIZE, ICON_BUFFER } = settings.dimensions;
 	const width = ICON_BUFFER + settings.slots * (ICON_SIZE + ICON_BUFFER);

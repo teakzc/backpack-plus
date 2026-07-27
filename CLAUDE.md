@@ -61,7 +61,7 @@ src/lib/
 - **charm-sync** (`@rbxts/charm-sync`) replicates the server atom to clients. `initializeBackpackServer` connects the syncer and fires `SyncState`; `filterPayload` narrows each payload to only that client's slice before sending.
 - **Client** mirrors its slice in `_clientBackpacks`, derives `clientBackpack` (computed atom for the local player), and uses `observe` (in `observeBackpack`) to assign arriving tools to `clientHotbar` (`Map<slot, ToolId|"Drag"|"Empty">`) or `clientBackpackOrder` (overflow array).
 - **Equip** is request/response: client calls `equipTool` → `RequestEquip.fire(toolId)`; server toggles `equip` and calls `holdTool` to parent the `Tool` to the character (or back to `backpackplus-storage`).
-- **UI** (React + `@rbxts/react-charm`) reads atoms reactively via `useAtom`. `draggingAtom` tracks in-flight drag state, `inventoryVisibleAtom` toggles the inventory panel, `backpackSelectionAtom` tracks the slot being hovered during a drag, and `consoleSwapAtom` holds the "picked up" source during a gamepad A-button swap.
+- **UI** (React + `@rbxts/react-charm`) reads atoms reactively via `useSignalState`. `draggingAtom` tracks in-flight drag state, `inventoryVisibleAtom` toggles the inventory panel, `backpackSelectionAtom` tracks the slot being hovered during a drag, and `consoleSwapAtom` holds the "picked up" source during a gamepad A-button swap.
 
 ### Networking (Zap, not remo)
 
@@ -100,7 +100,7 @@ Each `register*` returns a cleanup function that removes the decorator.
 | ---------------- | ----------------------------------------------------- |
 | UI framework     | `@rbxts/react` + `@rbxts/react-roblox`                |
 | Reactive state   | `@rbxts/charm` (atom, computed, observe)              |
-| React ↔ Charm    | `@rbxts/react-charm` (`useAtom`)                      |
+| React ↔ Charm    | `@rbxts/react-charm` (`useSignalState`)               |
 | State sync       | `@rbxts/charm-sync` (server/client syncer)            |
 | Networking       | Zap (generated `networking.luau` + `.d.ts`)           |
 | React hooks      | `@rbxts/pretty-react-hooks`                           |

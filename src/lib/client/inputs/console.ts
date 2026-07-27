@@ -1,7 +1,7 @@
-import { ToolId } from "../../shared/types";
-import { clientBackpack, clientHotbar } from "../atoms";
-import { backpackSettingsAtom } from "../settings";
-import { equipTool } from "../tools";
+import { ToolId } from "@/shared/types";
+import { getClientBackpack, getClientHotbar } from "@/client/charm";
+import { getBackpackSettings } from "@/client/settings";
+import { equipTool } from "@/client/tools";
 
 // Window for treating two L1/R1 presses as simultaneous (→ unequip), and the
 // debounce delay before a single press actually cycles. Matches satchel's
@@ -18,7 +18,7 @@ function isTool(id: ToolId | "Drag" | "Empty" | undefined): id is ToolId {
 
 /** Unequip whatever is currently held. `equipTool` toggles, so re-fire the equipped id. */
 function unequip() {
-	const equipped = clientBackpack().equip;
+	const equipped = getClientBackpack().equip;
 	if (isTool(equipped)) equipTool(equipped);
 }
 
@@ -53,9 +53,9 @@ function changeTool(input: InputObject) {
 	task.delay(maxEquipDeltaTime, () => {
 		if (lastInput !== input) return;
 
-		const slots = backpackSettingsAtom().slots;
-		const hotbar = clientHotbar();
-		const equipped = clientBackpack().equip;
+		const slots = getBackpackSettings().slots;
+		const hotbar = getClientHotbar();
+		const equipped = getClientBackpack().equip;
 
 		const toolAt = (slot: number) => {
 			const id = hotbar.get(slot);

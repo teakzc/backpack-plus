@@ -1,8 +1,7 @@
 import React from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
+import { useSignalState } from "@rbxts/react-charm";
 import { UserInputService } from "@rbxts/services";
-import { backpackSettingsAtom } from "../../../settings";
-
+import { getBackpackSettings } from "@/client/settings";
 interface HintFrameProps {
 	isConsole: boolean;
 	text: string;
@@ -39,7 +38,7 @@ function HintFrame(props: HintFrameProps) {
 }
 
 export default function InventoryConsoleHints() {
-	const settings = useAtom(backpackSettingsAtom);
+	const settings = useSignalState(getBackpackSettings);
 	const { ICON_SIZE, ICON_BUFFER } = settings.dimensions;
 
 	const width = ICON_BUFFER + settings.slots * (ICON_SIZE + ICON_BUFFER);

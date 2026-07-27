@@ -1,5 +1,5 @@
-import { backpackSelectionAtom, inventoryVisibleAtom } from "../atoms";
-import { equipTool, findToolFromSlot } from "../tools";
+import { getBackpackSelection, setInventoryVisibility } from "@/client/charm";
+import { equipTool, findToolFromSlot } from "@/client/tools";
 
 const slotKeys = {
 	Zero: 10,
@@ -19,8 +19,8 @@ function closeOnClick(input: InputObject) {
 	const clicked =
 		input.UserInputType === Enum.UserInputType.MouseButton1 || input.UserInputType === Enum.UserInputType.Touch;
 
-	if (clicked && backpackSelectionAtom() === undefined) {
-		inventoryVisibleAtom(false);
+	if (clicked && getBackpackSelection() === undefined) {
+		setInventoryVisibility(false);
 	}
 }
 

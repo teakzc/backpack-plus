@@ -1,8 +1,8 @@
 import React from "@rbxts/react";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { Players } from "@rbxts/services";
-import { initializeBackpackClient } from "../../lib/client/core";
-import { BackpackPlusApp } from "../../lib/client/ui/App";
+import { initializeBackpackClient } from "@/client/core";
+import { BackpackPlusApp } from "@/client/ui/App";
 
 initializeBackpackClient();
 

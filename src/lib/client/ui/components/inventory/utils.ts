@@ -1,6 +1,6 @@
-import { ToolId } from "../../../../shared/types";
-import { FuzzyScoreSorting } from "../../../../shared/utils/fuzzyscore";
-import { clientBackpack, draggingAtom, filterAtom } from "../../../atoms";
+import { ToolId } from "@/shared/types";
+import { FuzzyScoreSorting } from "@/shared/utils/fuzzyscore";
+import { getBackpackFilters, getClientBackpack, getDraggingState } from "@/client/charm";
 
 /**
  * @hidden
@@ -9,11 +9,11 @@ import { clientBackpack, draggingAtom, filterAtom } from "../../../atoms";
 export function filterInventory(
 	backpack: ToolId[],
 	hotbarIds: Set<ToolId | "Drag" | "Empty">,
-	bp: ReturnType<typeof clientBackpack>["backpack"],
-	filters: ReturnType<typeof filterAtom>,
+	bp: ReturnType<typeof getClientBackpack>["backpack"],
+	filters: ReturnType<typeof getBackpackFilters>,
 ): ToolId[] {
 	return backpack.filter((id) => {
-		if (hotbarIds.has(id) && draggingAtom()?.id === id) return false;
+		if (hotbarIds.has(id) && getDraggingState()?.id === id) return false;
 
 		const metadata = bp.get(id)?.metadata ?? {};
 		for (const [_, f] of filters) {
@@ -29,7 +29,7 @@ export function filterInventory(
  */
 export function fuzzyFilterInventory(
 	filtered: ToolId[],
-	bp: ReturnType<typeof clientBackpack>["backpack"],
+	bp: ReturnType<typeof getClientBackpack>["backpack"],
 	query: string,
 ): ToolId[] {
 	const names = filtered.map((id) => bp.get(id)?.name ?? id);

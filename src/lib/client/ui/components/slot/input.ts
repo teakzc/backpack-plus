@@ -1,6 +1,6 @@
 import { GuiService, UserInputService } from "@rbxts/services";
-import { dragTool } from "../../../tools";
-import { BackpackSlotProps } from "./page";
+import { dragTool } from "@/client/tools";
+import { BackpackSlotProps } from "@/client/ui/components/slot/page";
 
 /**
  * @hidden

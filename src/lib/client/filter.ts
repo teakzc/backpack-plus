@@ -1,5 +1,5 @@
 import { set } from "@rbxts/sift/out/Dictionary";
-import { BackpackFilterFn, filterAtom } from "./atoms";
+import { BackpackFilterFn, getBackpackFilters, setBackpackFilters } from "@/client/charm";
 
 /**
  * Adds a filter function to the `filterAtom`.
@@ -10,7 +10,7 @@ import { BackpackFilterFn, filterAtom } from "./atoms";
  * @client
  */
 export function addFilter<T = Record<string, unknown>>(key: string, filter: BackpackFilterFn<T>) {
-	filterAtom((current) => set(current, key, filter));
+	setBackpackFilters((current) => set(current, key, filter));
 
 	return () => {
 		removeFilter(key);
@@ -23,7 +23,7 @@ export function addFilter<T = Record<string, unknown>>(key: string, filter: Back
  * @client
  */
 export function removeFilter(key: string) {
-	filterAtom((current) => set(current, key, undefined));
+	setBackpackFilters((current) => set(current, key, undefined));
 }
 
 /**
@@ -33,12 +33,12 @@ export function removeFilter(key: string) {
  * @client
  */
 export function getFilter(key: string) {
-	return filterAtom().get(key);
+	return getBackpackFilters().get(key);
 }
 
 /**
  * @client
  */
 export function clearFilter() {
-	filterAtom(new Map<string, BackpackFilterFn>());
+	setBackpackFilters(new Map<string, BackpackFilterFn>());
 }

@@ -1,9 +1,9 @@
 import React, { StrictMode } from "@rbxts/react";
-import BackpackHotbar from "./components/hotbar/page";
-import Inventory from "./components/inventory/page";
-import BackpackDraggingSlot from "./components/slot/draggingslot";
-import BackpackStyleProvider from "./components/styleprovider";
-import { ErrorBoundary } from "./error/errorboundary";
+import BackpackHotbar from "@/client/ui/components/hotbar/page";
+import Inventory from "@/client/ui/components/inventory/page";
+import BackpackDraggingSlot from "@/client/ui/components/slot/draggingslot";
+import BackpackStyleProvider from "@/client/ui/components/styleprovider";
+import { ErrorBoundary } from "@/client/ui/error/errorboundary";
 
 /**
  * The full backpack-plus client app to be rendered.

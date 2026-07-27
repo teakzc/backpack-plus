@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { InferProps, Number } from "@rbxts/ui-labs";
-import { _clientBackpacks } from "../../lib/client/atoms";
-import BackpackSlot from "../../lib/client/ui/components/slot/page";
-import BackpackStyleProvider from "../../lib/client/ui/components/styleprovider";
+import { setClientBackpack } from "@/client";
+import BackpackSlot from "@/client/ui/components/slot/page";
+import BackpackStyleProvider from "@/client/ui/components/styleprovider";
 
 const controls = {
 	stack: Number(1, 0, 64, 1),
@@ -14,20 +14,13 @@ const story = {
 	reactRoblox: ReactRoblox,
 	controls: controls,
 	story: (props: InferProps<typeof controls>) => {
-		_clientBackpacks(
-			new Map([
-				[
-					"mock",
-					{
-						equip: "1",
-						backpack: new Map([
-							["1", { name: "Sword", icon: "rbxassetid://0", tooltip: "A sharp blade", metadata: {} }],
-							["2", { name: "Axe", icon: "rbxassetid://0", tooltip: "", metadata: {} }],
-						]),
-					},
-				],
+		setClientBackpack({
+			equip: "1",
+			backpack: new Map([
+				["1", { name: "Sword", icon: "rbxassetid://0", tooltip: "A sharp blade", metadata: {} }],
+				["2", { name: "Axe", icon: "rbxassetid://0", tooltip: "", metadata: {} }],
 			]),
-		);
+		});
 
 		return (
 			<>

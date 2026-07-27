@@ -1,6 +1,6 @@
 import { atom } from "@rbxts/charm";
 import React from "@rbxts/react";
-import { ToolPlus } from "../../shared/types";
+import { ToolPlus } from "@/shared/types";
 
 /**
  * Context provided to `SlotDecorator`.

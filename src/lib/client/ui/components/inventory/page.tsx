@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
-import { backpackSelectionAtom, consoleSwapAtom, inventoryVisibleAtom } from "../../../atoms";
-import { inventoryDecoratorsAtom } from "../../../decorating/inventory";
-import { clearBackpackSelection, focusFirstHotbarSlot } from "../../../inputs/gamepad";
-import { backpackSettingsAtom } from "../../../settings";
-import InventoryConsoleHints from "./consolehints";
-import InventoryScrollingFrame from "./scrolling";
+import { useSignalState } from "@rbxts/react-charm";
+import { inventoryDecoratorsAtom } from "@/client/decorating/inventory";
+import { clearBackpackSelection, focusFirstHotbarSlot } from "@/client/inputs/gamepad";
+
+import { getInventoryVisibility, setBackpackSelection, setConsoleSwap } from "@/client/charm";
+import { getBackpackSettings } from "@/client/settings";
+import InventoryConsoleHints from "@/client/ui/components/inventory/consolehints";
+import InventoryScrollingFrame from "@/client/ui/components/inventory/scrolling";
 
 /**
  * Hides the engine's default gamepad selection glow on its parent button by
@@ -34,14 +35,14 @@ function HideSelectionOutline() {
  * @hidden
  */
 export default function Inventory() {
-	const visibility = useAtom(inventoryVisibleAtom);
-	const settings = useAtom(backpackSettingsAtom);
+	const visibility = useSignalState(getInventoryVisibility);
+	const settings = useSignalState(getBackpackSettings);
 
 	const [query, setQuery] = useState("");
 
 	const scrollRef = useRef<ScrollingFrame>();
 
-	const decorators = useAtom(inventoryDecoratorsAtom);
+	const decorators = useSignalState(inventoryDecoratorsAtom);
 
 	// On gamepad, drop focus onto the first hotbar slot when the inventory opens
 	// and clear it on close — satchel's enable/disableGamepadInventoryControl.
@@ -54,7 +55,7 @@ export default function Inventory() {
 			clearBackpackSelection();
 			// Drop any in-progress A-button pickup so it can't complete a
 			// forgotten swap the next time the inventory opens.
-			consoleSwapAtom(undefined);
+			setConsoleSwap(undefined);
 		};
 	}, [visibility, settings.inputType]);
 
@@ -82,10 +83,10 @@ export default function Inventory() {
 				Active={false}
 				Event={{
 					MouseEnter: () => {
-						backpackSelectionAtom("Inventory");
+						setBackpackSelection("Inventory");
 					},
 					MouseLeave: () => {
-						backpackSelectionAtom(undefined);
+						setBackpackSelection(undefined);
 					},
 				}}
 			>

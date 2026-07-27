@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { ErrorBoundary } from "./errorboundary";
+import { ErrorBoundary } from "@/client/ui/error/errorboundary";
 
 /**
  * @hidden

@@ -1,3 +1,3 @@
-export * from "./console";
-export * from "./gamepad";
-export * from "./keyboard";
+export * from "@/client/inputs/console";
+export * from "@/client/inputs/gamepad";
+export * from "@/client/inputs/keyboard";

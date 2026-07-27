@@ -1,13 +1,15 @@
 import { useMouse } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
+import { useSignalState } from "@rbxts/react-charm";
 import { useSpring } from "@rbxts/react-ripple";
-import { clientBackpack, draggingAtom } from "../../../atoms";
-import { draggingSlotDecoratorsAtom } from "../../../decorating/draggingslot";
-import { backpackSettingsAtom } from "../../../settings";
-import { useTokens } from "../../hooks/useStyle";
-import { useTags } from "../../hooks/useTags";
-import BackpackSlotContent from "./content";
+
+import { draggingSlotDecoratorsAtom } from "@/client/decorating/draggingslot";
+
+import { getClientBackpack, getDraggingState } from "@/client/charm";
+import { getBackpackSettings } from "@/client/settings";
+import { useTokens } from "@/client/ui/hooks/useStyle";
+import { useTags } from "@/client/ui/hooks/useTags";
+import BackpackSlotContent from "@/client/ui/components/slot/content";
 
 /**
  * @hidden
@@ -25,8 +27,8 @@ export default function BackpackDraggingSlot() {
 		});
 	});
 
-	const drag = useAtom(() => {
-		const dragData = draggingAtom();
+	const drag = useSignalState(() => {
+		const dragData = getDraggingState();
 
 		if (dragData) {
 			const mousePos = mouse.getValue();
@@ -39,18 +41,18 @@ export default function BackpackDraggingSlot() {
 		return dragData;
 	});
 
-	const data = useAtom(() => {
-		return clientBackpack().backpack.get(drag?.id ?? "");
+	const data = useSignalState(() => {
+		return getClientBackpack().backpack.get(drag?.id ?? "");
 	}, [drag]);
 
-	const equipped = useAtom(() => clientBackpack().equip === drag?.id, [drag]);
+	const equipped = useSignalState(() => getClientBackpack().equip === drag?.id, [drag]);
 
 	const dragRef = useTags(equipped ? ["backpack-SlotButtonEquipped"] : [], [equipped]);
 
 	const style = useTokens()?.GetAttribute("LightColor");
 
-	const decorators = useAtom(draggingSlotDecoratorsAtom);
-	const { ICON_SIZE } = useAtom(() => backpackSettingsAtom().dimensions);
+	const decorators = useSignalState(draggingSlotDecoratorsAtom);
+	const { ICON_SIZE } = useSignalState(() => getBackpackSettings().dimensions);
 
 	if (!drag) return;
 	if (!data) return;

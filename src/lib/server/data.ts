@@ -1,4 +1,4 @@
-import { ToolId, ToolPlus } from "../shared/types";
+import { ToolId, ToolPlus } from "@/shared/types";
 
 /**
  * @hidden

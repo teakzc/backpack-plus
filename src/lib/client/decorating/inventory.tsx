@@ -1,8 +1,8 @@
 import { atom } from "@rbxts/charm";
 import React from "@rbxts/react";
-import BackpackPlusInventoryContent from "../ui/components/inventory/content";
-import BackpackPlusInventoryHeader from "../ui/components/inventory/header";
-import BackpackPlusInventorySearchBox from "../ui/components/searchbox";
+import BackpackPlusInventoryContent from "@/client/ui/components/inventory/content";
+import BackpackPlusInventoryHeader from "@/client/ui/components/inventory/header";
+import BackpackPlusInventorySearchBox from "@/client/ui/components/searchbox";
 
 /**
  * @client

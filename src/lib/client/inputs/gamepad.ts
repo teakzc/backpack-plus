@@ -1,6 +1,12 @@
 import { CollectionService, GuiService } from "@rbxts/services";
-import { backpackSelectionAtom, consoleSwapAtom, inventoryVisibleAtom } from "../atoms";
-import { swapSlots } from "../tools";
+import {
+	getBackpackSelection,
+	getConsoleSwap,
+	getInventoryVisibility,
+	setConsoleSwap,
+	setInventoryVisibility,
+} from "@/client/charm";
+import { swapSlots } from "@/client/tools";
 
 /**
  * Focus the first hotbar slot on gamepad, matching satchel's
@@ -36,17 +42,17 @@ export function clearBackpackSelection() {
 
 /** B: cancel an in-progress A-button pickup, otherwise close the inventory. */
 function cancel() {
-	if (consoleSwapAtom() !== undefined) {
-		consoleSwapAtom(undefined);
+	if (getConsoleSwap() !== undefined) {
+		setConsoleSwap(undefined);
 		return;
 	}
 
-	if (inventoryVisibleAtom()) inventoryVisibleAtom(false);
+	if (getInventoryVisibility()) setInventoryVisibility(false);
 }
 
 /** X: move the focused hotbar slot's tool to the inventory. */
 function removeFromHotbar() {
-	const focused = backpackSelectionAtom();
+	const focused = getBackpackSelection();
 	// A number means a hotbar slot is focused (inventory slots don't set this).
 	if (typeIs(focused, "number")) swapSlots(focused, "Inventory");
 }

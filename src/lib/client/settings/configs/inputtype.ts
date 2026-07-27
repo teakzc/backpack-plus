@@ -1,6 +1,6 @@
 import { atom } from "@rbxts/charm";
 import { RunService, UserInputService } from "@rbxts/services";
-import { SettingModule } from "../types";
+import { SettingModule } from "@/client/settings/types";
 
 function getInputType() {
 	if (!RunService.IsRunning()) return "default";

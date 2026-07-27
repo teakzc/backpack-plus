@@ -1,6 +1,6 @@
 import { computed } from "@rbxts/charm";
-import { SettingModule } from "../types";
-import { deviceSettingModule } from "./device";
+import { SettingModule } from "@/client/settings/types";
+import { deviceSettingModule } from "@/client/settings/configs/device";
 
 export const dimensionsSettingModule: SettingModule<"dimensions"> = {
 	key: "dimensions",

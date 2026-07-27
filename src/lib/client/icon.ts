@@ -1,7 +1,7 @@
+import { setInventoryVisibility } from "@/client/charm";
+import { getBackpackSettings } from "@/client/settings";
 import { effect } from "@rbxts/charm";
 import { Icon } from "@rbxts/topbarplus";
-import { inventoryVisibleAtom } from "./atoms";
-import { backpackSettingsAtom } from "./settings";
 
 let topbarIcon: Icon | undefined;
 
@@ -26,12 +26,12 @@ export function initializeTopbarIcon() {
 		.autoDeselect(false)
 		.setOrder(-1);
 
-	icon.toggled.Connect(() => inventoryVisibleAtom((v) => !v));
+	icon.toggled.Connect(() => setInventoryVisibility((v) => !v));
 
 	// Keep the icon's toggle key in sync with the setting. bindToggleKey
 	// accumulates keys, so the old key must be unbound when the setting changes.
 	effect(() => {
-		const key = backpackSettingsAtom().togglekey;
+		const key = getBackpackSettings().togglekey;
 		icon.bindToggleKey(key);
 		return () => icon.unbindToggleKey(key);
 	});

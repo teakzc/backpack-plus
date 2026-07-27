@@ -1,18 +1,18 @@
+import { getClientBackpack, getClientHotbar, getInventoryVisibility } from "@/client/charm";
 import React from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
-import { ToolId } from "../../../../shared/types";
-import { clientBackpack, clientHotbar, inventoryVisibleAtom } from "../../../atoms";
-import BackpackSlot from "../slot/page";
+import { useSignalState } from "@rbxts/react-charm";
+import { ToolId } from "@/shared/types";
+import BackpackSlot from "@/client/ui/components/slot/page";
 
 /**
  * @hidden
  */
 export default function BackpackHotbarContent() {
-	const visibility = useAtom(inventoryVisibleAtom);
-	const backpackData = useAtom(clientBackpack);
+	const visibility = useSignalState(getInventoryVisibility);
+	const backpackData = useSignalState(getClientBackpack);
 
-	const hotbar = useAtom(() => {
-		const hotbarMap = clientHotbar();
+	const hotbar = useSignalState(() => {
+		const hotbarMap = getClientHotbar();
 
 		const arr: [number, ToolId | "Drag" | "Empty"][] = [];
 		hotbarMap.forEach((tool, slot) => {

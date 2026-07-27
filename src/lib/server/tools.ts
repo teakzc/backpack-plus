@@ -1,9 +1,9 @@
 import { CollectionService, ReplicatedStorage } from "@rbxts/services";
 import { set } from "@rbxts/sift/out/Dictionary";
-import { ToolId, ToolPlus } from "../shared/types";
-import { generateId } from "../shared/utils/id";
-import { modifyPlayer } from "./clients";
-import { toolClientMap, toolMap, toolRegistry } from "./data";
+import { ToolId, ToolPlus } from "@/shared/types";
+import { generateId } from "@/shared/utils/id";
+import { modifyPlayer } from "@/server/clients";
+import { toolClientMap, toolMap, toolRegistry } from "@/server/data";
 
 let toolStorage = new Instance("Folder");
 toolStorage.Parent = ReplicatedStorage;

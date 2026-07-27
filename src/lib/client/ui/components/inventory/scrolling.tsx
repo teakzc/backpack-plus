@@ -1,13 +1,19 @@
 import { getBindingValue } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
+import { useSignalState } from "@rbxts/react-charm";
 import { VRService } from "@rbxts/services";
-import { ToolId } from "../../../../shared/types";
-import { clientBackpack, clientBackpackOrder, clientHotbar, filterAtom, inventoryVisibleAtom } from "../../../atoms";
-import { backpackSettingsAtom } from "../../../settings";
-import { useTokens } from "../../hooks/useStyle";
-import BackpackSlot from "../slot/page";
-import { filterInventory, fuzzyFilterInventory } from "./utils";
+import { ToolId } from "@/shared/types";
+import {
+	getBackpackFilters,
+	getClientBackpack,
+	getClientBackpackOrder,
+	getClientHotbar,
+	getInventoryVisibility,
+} from "@/client/charm";
+import { getBackpackSettings } from "@/client/settings";
+import { useTokens } from "@/client/ui/hooks/useStyle";
+import BackpackSlot from "@/client/ui/components/slot/page";
+import { filterInventory, fuzzyFilterInventory } from "@/client/ui/components/inventory/utils";
 
 interface InventoryScrollingFrameProps {
 	scrollRef: React.MutableRefObject<ScrollingFrame | undefined>;
@@ -19,16 +25,16 @@ interface InventoryScrollingFrameProps {
  */
 export default function InventoryScrollingFrame(props: InventoryScrollingFrameProps) {
 	const tokens = useTokens();
-	const visibility = useAtom(inventoryVisibleAtom);
-	const backpackData = useAtom(clientBackpack);
-	const dimensions = useAtom(() => backpackSettingsAtom().dimensions);
+	const visibility = useSignalState(getInventoryVisibility);
+	const backpackData = useSignalState(getClientBackpack);
+	const dimensions = useSignalState(() => getBackpackSettings().dimensions);
 
 	const { ICON_SIZE, ICON_BUFFER, INVENTORY_HEADER_SIZE } = dimensions;
 	const IsVr = VRService.VREnabled;
 
-	const inventory = useAtom(() => {
-		const backpack = clientBackpackOrder();
-		const hotbar = clientHotbar();
+	const inventory = useSignalState(() => {
+		const backpack = getClientBackpackOrder();
+		const hotbar = getClientHotbar();
 
 		const hotbarIds = new Set<ToolId | "Drag" | "Empty">();
 		for (const [_, id] of hotbar) {
@@ -36,7 +42,7 @@ export default function InventoryScrollingFrame(props: InventoryScrollingFramePr
 		}
 
 		const bp = backpackData.backpack;
-		const filters = filterAtom();
+		const filters = getBackpackFilters();
 
 		const filtered = filterInventory(backpack, hotbarIds, bp, filters);
 

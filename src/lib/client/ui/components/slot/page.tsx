@@ -1,15 +1,22 @@
 import React, { useBinding } from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
+import { useSignalState } from "@rbxts/react-charm";
 import { useSpring } from "@rbxts/react-ripple";
-import { ToolId, ToolPlus } from "../../../../shared/types";
-import { backpackSelectionAtom, consoleSwapAtom, inventoryVisibleAtom } from "../../../atoms";
-import { slotDecoratorsAtom } from "../../../decorating/slot";
-import { backpackSettingsAtom } from "../../../settings";
-import { equipTool, swapSlots } from "../../../tools";
-import { useTags } from "../../hooks/useTags";
-import BackpackSlotContent from "./content";
-import { backpackSlotInputBegan } from "./input";
-import BackpackSlotTooltip from "./tooltip";
+import { ToolId, ToolPlus } from "@/shared/types";
+import { slotDecoratorsAtom } from "@/client/decorating/slot";
+
+import {
+	getBackpackSelection,
+	getConsoleSwap,
+	getInventoryVisibility,
+	setBackpackSelection,
+	setConsoleSwap,
+} from "@/client/charm";
+import { getBackpackSettings } from "@/client/settings";
+import { equipTool, swapSlots } from "@/client/tools";
+import { useTags } from "@/client/ui/hooks/useTags";
+import BackpackSlotContent from "@/client/ui/components/slot/content";
+import { backpackSlotInputBegan } from "@/client/ui/components/slot/input";
+import BackpackSlotTooltip from "@/client/ui/components/slot/tooltip";
 
 /**
  * @hidden
@@ -37,14 +44,14 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 	if (!props.inventory) buttonTags.push("backpack-HotbarSlotButton");
 	const slotButtonRef = useTags(buttonTags, [props.equipped, props.inventory]);
 
-	const decorators = useAtom(slotDecoratorsAtom);
-	const settings = useAtom(backpackSettingsAtom);
+	const decorators = useSignalState(slotDecoratorsAtom);
+	const settings = useSignalState(getBackpackSettings);
 	const { ICON_SIZE } = settings.dimensions;
 
 	const [scale, setScale] = useSpring(1);
 
-	useAtom(() => {
-		inventoryVisibleAtom();
+	useSignalState(() => {
+		getInventoryVisibility();
 		setHover(false);
 	});
 
@@ -77,7 +84,7 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 					MouseEnter: () => {
 						setHover(true);
 						if (props.inventory) return;
-						backpackSelectionAtom(props.layoutOrder);
+						setBackpackSelection(props.layoutOrder);
 					},
 					MouseLeave: () => {
 						setHover(false);
@@ -85,17 +92,17 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 						// Only clear if we're still the selected slot: when the virtual
 						// cursor slides between slots, the next slot's enter can fire before
 						// this leave, and an unconditional clear would wipe that fresh value.
-						if (backpackSelectionAtom() === props.layoutOrder) backpackSelectionAtom(undefined);
+						if (getBackpackSelection() === props.layoutOrder) setBackpackSelection(undefined);
 					},
 					SelectionGained: () => {
 						setHover(true);
 						if (props.inventory) return;
-						backpackSelectionAtom(props.layoutOrder);
+						setBackpackSelection(props.layoutOrder);
 					},
 					SelectionLost: () => {
 						setHover(false);
 						if (props.inventory) return;
-						if (backpackSelectionAtom() === props.layoutOrder) backpackSelectionAtom(undefined);
+						if (getBackpackSelection() === props.layoutOrder) setBackpackSelection(undefined);
 					},
 					InputBegan: (rbx, input) => backpackSlotInputBegan(props, rbx, input),
 					MouseButton1Click: () => {
@@ -110,14 +117,14 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 
 						setScale.setGoal(1, { impulse: 4, tension: 240, friction: 19 });
 
-						const held = consoleSwapAtom();
+						const held = getConsoleSwap();
 						if (held === undefined) {
 							// Hotbar slots are picked by position (empty slots included);
 							// inventory tools by id.
 							if (props.inventory) {
-								if (props.id !== "Empty" && props.id !== "Drag") consoleSwapAtom(props.id);
+								if (props.id !== "Empty" && props.id !== "Drag") setConsoleSwap(props.id);
 							} else {
-								consoleSwapAtom(props.layoutOrder);
+								setConsoleSwap(props.layoutOrder);
 							}
 						} else {
 							// Target a specific inventory tool by id (so two inventory tools
@@ -127,7 +134,7 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 							} else {
 								swapSlots(held, props.layoutOrder);
 							}
-							consoleSwapAtom(undefined);
+							setConsoleSwap(undefined);
 						}
 					},
 				}}

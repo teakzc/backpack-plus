@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
-import { backpackSettingsAtom } from "../../../settings";
-import { useTags } from "../../hooks/useTags";
+import { useSignalState } from "@rbxts/react-charm";
+import { getBackpackSettings } from "@/client/settings";
+import { useTags } from "@/client/ui/hooks/useTags";
 
 interface BackpackSlotContentProps {
 	visibility: boolean;
@@ -19,7 +19,8 @@ export default function BackpackSlotContent(props: BackpackSlotContentProps) {
 	const slotRef = useTags(["backpack-WeightBold", "backpack-SlotNumber"]);
 	const textRef = useTags(["backpack-SlotName"]);
 
-	const settings = useAtom(backpackSettingsAtom);
+	const settings = useSignalState(getBackpackSettings);
+
 	const { SLOT_EQUIP_THICKNESS } = settings.dimensions;
 
 	return (

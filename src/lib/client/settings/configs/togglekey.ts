@@ -1,5 +1,5 @@
 import { atom } from "@rbxts/charm";
-import { SettingModule } from "../types";
+import { SettingModule } from "@/client/settings/types";
 
 export const togglekeySettingModule: SettingModule<"togglekey"> = {
 	key: "togglekey",

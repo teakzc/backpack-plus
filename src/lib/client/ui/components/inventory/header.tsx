@@ -1,14 +1,14 @@
 import React from "@rbxts/react";
-import { useAtom } from "@rbxts/react-charm";
-import { backpackSettingsAtom } from "../../../settings";
+import { useSignalState } from "@rbxts/react-charm";
+import { getBackpackSettings } from "@/client/settings";
 
 interface BackpackPlusInventoryHeaderProps {
 	text: string | React.Binding<string>;
 }
 
 export default function BackpackPlusInventoryHeader(props: BackpackPlusInventoryHeaderProps) {
-	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS } = useAtom(
-		() => backpackSettingsAtom().dimensions,
+	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS } = useSignalState(
+		() => getBackpackSettings().dimensions,
 	);
 
 	const headerInner = INVENTORY_HEADER_SIZE - SEARCH_BUFFER_PIXELS * 2;

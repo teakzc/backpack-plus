@@ -1,35 +1,35 @@
-import { server } from "@rbxts/charm-sync";
+import { computed } from "@rbxts/charm";
+import { config, server } from "@rbxts/charm-sync";
 import { set } from "@rbxts/sift/out/Dictionary";
-import { backpackSyncPayload, zapSyncPayload } from "../shared/networking";
-import { clientBackpacks } from "./atoms";
-import { modifyPlayer } from "./clients";
-import { RequestEquip, RequestState, SyncState } from "./networking";
-import { holdTool } from "./tools";
+
+import { SyncBackpackGetter } from "@/shared/types";
+
+import { getClientBackpacks } from "@/server/charm";
+import { modifyPlayer } from "@/server/clients";
+import { RequestEquip, RequestState, SyncState } from "@/server/networking";
+import { holdTool } from "@/server/tools";
 
 /**
  * Initializes the backpack-plus server
  * @server
  */
 export function initializeBackpackServer() {
-	const syncer = server({
-		atoms: {
-			clientBackpacks: clientBackpacks,
-		},
-		interval: 0,
-		preserveHistory: false,
-		autoSerialize: false,
-	});
-
-	syncer.connect((client, payload) => {
-		SyncState.fire(client, filterPayload(client, payload));
-	});
+	config.fixArrays = false;
 
 	RequestState.on((client) => {
-		syncer.hydrate(client);
+		server.addSignalsToClient(client, {
+			[`backpackplus-${client.Name}`]: computed(() => {
+				return getClientBackpacks().get(client.Name);
+			}),
+		});
+	});
+
+	server.connect<SyncBackpackGetter, false>((client, payload) => {
+		SyncState.fire(client, payload);
 	});
 
 	RequestEquip.on((client, toolId) => {
-		const backpack = clientBackpacks().get(client.Name);
+		const backpack = getClientBackpacks().get(client.Name);
 		if (!backpack) return;
 
 		if (!backpack.backpack.has(toolId)) return;
@@ -44,14 +44,4 @@ export function initializeBackpackServer() {
 		holdTool(client, toolId);
 		modifyPlayer(client, (backpack) => set(backpack, "equip", toolId));
 	});
-}
-
-function filterPayload(client: Player, payload: backpackSyncPayload): zapSyncPayload {
-	const backpacks = payload.data.clientBackpacks as unknown as Map<string, unknown>;
-	const playerSlice = new Map([[client.Name, backpacks.get(client.Name)]]);
-
-	return {
-		type: payload.type,
-		data: { clientBackpacks: playerSlice },
-	} as unknown as zapSyncPayload;
 }

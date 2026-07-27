@@ -11,25 +11,21 @@ event SyncState = {
 	call: SingleAsync,
 	data: (payload: struct {
 		data: struct {
-			clientBackpacks: map {
-				[string.binary]: struct {
-					backpack: map {
-						[string.binary]: struct {
-							metadata: map {
-								[string.binary]: unknown
-							}?,
-							name: string.binary?,
-							icon: string.binary?,
-							tooltip: string.binary?,
-							instance: Instance.Tool?,
-						}
-					}?,
-					equip: string.binary?,
-				}
-			}
+			backpack: map {
+                [string.binary]: struct {
+                    metadata: map {
+                        [string.binary]: unknown
+                    }?,
+                    name: string.binary?,
+                    icon: string.binary?,
+                    tooltip: string.binary?,
+                    instance: Instance.Tool?,
+                }
+			}?,
+			equip: string.binary?,
 		},
 		type: enum { "init", "patch" }
-	})
+	}[])
 }
 
 event RequestState = {
