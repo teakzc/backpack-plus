@@ -2,7 +2,7 @@
 export declare const sendEvents: () => void
 export declare const SyncState: {
 	setCallback: (callback: (payload: ({
-		["data"]: {
+		["data"]: Map<string, {
 			["backpack"]?: Map<string, {
 				["metadata"]?: Map<string, unknown> | undefined,
 				["name"]?: string | undefined,
@@ -11,7 +11,7 @@ export declare const SyncState: {
 				["instance"]?: Tool | undefined,
 			}> | undefined,
 			["equip"]?: string | undefined,
-		},
+		}>,
 		["type"]: "init" | "patch",
 	})[]) => void) => () => void;
 };

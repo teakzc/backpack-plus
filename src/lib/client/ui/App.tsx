@@ -1,15 +1,16 @@
-import React, { StrictMode } from "@rbxts/react";
 import BackpackHotbar from "@/client/ui/components/hotbar/page";
 import Inventory from "@/client/ui/components/inventory/page";
 import BackpackDraggingSlot from "@/client/ui/components/slot/draggingslot";
 import BackpackStyleProvider from "@/client/ui/components/styleprovider";
 import { ErrorBoundary } from "@/client/ui/error/errorboundary";
+import React, { StrictMode } from "@rbxts/react";
 
 /**
  * The full backpack-plus client app to be rendered.
  * @client
  */
 export function BackpackPlusApp() {
+	print("Loading ui");
 	return (
 		<StrictMode>
 			<ErrorBoundary>

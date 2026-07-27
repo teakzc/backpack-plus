@@ -185,75 +185,86 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 				local val_1
 				val_1 = {  }
 				val_1["data"] = {  }
-				if bit32.btest(bool_1, 0b0000000000000001) then
-					val_1["data"]["backpack"] = {  }
-					if not bit32.btest(bool_1, 0b0000000000000010) then
-						for _ = 1, buffer.readu16(incoming_buff, read(2)) + 1 do
-							local bool_2 = buffer.readu8(incoming_buff, read(1))
-							local key_1
-							local val_2
-							local len_2 = buffer.readu16(incoming_buff, read(2))
-							key_1 = buffer.readstring(incoming_buff, read(len_2), len_2)
-							val_2 = {  }
-							if bit32.btest(bool_2, 0b0000000000000001) then
-								val_2["metadata"] = {  }
-								if not bit32.btest(bool_2, 0b0000000000000010) then
-									for _ = 1, buffer.readu16(incoming_buff, read(2)) + 1 do
-										local bool_3 = buffer.readu8(incoming_buff, read(1))
-										local key_2
-										local val_3
-										local len_3 = buffer.readu16(incoming_buff, read(2))
-										key_2 = buffer.readstring(incoming_buff, read(len_3), len_3)
-										if bit32.btest(bool_3, 0b0000000000000001) then
-											incoming_ipos = incoming_ipos + 1
-											val_3 = incoming_inst[incoming_ipos]
-										else
-											val_3 = nil
+				if not bit32.btest(bool_1, 0b0000000000000001) then
+					for _ = 1, buffer.readu16(incoming_buff, read(2)) + 1 do
+						local bool_2 = buffer.readu8(incoming_buff, read(1))
+						local key_1
+						local val_2
+						local len_2 = buffer.readu16(incoming_buff, read(2))
+						key_1 = buffer.readstring(incoming_buff, read(len_2), len_2)
+						val_2 = {  }
+						if bit32.btest(bool_2, 0b0000000000000001) then
+							val_2["backpack"] = {  }
+							if not bit32.btest(bool_2, 0b0000000000000010) then
+								for _ = 1, buffer.readu16(incoming_buff, read(2)) + 1 do
+									local bool_3 = buffer.readu8(incoming_buff, read(1))
+									local key_2
+									local val_3
+									local len_3 = buffer.readu16(incoming_buff, read(2))
+									key_2 = buffer.readstring(incoming_buff, read(len_3), len_3)
+									val_3 = {  }
+									if bit32.btest(bool_3, 0b0000000000000001) then
+										val_3["metadata"] = {  }
+										if not bit32.btest(bool_3, 0b0000000000000010) then
+											for _ = 1, buffer.readu16(incoming_buff, read(2)) + 1 do
+												local bool_4 = buffer.readu8(incoming_buff, read(1))
+												local key_3
+												local val_4
+												local len_4 = buffer.readu16(incoming_buff, read(2))
+												key_3 = buffer.readstring(incoming_buff, read(len_4), len_4)
+												if bit32.btest(bool_4, 0b0000000000000001) then
+													incoming_ipos = incoming_ipos + 1
+													val_4 = incoming_inst[incoming_ipos]
+												else
+													val_4 = nil
+												end
+												val_3["metadata"][key_3] = val_4
+											end
 										end
-										val_2["metadata"][key_2] = val_3
+									else
+										val_3["metadata"] = nil
 									end
+									if bit32.btest(bool_3, 0b0000000000000100) then
+										local len_5 = buffer.readu16(incoming_buff, read(2))
+										val_3["name"] = buffer.readstring(incoming_buff, read(len_5), len_5)
+									else
+										val_3["name"] = nil
+									end
+									if bit32.btest(bool_3, 0b0000000000001000) then
+										local len_6 = buffer.readu16(incoming_buff, read(2))
+										val_3["icon"] = buffer.readstring(incoming_buff, read(len_6), len_6)
+									else
+										val_3["icon"] = nil
+									end
+									if bit32.btest(bool_3, 0b0000000000010000) then
+										local len_7 = buffer.readu16(incoming_buff, read(2))
+										val_3["tooltip"] = buffer.readstring(incoming_buff, read(len_7), len_7)
+									else
+										val_3["tooltip"] = nil
+									end
+									if bit32.btest(bool_3, 0b0000000000100000) then
+										incoming_ipos = incoming_ipos + 1
+										val_3["instance"] = incoming_inst[incoming_ipos]
+										assert(val_3["instance"] == nil or val_3["instance"]:IsA("Tool"), "received instance is not of the Tool class!")
+									else
+										val_3["instance"] = nil
+									end
+									val_2["backpack"][key_2] = val_3
 								end
-							else
-								val_2["metadata"] = nil
 							end
-							if bit32.btest(bool_2, 0b0000000000000100) then
-								local len_4 = buffer.readu16(incoming_buff, read(2))
-								val_2["name"] = buffer.readstring(incoming_buff, read(len_4), len_4)
-							else
-								val_2["name"] = nil
-							end
-							if bit32.btest(bool_2, 0b0000000000001000) then
-								local len_5 = buffer.readu16(incoming_buff, read(2))
-								val_2["icon"] = buffer.readstring(incoming_buff, read(len_5), len_5)
-							else
-								val_2["icon"] = nil
-							end
-							if bit32.btest(bool_2, 0b0000000000010000) then
-								local len_6 = buffer.readu16(incoming_buff, read(2))
-								val_2["tooltip"] = buffer.readstring(incoming_buff, read(len_6), len_6)
-							else
-								val_2["tooltip"] = nil
-							end
-							if bit32.btest(bool_2, 0b0000000000100000) then
-								incoming_ipos = incoming_ipos + 1
-								val_2["instance"] = incoming_inst[incoming_ipos]
-								assert(val_2["instance"] == nil or val_2["instance"]:IsA("Tool"), "received instance is not of the Tool class!")
-							else
-								val_2["instance"] = nil
-							end
-							val_1["data"]["backpack"][key_1] = val_2
+						else
+							val_2["backpack"] = nil
 						end
+						if bit32.btest(bool_2, 0b0000000000000100) then
+							local len_8 = buffer.readu16(incoming_buff, read(2))
+							val_2["equip"] = buffer.readstring(incoming_buff, read(len_8), len_8)
+						else
+							val_2["equip"] = nil
+						end
+						val_1["data"][key_1] = val_2
 					end
-				else
-					val_1["data"]["backpack"] = nil
 				end
-				if bit32.btest(bool_1, 0b0000000000000100) then
-					local len_7 = buffer.readu16(incoming_buff, read(2))
-					val_1["data"]["equip"] = buffer.readstring(incoming_buff, read(len_7), len_7)
-				else
-					val_1["data"]["equip"] = nil
-				end
-				if bit32.btest(bool_1, 0b0000000000001000) then
+				if bit32.btest(bool_1, 0b0000000000000010) then
 					val_1["type"] = "init"
 				else
 					val_1["type"] = "patch"
@@ -280,7 +291,7 @@ local returns = {
 	sendEvents = sendEvents,
 	SyncState = {
 		setCallback = function(callback: (payload: ({ ({
-			["data"]: ({
+			["data"]: ({ [(string)]: ({
 				["backpack"]: (({ [(string)]: ({
 					["metadata"]: (({ [(string)]: ((unknown)) })?),
 					["name"]: ((string)?),
@@ -289,7 +300,7 @@ local returns = {
 					["instance"]: ((Tool)?),
 				}) })?),
 				["equip"]: ((string)?),
-			}),
+			}) }),
 			["type"]: ("init" | "patch"),
 		}) })) -> ()): () -> ()
 			reliable_events[0] = callback
@@ -312,11 +323,11 @@ local returns = {
 		fire = function(toolId: (string))
 			alloc(1)
 			buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-			local len_8 = #toolId
+			local len_9 = #toolId
 			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_8)
-			alloc(len_8)
-			buffer.writestring(outgoing_buff, outgoing_apos, toolId, len_8)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_9)
+			alloc(len_9)
+			buffer.writestring(outgoing_buff, outgoing_apos, toolId, len_9)
 		end,
 	},
 }

@@ -25,7 +25,8 @@ export function initializeBackpackServer() {
 	});
 
 	server.connect<SyncBackpackGetter, false>((client, payload) => {
-		SyncState.fire(client, payload);
+		// Fix types later D:
+		SyncState.fire(client, payload as never);
 	});
 
 	RequestEquip.on((client, toolId) => {

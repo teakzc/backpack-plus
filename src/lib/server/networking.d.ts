@@ -2,7 +2,7 @@
 export declare const sendEvents: () => void
 export declare const SyncState: {
 	fire: (player: Player, payload: ({
-		["data"]: {
+		["data"]: Map<string, {
 			["backpack"]?: Map<string, {
 				["metadata"]?: Map<string, unknown> | undefined,
 				["name"]?: string | undefined,
@@ -11,11 +11,11 @@ export declare const SyncState: {
 				["instance"]?: Tool | undefined,
 			}> | undefined,
 			["equip"]?: string | undefined,
-		},
+		}>,
 		["type"]: "init" | "patch",
 	})[]) => void;
 	fireAll: (payload: ({
-		["data"]: {
+		["data"]: Map<string, {
 			["backpack"]?: Map<string, {
 				["metadata"]?: Map<string, unknown> | undefined,
 				["name"]?: string | undefined,
@@ -24,11 +24,11 @@ export declare const SyncState: {
 				["instance"]?: Tool | undefined,
 			}> | undefined,
 			["equip"]?: string | undefined,
-		},
+		}>,
 		["type"]: "init" | "patch",
 	})[]) => void;
 	fireExcept: (except: Player, payload: ({
-		["data"]: {
+		["data"]: Map<string, {
 			["backpack"]?: Map<string, {
 				["metadata"]?: Map<string, unknown> | undefined,
 				["name"]?: string | undefined,
@@ -37,11 +37,11 @@ export declare const SyncState: {
 				["instance"]?: Tool | undefined,
 			}> | undefined,
 			["equip"]?: string | undefined,
-		},
+		}>,
 		["type"]: "init" | "patch",
 	})[]) => void;
 	fireList: (list: Player[] | Record<string | number | symbol, Player> | Map<unknown, Player>, payload: ({
-		["data"]: {
+		["data"]: Map<string, {
 			["backpack"]?: Map<string, {
 				["metadata"]?: Map<string, unknown> | undefined,
 				["name"]?: string | undefined,
@@ -50,11 +50,11 @@ export declare const SyncState: {
 				["instance"]?: Tool | undefined,
 			}> | undefined,
 			["equip"]?: string | undefined,
-		},
+		}>,
 		["type"]: "init" | "patch",
 	})[]) => void;
 	fireSet: (set: Set<Player> | Map<Player, unknown>, payload: ({
-		["data"]: {
+		["data"]: Map<string, {
 			["backpack"]?: Map<string, {
 				["metadata"]?: Map<string, unknown> | undefined,
 				["name"]?: string | undefined,
@@ -63,7 +63,7 @@ export declare const SyncState: {
 				["instance"]?: Tool | undefined,
 			}> | undefined,
 			["equip"]?: string | undefined,
-		},
+		}>,
 		["type"]: "init" | "patch",
 	})[]) => void
 };

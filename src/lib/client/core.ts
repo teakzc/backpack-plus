@@ -7,16 +7,16 @@ import {
 	setClientHotbar,
 	setDraggingState,
 } from "@/client/charm";
+import { initializeTopbarIcon } from "@/client/icon";
+import { consoleInputHelper, gamepadInputHelper, keyboardInputHelper } from "@/client/inputs";
+import { RequestState, SyncState } from "@/client/networking";
 import { getBackpackSettings } from "@/client/settings";
-import { observe } from "@rbxts/charm";
+import { SyncBackpackGetter, ToolId, ToolPlus } from "@/shared/types";
+import { effect, observe } from "@rbxts/charm";
 import { client } from "@rbxts/charm-sync";
 import { Players, StarterGui, UserInputService } from "@rbxts/services";
 import { removeValue } from "@rbxts/sift/out/Array";
 import { set } from "@rbxts/sift/out/Dictionary";
-import { SyncBackpackGetter, ToolId, ToolPlus } from "@/shared/types";
-import { initializeTopbarIcon } from "@/client/icon";
-import { consoleInputHelper, gamepadInputHelper, keyboardInputHelper } from "@/client/inputs";
-import { RequestState, SyncState } from "@/client/networking";
 
 function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 	// Find for free slot.
@@ -80,7 +80,8 @@ export function initializeBackpackClient() {
 	});
 
 	SyncState.setCallback((payload) => {
-		client.patch<SyncBackpackGetter, false>(payload);
+		// Fix types later D:
+		client.patch<SyncBackpackGetter, false>(payload as never);
 	});
 
 	RequestState.fire();
@@ -93,6 +94,10 @@ export function initializeBackpackClient() {
 		keyboardInputHelper(input);
 		consoleInputHelper(input);
 		gamepadInputHelper(input);
+	});
+
+	effect(() => {
+		print(getClientBackpack());
 	});
 
 	print(`backpack-plus @ v2.0.0-rc.1 loaded successfully!`);
