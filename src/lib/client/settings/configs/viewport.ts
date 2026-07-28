@@ -1,6 +1,6 @@
+import { SettingModule } from "@/client/settings/types";
 import { atom } from "@rbxts/charm";
 import { Workspace } from "@rbxts/services";
-import { SettingModule } from "@/client/settings/types";
 
 export const viewportXSettingModule: SettingModule<"viewportX"> = {
 	key: "viewportX",

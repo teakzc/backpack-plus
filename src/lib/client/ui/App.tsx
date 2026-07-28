@@ -10,7 +10,6 @@ import React, { StrictMode } from "@rbxts/react";
  * @client
  */
 export function BackpackPlusApp() {
-	print("Loading ui");
 	return (
 		<StrictMode>
 			<ErrorBoundary>

@@ -10,8 +10,8 @@ event SyncState = {
 	type: Reliable,
 	call: SingleAsync,
 	data: (payload: struct {
-		data: map {
-			[string.binary]: struct {
+		data: struct {
+            backpackplus: struct {
                 backpack: map {
                     [string.binary]: struct {
                         metadata: map {

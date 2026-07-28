@@ -1,8 +1,7 @@
+import { slotDecoratorsAtom } from "@/client/decorating/slot";
+import { ToolId, ToolPlus } from "@/shared/types";
 import React, { useBinding } from "@rbxts/react";
 import { useSignalState } from "@rbxts/react-charm";
-import { useSpring } from "@rbxts/react-ripple";
-import { ToolId, ToolPlus } from "@/shared/types";
-import { slotDecoratorsAtom } from "@/client/decorating/slot";
 
 import {
 	getBackpackSelection,
@@ -13,10 +12,11 @@ import {
 } from "@/client/charm";
 import { getBackpackSettings } from "@/client/settings";
 import { equipTool, swapSlots } from "@/client/tools";
-import { useTags } from "@/client/ui/hooks/useTags";
 import BackpackSlotContent from "@/client/ui/components/slot/content";
 import { backpackSlotInputBegan } from "@/client/ui/components/slot/input";
 import BackpackSlotTooltip from "@/client/ui/components/slot/tooltip";
+import { useTags } from "@/client/ui/hooks/useTags";
+import { useSpring } from "@rbxts/react-ripple";
 
 /**
  * @hidden
@@ -46,6 +46,7 @@ export default function BackpackSlot(props: BackpackSlotProps) {
 
 	const decorators = useSignalState(slotDecoratorsAtom);
 	const settings = useSignalState(getBackpackSettings);
+
 	const { ICON_SIZE } = settings.dimensions;
 
 	const [scale, setScale] = useSpring(1);

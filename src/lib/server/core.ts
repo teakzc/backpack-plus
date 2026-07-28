@@ -1,13 +1,25 @@
 import { computed } from "@rbxts/charm";
-import { config, server } from "@rbxts/charm-sync";
+import { SyncPayload, config, server } from "@rbxts/charm-sync";
 import { set } from "@rbxts/sift/out/Dictionary";
 
-import { SyncBackpackGetter } from "@/shared/types";
+import { BackpackNormalizedGetter, SyncBackpackGetter } from "@/shared/types";
 
 import { getClientBackpacks } from "@/server/charm";
 import { modifyPlayer } from "@/server/clients";
 import { RequestEquip, RequestState, SyncState } from "@/server/networking";
 import { holdTool } from "@/server/tools";
+
+function normalizePayload(
+	client: Player,
+	payloads: SyncPayload<SyncBackpackGetter, false>[],
+): SyncPayload<BackpackNormalizedGetter, false>[] {
+	const key = `backpackplus-${client.Name}` as const;
+
+	return payloads.map((payload) => ({
+		type: payload.type,
+		data: { backpackplus: payload.data[key] },
+	})) as SyncPayload<BackpackNormalizedGetter, false>[];
+}
 
 /**
  * Initializes the backpack-plus server
@@ -26,7 +38,7 @@ export function initializeBackpackServer() {
 
 	server.connect<SyncBackpackGetter, false>((client, payload) => {
 		// Fix types later D:
-		SyncState.fire(client, payload as never);
+		SyncState.fire(client, normalizePayload(client, payload) as never);
 	});
 
 	RequestEquip.on((client, toolId) => {

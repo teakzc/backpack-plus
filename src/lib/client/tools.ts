@@ -8,12 +8,12 @@ import {
 	setClientHotbar,
 	setDraggingState,
 } from "@/client/charm";
+import { RequestEquip } from "@/client/networking";
 import { getBackpackSettings } from "@/client/settings";
+import { ToolId } from "@/shared/types";
 import { UserInputService } from "@rbxts/services";
 import { removeValue, set as setArray } from "@rbxts/sift/out/Array";
 import { set } from "@rbxts/sift/out/Dictionary";
-import { ToolId } from "@/shared/types";
-import { RequestEquip } from "@/client/networking";
 
 /**
  * Swaps two tool slots in the hotbar.
@@ -161,6 +161,8 @@ export function findToolFromSlot(slot: number): ToolId | "Drag" | "Empty" | unde
  * @client
  */
 export function dragTool(toolId: ToolId, offset: Vector2, inputObject?: InputObject) {
+	print("Dragging", toolId);
+
 	const from = findToolLocation(toolId);
 	if (from === undefined) return;
 

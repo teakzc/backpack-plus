@@ -18,3 +18,7 @@ export type ClientBackpacks = Map<string, ClientBackpack>;
 export type SyncBackpackGetter = {
 	[key: `backpackplus-${string}`]: () => ClientBackpack;
 };
+
+export type BackpackNormalizedGetter = {
+	backpackplus: () => ClientBackpack;
+};

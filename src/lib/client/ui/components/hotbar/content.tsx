@@ -1,8 +1,8 @@
 import { getClientBackpack, getClientHotbar, getInventoryVisibility } from "@/client/charm";
+import BackpackSlot from "@/client/ui/components/slot/page";
+import { ToolId } from "@/shared/types";
 import React from "@rbxts/react";
 import { useSignalState } from "@rbxts/react-charm";
-import { ToolId } from "@/shared/types";
-import BackpackSlot from "@/client/ui/components/slot/page";
 
 /**
  * @hidden

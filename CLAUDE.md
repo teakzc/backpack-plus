@@ -11,7 +11,10 @@ npm run dev          # compile as a game place, watch mode
 npx eslint src/      # lint
 ```
 
-There are no automated test scripts that run outside Roblox. Tests are written with `@rbxts/jest` and execute inside Roblox Studio using the compiled output. To test: build the project, sync into a Studio place with Rojo (`default.project.json`), then play. The client test entry is `src/tests/client/runtime.client.tsx` and the server test entry is `src/tests/server/runtime.server.ts`.
+There is no automated test suite. Development and verification happen inside Roblox Studio: build, sync with Rojo (`default.project.json`), then play.
+
+- **UI-Labs storybook** — `src/tests/storybook/` (`backpack.storybook.ts` plus `*.story.tsx`) is the component dev loop.
+- **Runtime harnesses** — `src/tests/client/runtime.client.tsx` and `src/tests/server/runtime.server.ts` are demo entry points that exercise the library end to end. They are harnesses, not assertions.
 
 ## Architecture
 
@@ -23,11 +26,11 @@ There are no automated test scripts that run outside Roblox. Tests are written w
 src/lib/
 ├── client/
 │   ├── core.ts         # initializeBackpackClient() — syncer, observer, input wiring (idempotent)
-│   ├── atoms.ts        # Charm atoms (clientBackpack, clientHotbar, draggingAtom, filterAtom, consoleSwapAtom, ...)
+│   ├── charm.ts        # Charm signals: getClientBackpack/setClientBackpack, getClientHotbar, getClientBackpackOrder, getDraggingState, getInventoryVisibility, getBackpackSelection, getBackpackFilters, getConsoleSwap
 │   ├── icon.ts         # TopBarPlus inventory topbar icon, bound to the togglekey setting
-│   ├── inputs/         # keyboard.ts (0–9 equip, click-outside close), console.ts (L1/R1 cycling), gamepad.ts (B/X + focus helpers)
-│   ├── settings/       # setting modules (configs/: device, viewport, slots, dimensions, inputtype, togglekey) gathered into backpackSettingsAtom
-│   ├── tools.ts        # dragTool(), undragTool(), swapSlots(), equipTool(), findTool* helpers
+│   ├── inputs/         # keyboard.ts (0–9 equip), console.ts (L1/R1 cycling), gamepad.ts (B/X + focus helpers), index.ts barrel
+│   ├── settings/       # setting modules (configs/: device, viewport, slots, dimensions, inputtype, togglekey), types.ts (SettingModule), index.ts assembles getBackpackSettings
+│   ├── tools.ts        # dragTool(), undragTool(), swapSlots(), swapSlotsHotbar(), equipTool(), findTool* helpers
 │   ├── filter.ts       # addFilter(), removeFilter(), getFilter(), clearFilter()
 │   ├── networking.luau / networking.d.ts  # Zap-generated client remotes (SyncState, RequestState, RequestEquip)
 │   ├── decorating/     # Plugin-style UI extension points (see "Decorating" below)
@@ -42,34 +45,49 @@ src/lib/
 │       └── hooks/       # useStyle, useTags
 ├── server/
 │   ├── core.ts         # initializeBackpackServer() — charm-sync server + equip handling
-│   ├── atoms.ts        # clientBackpacks atom (source of truth)
+│   ├── charm.ts        # getClientBackpacks / setClientBackpacks (source of truth)
 │   ├── clients.ts      # registerPlayer(), unregisterPlayer(), modifyPlayer(), getBackpack(), getClientOwnership()
 │   ├── tools.ts        # giveTool(), removeTool(), updateTool(), holdTool()
 │   ├── data.ts         # toolMap, toolClientMap, toolRegistry (server-only tool bookkeeping)
 │   └── networking.luau / networking.d.ts  # Zap-generated server remotes
 └── shared/
-    ├── types.ts        # ToolPlus, ToolId
-    ├── networking.ts   # ClientBackpack, ClientBackpacks, backpackSyncPayload, zapSyncPayload
+    ├── types.ts        # ToolPlus, ToolId, ClientBackpack, ClientBackpacks, SyncBackpackGetter, BackpackNormalizedGetter
     └── utils/
         ├── id.ts        # generateId() — counter-based unique IDs
         └── fuzzyscore.luau / .d.ts  # fuzzy search scoring helper
 ```
 
+### State: Charm signals, not atoms
+
+State lives in `client/charm.ts` and `server/charm.ts` as **Charm v11 `signal()` pairs**, not `atom()`. Each signal destructures into a getter and a setter, both exported:
+
+```ts
+const [clientHotbar, updateClientHotbar] = signal(new Map<number, ToolId | "Drag" | "Empty">());
+export const getClientHotbar = clientHotbar;
+export const setClientHotbar = updateClientHotbar;
+```
+
+So the convention throughout is `getX()` to read and `setX(value | updater)` to write — there is no `xAtom` symbol anywhere. Setters accept either a new value or an updater function receiving the current one.
+
+The one exception is `client/settings/`, which still uses `Atom` internally (`SettingModule.atom`) and exposes the assembled result through the `computed` getter `getBackpackSettings()`.
+
 ### State flow
 
-- **Server** owns the `clientBackpacks` atom — a `Map<playerName, ClientBackpack>` where `ClientBackpack = { equip: ToolId; backpack: Map<ToolId, ToolPlus> }`. Tools are added/removed server-side via `giveTool` / `removeTool` / `updateTool`. The server also keeps `toolMap` / `toolClientMap` / `toolRegistry` (in `server/data.ts`) for the actual `Tool` instances.
-- **charm-sync** (`@rbxts/charm-sync`) replicates the server atom to clients. `initializeBackpackServer` connects the syncer and fires `SyncState`; `filterPayload` narrows each payload to only that client's slice before sending.
-- **Client** mirrors its slice in `_clientBackpacks`, derives `clientBackpack` (computed atom for the local player), and uses `observe` (in `observeBackpack`) to assign arriving tools to `clientHotbar` (`Map<slot, ToolId|"Drag"|"Empty">`) or `clientBackpackOrder` (overflow array).
+- **Server** owns `getClientBackpacks()` — a `Map<playerName, ClientBackpack>` where `ClientBackpack = { equip: ToolId; backpack: Map<ToolId, ToolPlus> }`. Tools are added/removed server-side via `giveTool` / `removeTool` / `updateTool`. The server also keeps `toolMap` / `toolClientMap` / `toolRegistry` (in `server/data.ts`) for the actual `Tool` instances.
+- **charm-sync** (`@rbxts/charm-sync`) replicates to clients. Narrowing happens at *subscription* time, not send time: on `RequestState`, the server calls `server.addSignalsToClient(client, { [`backpackplus-${client.Name}`]: computed(...) })`, so each client's syncer only ever observes its own slice. `normalizePayload` (`server/core.ts`) then rewrites the per-client key `backpackplus-<Name>` down to the flat key `backpackplus` before firing, which is why client and server use two payload types — `SyncBackpackGetter` (keyed) and `BackpackNormalizedGetter` (flat).
+- **Client** registers `client.addSignals({ backpackplus: setClientBackpack })` and patches arriving payloads. `observe` (in `observeBackpack`) assigns arriving tools to `getClientHotbar()` (`Map<slot, ToolId|"Drag"|"Empty">`) or `getClientBackpackOrder()` (overflow array).
 - **Equip** is request/response: client calls `equipTool` → `RequestEquip.fire(toolId)`; server toggles `equip` and calls `holdTool` to parent the `Tool` to the character (or back to `backpackplus-storage`).
-- **UI** (React + `@rbxts/react-charm`) reads atoms reactively via `useSignalState`. `draggingAtom` tracks in-flight drag state, `inventoryVisibleAtom` toggles the inventory panel, `backpackSelectionAtom` tracks the slot being hovered during a drag, and `consoleSwapAtom` holds the "picked up" source during a gamepad A-button swap.
+- **UI** (React + `@rbxts/react-charm`) reads signals reactively via `useSignalState`. `getDraggingState()` tracks in-flight drag state, `getInventoryVisibility()` toggles the inventory panel, `getBackpackSelection()` tracks the slot hovered during a drag, and `getConsoleSwap()` holds the "picked up" source during a gamepad A-button swap.
+
+Both sync callbacks currently cast through `as never` with a `// Fix types later D:` comment — the payload types don't line up with charm-sync's generics yet.
 
 ### Networking (Zap, not remo)
 
-Remotes are **generated by [Zap](https://github.com/red-blox/zap)** and committed as `networking.luau` + `networking.d.ts` on both client and server (the old `@rbxts/remo` setup is gone). They communicate over a `backpack-plus_ZAP_REMOTES` folder in `ReplicatedStorage`. The exposed events are `SyncState` (server→client state sync), `RequestState` (client→server hydrate request), and `RequestEquip` (client→server equip toggle). Do not hand-edit the generated `.luau`/`.d.ts` — regenerate from the Zap definition if the wire format changes.
+Remotes are **generated by [Zap](https://github.com/red-blox/zap)** from `src/networking.zap` and committed as `networking.luau` + `networking.d.ts` on both client and server (the old `@rbxts/remo` setup is gone). They communicate over a `backpack-plus_ZAP_REMOTES` folder in `ReplicatedStorage`. The exposed events are `SyncState` (server→client state sync), `RequestState` (client→server hydrate request), and `RequestEquip` (client→server equip toggle). Do not hand-edit the generated `.luau`/`.d.ts` — edit `src/networking.zap` and regenerate.
 
 ### Decorating (extension API)
 
-The UI exposes plugin-style decorator registries (atoms of arrays) so consumers can inject custom elements without forking:
+The UI exposes plugin-style decorator registries so consumers can inject custom elements without forking:
 
 - `registerSlotDecorator(fn)` — renders per slot; receives `(tool, ToolContext)` where `ToolContext` carries `location`, `equipped`, `dragged`, `hovered` (a `React.Binding<boolean>`).
 - `registerHotbarDecorator(fn)` — renders extra elements in the hotbar frame.
@@ -78,13 +96,19 @@ The UI exposes plugin-style decorator registries (atoms of arrays) so consumers 
 
 Each `register*` returns a cleanup function that removes the decorator.
 
+> **Known gap:** `decorating/index.ts` exists but is **not** re-exported from `client/index.ts`, so consumers of the published package cannot reach `registerSlotDecorator` and friends. Add the export before shipping.
+
 ### Filtering
 
-`client/filter.ts` maintains `filterAtom`, a `Map<string, BackpackFilterFn>`. `addFilter(key, fn)` / `removeFilter(key)` register predicates keyed by string; the inventory grid applies them to each tool's `metadata`. `BackpackFilterFn<T>` is `(metadata: T) => boolean`.
+`client/filter.ts` wraps the `getBackpackFilters()` signal, a `Map<string, BackpackFilterFn>`. `addFilter(key, fn)` registers a predicate and returns a cleanup function; `removeFilter(key)` / `getFilter(key)` / `clearFilter()` round it out. `BackpackFilterFn<T>` is `(metadata: T) => boolean` and is declared in `client/charm.ts`. The inventory grid applies every registered predicate to each tool's `metadata` (`ui/components/inventory/utils.ts`).
 
 ### Public API surface
 
-`src/lib/index.ts` re-exports `shared/types`. Consumers import client APIs from the client entry (`atoms`, `core`, `filter`, `settings`, `tools`, `ui/App`) and server APIs from the server entry (`atoms`, `clients`, `core`, `tools`).
+- `src/lib/index.ts` re-exports `shared/types` only.
+- `src/lib/client/index.ts` re-exports `charm`, `core`, `filter`, `settings`, `tools`, `ui/App`.
+- `src/lib/server/index.ts` re-exports `charm`, `clients`, `core`, `tools`.
+
+Because `client/charm.ts` is exported wholesale, the sync-layer setters (`setClientBackpack`, `setBackpackFilters`, `setConsoleSwap`, …) are public even though they are internal in spirit. Prefer the server tool APIs and `filter.ts` helpers over writing signals directly.
 
 ### Key design constraints
 
@@ -93,30 +117,32 @@ Each `register*` returns a cleanup function that removes the decorator.
 - Phones default to 6 hotbar slots; other devices default to 10 (`slots` setting module, derived from the `device` module).
 - The inventory is toggled through the TopBarPlus topbar icon; its toggle key comes from the `togglekey` setting (default `` ` ``). Keys 0–9 equip hotbar slots. On gamepad: L1/R1 cycle the equipped tool, A picks up/swaps slots inside the inventory, X moves a hotbar tool to the inventory, B cancels a pickup or closes the inventory.
 - Held `Tool` instances are tagged `backpack-<PlayerName>` (CollectionService) and parked in a `backpackplus-storage` folder in `ReplicatedStorage` when not equipped.
+- Hotbar slot buttons are tagged `backpack-HotbarSlotButton` / `backpack-SlotButton` so gamepad focus helpers can find them.
 
 ### Tech stack
 
 | Concern          | Library                                               |
 | ---------------- | ----------------------------------------------------- |
 | UI framework     | `@rbxts/react` + `@rbxts/react-roblox`                |
-| Reactive state   | `@rbxts/charm` (atom, computed, observe)              |
+| Reactive state   | `@rbxts/charm` v11 (signal, computed, effect, observe) |
 | React ↔ Charm    | `@rbxts/react-charm` (`useSignalState`)               |
 | State sync       | `@rbxts/charm-sync` (server/client syncer)            |
 | Networking       | Zap (generated `networking.luau` + `.d.ts`)           |
 | React hooks      | `@rbxts/pretty-react-hooks`                           |
-| Animations       | `@rbxts/react-ripple`                                 |
+| Animations       | `@rbxts/react-ripple` / `@rbxts/ripple`               |
 | Topbar icon      | `@rbxts/topbarplus`                                   |
 | Functional utils | `@rbxts/sift` (Dictionary.set, Array.removeValue/set) |
-| Testing          | `@rbxts/jest` (+ `@isentinel/jest-roblox`)            |
+| Storybook        | `@rbxts/ui-labs` (dev only)                           |
 | Compiler         | `roblox-ts` 3.x → Lua                                 |
 
 ## Code style
 
 - Prettier: 4-space tab width, tabs (not spaces), 120 char print width, trailing commas. `prettier-plugin-organize-imports` sorts imports.
 - ESLint extends `@teakzc/eslint-config` (roblox-ts based).
-- Use `table.clone()` for shallow-copying Roblox Maps before mutation (Lua semantics — Maps are reference types). Sift's `set` returns a new map/array and is preferred for atom updates.
+- Use `table.clone()` for shallow-copying Roblox Maps before mutation (Lua semantics — Maps are reference types). Sift's `set` returns a new map/array and is preferred for signal updates; `set(map, key, undefined)` removes a key.
 - Avoid JavaScript-only APIs: `Array.from()`, `Object.keys/values/entries()`, `for...in`, `string[index]`, `.charAt()`. Use roblox-ts equivalents or Sift utilities instead.
-- `@hidden` JSDoc marks internal symbols that should not appear in the published API.
+- `@hidden` JSDoc marks internal symbols that should not appear in the published API; `@client` / `@server` mark the realm a symbol belongs to.
+- No `print` in library code paths outside the single load banner in `client/core.ts`.
 
 ## MCP Tools: code intelligence
 

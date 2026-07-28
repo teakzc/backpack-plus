@@ -1,7 +1,7 @@
+import { viewportXSettingModule } from "@/client/settings/configs/viewport";
+import { SettingModule } from "@/client/settings/types";
 import { computed } from "@rbxts/charm";
 import { GuiService, UserInputService } from "@rbxts/services";
-import { SettingModule } from "@/client/settings/types";
-import { viewportXSettingModule } from "@/client/settings/configs/viewport";
 
 export const deviceSettingModule: SettingModule<"device"> = {
 	key: "device",
@@ -9,8 +9,6 @@ export const deviceSettingModule: SettingModule<"device"> = {
 		const isMobile = UserInputService.TouchEnabled && !UserInputService.KeyboardEnabled;
 		const isConsole = GuiService.IsTenFootInterface();
 		const isTablet = isMobile && viewportXSettingModule.atom() > 1024;
-
-		print(isTablet);
 
 		if (isConsole) return "console";
 		if (isTablet) return "tablet";

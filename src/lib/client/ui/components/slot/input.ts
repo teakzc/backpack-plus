@@ -13,16 +13,26 @@ export function backpackSlotInputBegan(props: BackpackSlotProps, rbx: ImageButto
 
 	let flag = false;
 
-	const cleanupUIS = UserInputService.InputChanged.Connect((input) => {
-		if (
-			input.UserInputType === Enum.UserInputType.MouseMovement ||
-			input.UserInputType === Enum.UserInputType.Touch
-		) {
-			if (flag) return;
+	// ponytail: a press only drags via movement from its own device. InputChanged is a
+	// global stream, so without this a gamepad Virtual Cursor press left this connection
+	// live and the first real mouse move after switching devices started a phantom drag.
+	const startedWithGamepad = UserInputService.GetLastInputType() === Enum.UserInputType.Gamepad1;
 
-			flag = true;
-			cleanup(true);
-		}
+	const cleanupUIS = UserInputService.InputChanged.Connect((moved) => {
+		const mouse =
+			input.UserInputType === Enum.UserInputType.MouseButton1 &&
+			moved.UserInputType === Enum.UserInputType.MouseMovement &&
+			// Virtual Cursor presses register as MouseButton1; a later real-mouse move is a
+			// different device, not a continuation of this press.
+			!startedWithGamepad;
+		// touch drag must be the same finger that pressed
+		const touch = moved.UserInputType === Enum.UserInputType.Touch && moved === input;
+
+		if (!mouse && !touch) return;
+		if (flag) return;
+
+		flag = true;
+		cleanup(true);
 	});
 
 	const cleanupDetect = rbx.MouseButton1Up.Connect(() => {
