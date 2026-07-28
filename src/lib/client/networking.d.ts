@@ -17,9 +17,21 @@ export declare const SyncState: {
 		["type"]: "init" | "patch",
 	})[]) => void) => () => void;
 };
+export declare const RestoreLayout: {
+	setCallback: (callback: (layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void) => () => void;
+};
 export declare const RequestState: {
 	fire: () => void;
 };
 export declare const RequestEquip: {
 	fire: (toolId: string) => void;
+};
+export declare const ReportLayout: {
+	fire: (layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void;
 };

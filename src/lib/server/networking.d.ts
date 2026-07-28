@@ -77,9 +77,37 @@ export declare const SyncState: {
 		["type"]: "init" | "patch",
 	})[]) => void
 };
+export declare const RestoreLayout: {
+	fire: (player: Player, layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void;
+	fireAll: (layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void;
+	fireExcept: (except: Player, layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void;
+	fireList: (list: Player[] | Record<string | number | symbol, Player> | Map<unknown, Player>, layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void;
+	fireSet: (set: Set<Player> | Map<Player, unknown>, layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void
+};
 export declare const RequestState: {
 	on: (callback: (player: Player) => void) => () => void;
 };
 export declare const RequestEquip: {
 	on: (callback: (player: Player, toolId: string) => void) => () => void;
+};
+export declare const ReportLayout: {
+	on: (callback: (player: Player, layout: {
+		["hotbar"]: Map<string, string>,
+		["order"]: (string)[],
+	}) => void) => () => void;
 };
