@@ -10,7 +10,7 @@ import {
 } from "@/client/charm";
 import { RequestEquip } from "@/client/networking";
 import { getBackpackSettings } from "@/client/settings";
-import { ToolId } from "@/shared/types";
+import { ToolId, ToolPlus } from "@/shared/types";
 import { UserInputService } from "@rbxts/services";
 import { removeValue, set as setArray } from "@rbxts/sift/out/Array";
 import { set } from "@rbxts/sift/out/Dictionary";
@@ -118,6 +118,17 @@ export function swapSlots(picked: number | ToolId, target: number | ToolId | "In
 }
 
 /**
+ * Returns the tool data for a given tool id.
+ *
+ * @param toolId The tool's id
+ * @returns `ToolPlus`, or undefined if no tool has that id
+ * @client
+ */
+export function getTool(toolId: ToolId): ToolPlus | undefined {
+	return getClientBackpack().backpack.get(toolId);
+}
+
+/**
  * Finds the tool's location
  *
  * number: slot in hotbar
@@ -211,6 +222,27 @@ function replaceDragPlaceholder(id: ToolId) {
 		// sift Array.set is 1-based; findIndex is 0-based.
 		return setArray(current, index + 1, id);
 	});
+}
+
+/**
+ * Cancels an in-flight drag, returning the tool to the slot it came from.
+ *
+ * A drag normally resolves on input release, so a drag still in flight when the
+ * session ends would leave the "Drag" placeholder as the tool's final recorded
+ * position. Call this before reading the hotbar for persistence.
+ *
+ * No-op when nothing is being dragged.
+ *
+ * @client
+ */
+export function cancelDrag() {
+	if (getDraggingState() === undefined) return;
+
+	// Clearing the selection makes undragTool take its "dropped on nothing" path,
+	// which restores the tool to its origin slot.
+
+	setBackpackSelection(undefined);
+	undragTool();
 }
 
 /**

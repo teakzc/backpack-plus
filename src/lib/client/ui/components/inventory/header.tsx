@@ -1,11 +1,14 @@
+import { getBackpackSettings } from "@/client/settings";
 import React from "@rbxts/react";
 import { useSignalState } from "@rbxts/react-charm";
-import { getBackpackSettings } from "@/client/settings";
 
 interface BackpackPlusInventoryHeaderProps {
 	text: string | React.Binding<string>;
 }
 
+/**
+ * @hidden
+ */
 export default function BackpackPlusInventoryHeader(props: BackpackPlusInventoryHeaderProps) {
 	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS } = useSignalState(
 		() => getBackpackSettings().dimensions,

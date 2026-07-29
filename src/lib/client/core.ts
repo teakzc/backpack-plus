@@ -7,14 +7,16 @@ import {
 	setClientHotbar,
 	setDraggingState,
 } from "@/client/charm";
+import { backpackLoaded, toolAdded, toolRemoved } from "@/client/hooks";
 import { initializeTopbarIcon } from "@/client/icon";
 import { consoleInputHelper, gamepadInputHelper, keyboardInputHelper } from "@/client/inputs";
 import { RequestState, SyncState } from "@/client/networking";
 import { getBackpackSettings } from "@/client/settings";
+import { cancelDrag } from "@/client/tools";
 import { BackpackNormalizedGetter, ToolId, ToolPlus } from "@/shared/types";
 import { observe } from "@rbxts/charm";
 import { client } from "@rbxts/charm-sync";
-import { StarterGui, UserInputService } from "@rbxts/services";
+import { Players, StarterGui, UserInputService } from "@rbxts/services";
 import { removeValue } from "@rbxts/sift/out/Array";
 import { set } from "@rbxts/sift/out/Dictionary";
 
@@ -39,6 +41,8 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 		setClientBackpackOrder((current) => [...current, toolId]);
 	}
 
+	toolAdded[1](toolId);
+
 	return () => {
 		setClientHotbar((current) => {
 			for (const [slot, id] of current) {
@@ -58,6 +62,8 @@ function observeBackpack(_tool: ToolPlus, toolId: ToolId) {
 		}
 
 		setClientBackpackOrder((current) => removeValue(current, toolId));
+
+		toolRemoved[1](toolId);
 	};
 }
 
@@ -82,6 +88,9 @@ export function initializeBackpackClient() {
 	SyncState.setCallback((payload) => {
 		// Fix types later D:
 		client.patch<BackpackNormalizedGetter, false>(payload as never);
+
+		// Latched, so this only fires for the first payload.
+		backpackLoaded[1]();
 	});
 
 	RequestState.fire();
@@ -94,6 +103,14 @@ export function initializeBackpackClient() {
 		keyboardInputHelper(input);
 		consoleInputHelper(input);
 		gamepadInputHelper(input);
+	});
+
+	// A drag resolves on input release, which never arrives if the player leaves
+	// mid-drag — the hotbar would keep the "Drag" placeholder as the tool's final
+	// position. Cancelling here means the last onHotbarChanged a consumer sees is
+	// a clean arrangement they can persist.
+	Players.PlayerRemoving.Connect((player) => {
+		if (player === Players.LocalPlayer) cancelDrag();
 	});
 
 	print(`backpack-plus @ v2.0.0-rc.1 loaded successfully!`);

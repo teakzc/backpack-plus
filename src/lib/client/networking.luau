@@ -135,16 +135,10 @@ if not RunService:IsRunning() then
 		SyncState = table.freeze({
 			setCallback = noop
 		}),
-		RestoreLayout = table.freeze({
-			setCallback = noop
-		}),
 		RequestState = table.freeze({
 			fire = noop
 		}),
 		RequestEquip = table.freeze({
-			fire = noop
-		}),
-		ReportLayout = table.freeze({
 			fire = noop
 		}),
 	}) :: Events
@@ -171,10 +165,9 @@ end
 
 RunService.Heartbeat:Connect(sendEvents)
 
-local reliable_events = table.create(2)
-local reliable_event_queue: { [number]: { any } } = table.create(2)
+local reliable_events = table.create(1)
+local reliable_event_queue: { [number]: { any } } = table.create(1)
 reliable_event_queue[0] = {}
-reliable_event_queue[1] = {}
 reliable.OnClientEvent:Connect(function(buff, inst)
 	incoming_buff = buff
 	incoming_inst = inst
@@ -276,38 +269,6 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 					warn(`[ZAP] {#reliable_event_queue[0]} events in queue for SyncState. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 1 then -- RestoreLayout
-			local value
-			local bool_4 = buffer.readu8(incoming_buff, read(1))
-			value = {  }
-			value["hotbar"] = {  }
-			if not bit32.btest(bool_4, 0b0000000000000001) then
-				for _ = 1, buffer.readu16(incoming_buff, read(2)) + 1 do
-					local key_3
-					local val_4
-					local len_8 = buffer.readu16(incoming_buff, read(2))
-					key_3 = buffer.readstring(incoming_buff, read(len_8), len_8)
-					local len_9 = buffer.readu16(incoming_buff, read(2))
-					val_4 = buffer.readstring(incoming_buff, read(len_9), len_9)
-					value["hotbar"][key_3] = val_4
-				end
-			end
-			local len_10 = buffer.readu16(incoming_buff, read(2))
-			value["order"] = table.create(len_10)
-			for i_2 = 1, len_10 do
-				local val_5
-				local len_11 = buffer.readu16(incoming_buff, read(2))
-				val_5 = buffer.readstring(incoming_buff, read(len_11), len_11)
-				value["order"][i_2] = val_5
-			end
-			if reliable_events[1] then
-				task.spawn(reliable_events[1], value)
-			else
-				table.insert(reliable_event_queue[1], value)
-				if #reliable_event_queue[1] > 64 then
-					warn(`[ZAP] {#reliable_event_queue[1]} events in queue for RestoreLayout. Did you forget to attach a listener?`)
-				end
-			end
 		else
 			error("Unknown event id")
 		end
@@ -344,21 +305,6 @@ local returns = {
 			end
 		end,
 	},
-	RestoreLayout = {
-		setCallback = function(callback: (layout: ({
-			["hotbar"]: ({ [(string)]: (string) }),
-			["order"]: ({ (string) }),
-		})) -> ()): () -> ()
-			reliable_events[1] = callback
-			for _, value in reliable_event_queue[1] do
-				task.spawn(callback, value)
-			end
-			reliable_event_queue[1] = {}
-			return function()
-				reliable_events[1] = nil
-			end
-		end,
-	},
 	RequestState = {
 		fire = function()
 			alloc(1)
@@ -369,57 +315,11 @@ local returns = {
 		fire = function(toolId: (string))
 			alloc(1)
 			buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-			local len_12 = #toolId
+			local len_8 = #toolId
 			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_12)
-			alloc(len_12)
-			buffer.writestring(outgoing_buff, outgoing_apos, toolId, len_12)
-		end,
-	},
-	ReportLayout = {
-		fire = function(layout: ({
-			["hotbar"]: ({ [(string)]: (string) }),
-			["order"]: ({ (string) }),
-		}))
-			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 2)
-			local bool_5 = 0
-			local bool_5_pos_1 = alloc(1)
-			local len_pos_1
-			local len_13 = 0
-			for k_1, v_1 in layout["hotbar"] do
-				if len_13 == 0 then
-					len_pos_1 = alloc(2)
-				end
-				len_13 = len_13 + 1
-				local len_14 = #k_1
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_14)
-				alloc(len_14)
-				buffer.writestring(outgoing_buff, outgoing_apos, k_1, len_14)
-				local len_15 = #v_1
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_15)
-				alloc(len_15)
-				buffer.writestring(outgoing_buff, outgoing_apos, v_1, len_15)
-			end
-			if len_pos_1 then
-				buffer.writeu16(outgoing_buff, len_pos_1, len_13 - 1)
-			else
-				bool_5 = bit32.bor(bool_5, 0b0000000000000001)
-			end
-			local len_16 = #layout["order"]
-			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_16)
-			for i_3 = 1, len_16 do
-				local val_6 = layout["order"][i_3]
-				local len_17 = #val_6
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_17)
-				alloc(len_17)
-				buffer.writestring(outgoing_buff, outgoing_apos, val_6, len_17)
-			end
-			buffer.writeu8(outgoing_buff, bool_5_pos_1, bool_5)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_8)
+			alloc(len_8)
+			buffer.writestring(outgoing_buff, outgoing_apos, toolId, len_8)
 		end,
 	},
 }

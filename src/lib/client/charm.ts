@@ -1,5 +1,5 @@
-import { signal } from "@rbxts/charm";
 import { ClientBackpack, ToolId } from "@/shared/types";
+import { computed, signal } from "@rbxts/charm";
 
 const [clientBackpack, updateClientBackpack] = signal<ClientBackpack>({
 	equip: "",
@@ -21,6 +21,12 @@ export const getClientBackpack = clientBackpack;
  * @client
  */
 export const setClientBackpack = updateClientBackpack;
+
+/**
+ * Reads the `ToolId` of the currently equipped tool, or `""` when nothing is equipped.
+ * @client
+ */
+export const getClientEquipped = computed(() => getClientBackpack().equip);
 
 const [clientHotbar, updateClientHotbar] = signal(new Map<number, ToolId | "Drag" | "Empty">());
 

@@ -2,6 +2,11 @@ import { SettingModule } from "@/client/settings/types";
 import { atom } from "@rbxts/charm";
 import { Workspace } from "@rbxts/services";
 
+/**
+ * Tracks the camera viewport width.
+ * @hidden
+ * @client
+ */
 export const viewportXSettingModule: SettingModule<"viewportX"> = {
 	key: "viewportX",
 	atom: atom(0),

@@ -8,8 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run build        # compile TypeScript → Lua via rbxtsc
 npm run watch        # compile in watch mode (rbxtsc -w)
 npm run dev          # compile as a game place, watch mode
-npx eslint src/      # lint
+npx eslint src/      # lint — currently broken, see note below
 ```
+
+> **Known gap:** `npx eslint src/` fails outright (`eslint.config.js` not found). `package.json` pins ESLint 9, but the repo still ships the legacy `.eslintrc` format, which ESLint 9 can't read without a compat shim. Needs either a flat-config migration or a pin back to ESLint 8 before lint is usable again.
 
 There is no automated test suite. Development and verification happen inside Roblox Studio: build, sync with Rojo (`default.project.json`), then play.
 
@@ -26,12 +28,13 @@ There is no automated test suite. Development and verification happen inside Rob
 src/lib/
 ├── client/
 │   ├── core.ts         # initializeBackpackClient() — syncer, observer, input wiring (idempotent)
-│   ├── charm.ts        # Charm signals: getClientBackpack/setClientBackpack, getClientHotbar, getClientBackpackOrder, getDraggingState, getInventoryVisibility, getBackpackSelection, getBackpackFilters, getConsoleSwap
+│   ├── charm.ts        # Charm signals: getClientBackpack/setClientBackpack, getClientEquipped (computed), getClientHotbar, getClientBackpackOrder, getDraggingState, getInventoryVisibility, getBackpackSelection, getBackpackFilters, getConsoleSwap
 │   ├── icon.ts         # TopBarPlus inventory topbar icon, bound to the togglekey setting
 │   ├── inputs/         # keyboard.ts (0–9 equip), console.ts (L1/R1 cycling), gamepad.ts (B/X + focus helpers), index.ts barrel
 │   ├── settings/       # setting modules (configs/: device, viewport, slots, dimensions, inputtype, togglekey), types.ts (SettingModule), index.ts assembles getBackpackSettings
-│   ├── tools.ts        # dragTool(), undragTool(), swapSlots(), swapSlotsHotbar(), equipTool(), findTool* helpers
+│   ├── tools.ts        # dragTool(), undragTool(), swapSlots(), swapSlotsHotbar(), equipTool(), getTool(), cancelDrag(), findTool* helpers
 │   ├── filter.ts       # addFilter(), removeFilter(), getFilter(), clearFilter()
+│   ├── hooks.ts        # onToolEquipped/Unequipped, onToolAdded/Removed, onInventoryToggled, onBackpackLoaded, onHotbarChanged, onSlotChanged
 │   ├── networking.luau / networking.d.ts  # Zap-generated client remotes (SyncState, RequestState, RequestEquip)
 │   ├── decorating/     # Plugin-style UI extension points (see "Decorating" below)
 │   │   ├── slot.ts         # registerSlotDecorator(), SlotDecorator, ToolContext
@@ -47,7 +50,8 @@ src/lib/
 │   ├── core.ts         # initializeBackpackServer() — charm-sync server + equip handling
 │   ├── charm.ts        # getClientBackpacks / setClientBackpacks (source of truth)
 │   ├── clients.ts      # registerPlayer(), unregisterPlayer(), modifyPlayer(), getBackpack(), getClientOwnership()
-│   ├── tools.ts        # giveTool(), removeTool(), updateTool(), holdTool()
+│   ├── tools.ts        # giveTool(), removeTool(), updateTool(), holdTool(), getTool()
+│   ├── hooks.ts        # onToolEquipped(), onToolUnequipped()
 │   ├── data.ts         # toolMap, toolClientMap, toolRegistry (server-only tool bookkeeping)
 │   └── networking.luau / networking.d.ts  # Zap-generated server remotes
 └── shared/
@@ -96,17 +100,23 @@ The UI exposes plugin-style decorator registries so consumers can inject custom 
 
 Each `register*` returns a cleanup function that removes the decorator.
 
-> **Known gap:** `decorating/index.ts` exists but is **not** re-exported from `client/index.ts`, so consumers of the published package cannot reach `registerSlotDecorator` and friends. Add the export before shipping.
-
 ### Filtering
 
 `client/filter.ts` wraps the `getBackpackFilters()` signal, a `Map<string, BackpackFilterFn>`. `addFilter(key, fn)` registers a predicate and returns a cleanup function; `removeFilter(key)` / `getFilter(key)` / `clearFilter()` round it out. `BackpackFilterFn<T>` is `(metadata: T) => boolean` and is declared in `client/charm.ts`. The inventory grid applies every registered predicate to each tool's `metadata` (`ui/components/inventory/utils.ts`).
 
+### Hooks (event API)
+
+`client/hooks.ts` and `server/hooks.ts` expose one-shot/repeating event subscriptions built on a shared internal `createHook`/`createLatchHook` factory (listeners are a `Set`, iterated over a copy so a listener can register/unregister mid-fire; a `pcall` around each listener means one bad callback can't break the others). All return a cleanup function.
+
+- **Client:** `onToolEquipped` / `onToolUnequipped` (fire on sync arrival, not on the optimistic local call), `onToolAdded` / `onToolRemoved`, `onInventoryToggled`, `onHotbarChanged` (receives a cloned map), `onSlotChanged` (derived from the hotbar signal, reports one move per drag landing), `onBackpackLoaded` (latched — fires immediately if the initial sync already happened).
+- **Server:** `onToolEquipped` / `onToolUnequipped`, fired from `initializeBackpackServer`'s equip handler after validation passes.
+- `initializeBackpackClient` cancels any in-flight drag (`cancelDrag()`) on `Players.PlayerRemoving` for the local player, so `onHotbarChanged`'s last event before teardown is always a clean arrangement rather than a stranded `"Drag"` placeholder.
+
 ### Public API surface
 
 - `src/lib/index.ts` re-exports `shared/types` only.
-- `src/lib/client/index.ts` re-exports `charm`, `core`, `filter`, `settings`, `tools`, `ui/App`.
-- `src/lib/server/index.ts` re-exports `charm`, `clients`, `core`, `tools`.
+- `src/lib/client/index.ts` re-exports `charm`, `core`, `decorating`, `filter`, `hooks`, `settings`, `tools`, `ui/App`.
+- `src/lib/server/index.ts` re-exports `charm`, `clients`, `core`, `hooks`, `tools`.
 
 Because `client/charm.ts` is exported wholesale, the sync-layer setters (`setClientBackpack`, `setBackpackFilters`, `setConsoleSwap`, …) are public even though they are internal in spirit. Prefer the server tool APIs and `filter.ts` helpers over writing signals directly.
 

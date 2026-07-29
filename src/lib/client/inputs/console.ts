@@ -103,6 +103,7 @@ function changeTool(input: InputObject) {
 
 /**
  * @hidden
+ * @client
  */
 export function consoleInputHelper(input: InputObject) {
 	if (input.KeyCode === Enum.KeyCode.ButtonL1 || input.KeyCode === Enum.KeyCode.ButtonR1) {

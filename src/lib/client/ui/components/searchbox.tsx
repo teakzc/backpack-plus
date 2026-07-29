@@ -1,7 +1,7 @@
+import { getBackpackSettings } from "@/client/settings";
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSignalState } from "@rbxts/react-charm";
-import { getBackpackSettings } from "@/client/settings";
 
 interface BackpackPlusInventorySearchBoxProps {
 	onQuery: (query: string) => void;
@@ -9,6 +9,9 @@ interface BackpackPlusInventorySearchBoxProps {
 	alignment?: Enum.TextXAlignment;
 }
 
+/**
+ * @hidden
+ */
 export default function BackpackPlusInventorySearchBox(props: BackpackPlusInventorySearchBoxProps) {
 	const { INVENTORY_HEADER_SIZE, SEARCH_BUFFER_PIXELS, SEARCH_WIDTH_PIXELS, SEARCH_TEXT_OFFSET } = useSignalState(
 		() => getBackpackSettings().dimensions,

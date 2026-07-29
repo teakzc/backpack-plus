@@ -75,6 +75,17 @@ export function updateTool(client: Player, toolId: ToolId, transform: ToolPlus |
 }
 
 /**
+ * Returns the tool data for a given tool id.
+ *
+ * @param toolId The tool's id
+ * @returns `ToolPlus`, or undefined if no tool has that id
+ * @server
+ */
+export function getTool(toolId: ToolId): ToolPlus | undefined {
+	return toolMap.get(toolId);
+}
+
+/**
  * Returns the `Tool` instance that the client owns.
  *
  * @param toolId The tool id

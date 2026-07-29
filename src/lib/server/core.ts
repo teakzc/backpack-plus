@@ -6,6 +6,7 @@ import { BackpackNormalizedGetter, SyncBackpackGetter } from "@/shared/types";
 
 import { getClientBackpacks } from "@/server/charm";
 import { modifyPlayer } from "@/server/clients";
+import { toolEquipped, toolUnequipped } from "@/server/hooks";
 import { RequestEquip, RequestState, SyncState } from "@/server/networking";
 import { holdTool } from "@/server/tools";
 
@@ -48,11 +49,15 @@ export function initializeBackpackServer() {
 		if (!backpack.backpack.has(toolId)) return;
 
 		if (backpack.equip === toolId) {
+			toolUnequipped[1](toolId);
+
 			modifyPlayer(client, (backpack) => set(backpack, "equip", ""));
 			holdTool(client, undefined);
 
 			return;
 		}
+
+		toolEquipped[1](toolId);
 
 		holdTool(client, toolId);
 		modifyPlayer(client, (backpack) => set(backpack, "equip", toolId));

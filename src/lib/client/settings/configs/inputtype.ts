@@ -8,6 +8,11 @@ function getInputType() {
 	return UserInputService.PreferredInput === Enum.PreferredInput.Gamepad ? "gamepad" : "default";
 }
 
+/**
+ * Tracks whether the player is on gamepad or keyboard/mouse.
+ * @hidden
+ * @client
+ */
 export const inputTypeSettingModule: SettingModule<"inputType"> = {
 	key: "inputType",
 	atom: atom(getInputType()),

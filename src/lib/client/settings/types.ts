@@ -1,5 +1,10 @@
 import { Atom } from "@rbxts/charm";
 
+/**
+ * Pixel dimensions the UI lays out against.
+ * @hidden
+ * @client
+ */
 export type BackpackDimensions = {
 	SCROLL_OFFSET: number;
 	ICON_BUFFER: number;
@@ -14,6 +19,11 @@ export type BackpackDimensions = {
 	INVENTORY_ARROWS_BUFFER_VR: number;
 };
 
+/**
+ * The resolved settings, as returned by `getBackpackSettings`.
+ * @hidden
+ * @client
+ */
 export type BackpackSettingsValues = {
 	device: "desktop" | "phone" | "tablet" | "console";
 	viewportX: number;
@@ -23,6 +33,12 @@ export type BackpackSettingsValues = {
 	togglekey: Enum.KeyCode;
 };
 
+/**
+ * One setting: an atom, an optional external `source` that writes into it, and an
+ * optional `effect` run whenever it changes.
+ * @hidden
+ * @client
+ */
 export type SettingModule<K extends keyof BackpackSettingsValues> = {
 	key: K;
 	atom: Atom<BackpackSettingsValues[K]>;

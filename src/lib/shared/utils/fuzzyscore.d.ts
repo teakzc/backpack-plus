@@ -1,5 +1,6 @@
 /**higher - better
  * @param output_terms if terms were transformed, here could be the original terms
+ * @hidden
  */
 export declare function FuzzyScoreSorting<T = string>(
 	terms: string[],

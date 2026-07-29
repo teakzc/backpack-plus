@@ -36,6 +36,11 @@ const modules = [
 
 for (const module of modules) build(module as AnySettingModule);
 
+/**
+ * Reads the assembled backpack settings — device, viewport, slots, dimensions,
+ * input type, and toggle key.
+ * @client
+ */
 export const getBackpackSettings = computed(() => {
 	const settings = {} as BackpackSettingsValues;
 	for (const module of modules) {

@@ -35,6 +35,7 @@ function equipFromKey(input: InputObject) {
 
 /**
  * @hidden
+ * @client
  */
 export function keyboardInputHelper(input: InputObject) {
 	closeOnClick(input);

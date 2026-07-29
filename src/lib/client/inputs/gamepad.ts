@@ -13,6 +13,7 @@ import { swapSlots } from "@/client/tools";
  * `GuiService.SelectedObject = HotbarFrame:FindFirstChild("1")` when the
  * inventory opens. Picks the selectable hotbar slot with the lowest SelectionOrder.
  * @hidden
+ * @client
  */
 export function focusFirstHotbarSlot() {
 	let best: ImageButton | undefined = undefined;
@@ -32,6 +33,7 @@ export function focusFirstHotbarSlot() {
  * Clear gamepad selection if it currently sits on a backpack slot, matching
  * satchel's `disableGamepadInventoryControl` on close.
  * @hidden
+ * @client
  */
 export function clearBackpackSelection() {
 	const selected = GuiService.SelectedObject;
@@ -59,6 +61,7 @@ function removeFromHotbar() {
 
 /**
  * @hidden
+ * @client
  */
 export function gamepadInputHelper(input: InputObject) {
 	if (input.KeyCode === Enum.KeyCode.ButtonB) cancel();
