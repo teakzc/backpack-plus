@@ -5,6 +5,9 @@ on:
         branches:
             - main
 
+permissions:
+    id-token: write
+
 jobs:
     publish:
         runs-on: ubuntu-latest
@@ -17,8 +20,8 @@ jobs:
                   cache: npm
                   registry-url: https://registry.npmjs.org
 
+            - run: npm install -g npm@latest
+
             - run: npm ci
 
             - run: npm publish --tag rc
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
