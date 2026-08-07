@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/backpack-plus",
-  "version": "2.0.0-rc.3",
+  "version": "2.0.0-rc.4",
   "description": "A modern Roblox backpack UI & custom server-side made /w React & inspired by ryanlua/satchel",
   "main": "out/lib/init.luau",
   "types": "out/lib/index.d.ts",
