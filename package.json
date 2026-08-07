@@ -1,8 +1,18 @@
 {
   "name": "@rbxts/backpack-plus",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0-rc.2",
   "description": "A modern Roblox backpack UI & custom server-side made /w React & inspired by ryanlua/satchel",
   "main": "out/lib/init.luau",
+  "exports": {
+    ".": {
+      "types": "out/lib/index.d.ts"
+    },
+    "./server": {
+      "types": "out/lib/server/index.d.ts"
+    },
+    "./client": {
+      "types": "out/lib/client/index.d.ts"
+  },
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
