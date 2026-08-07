@@ -12,6 +12,7 @@
     },
     "./client": {
       "types": "out/lib/client/index.d.ts"
+    }
   },
   "scripts": {
     "build": "rbxtsc",
