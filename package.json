@@ -1,46 +1,88 @@
 {
-  "name": "@rbxts/backpack-plus",
-  "version": "2.0.0-rc.4",
-  "description": "A modern Roblox backpack UI & custom server-side made /w React & inspired by ryanlua/satchel",
-  "main": "out/lib/init.luau",
-  "types": "out/lib/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "server": ["out/lib/server/index.d.ts"],
-      "client": ["out/lib/client/index.d.ts"]
-    }
-  },
-  "exports": {
-    ".": {
-      "types": "./out/lib/index.d.ts",
-      "default": "./out/lib/init.luau"
-    },
-    "./server": {
-      "types": "./out/lib/server/index.d.ts",
-      "default": "./out/lib/server/init.luau"
-    },
-    "./client": {
-      "types": "./out/lib/client/index.d.ts",
-      "default": "./out/lib/client/init.luau"
-    },
-    "./package.json": "./package.json"
-  },
-  "scripts": {
-    "build": "rbxtsc",
-    "watch": "rbxtsc -w",
-    "dev": "rbxtsc build --type game --watch",
-    "prepublishOnly": "npm run build"
-  },
-  "keywords": ["Roblox", "Backpack"],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/teakzc/backpack-plus.git"
-  },
-  "author": "teakzc",
-  "license": "MIT",
-  "files": ["out/lib/**", "LICENSE", "README.md", "!**/*.tsbuildinfo"],
-  "publishConfig": { "access": "public" },
-  "devDependencies": { "...": "unchanged" },
-  "dependencies": { "...": "unchanged" },
-  "overrides": { "...": "unchanged" }
+	"name": "@rbxts/backpack-plus",
+	"version": "2.0.0-rc.6",
+	"description": "A modern Roblox backpack UI & custom server-side made /w React & inspired by ryanlua/satchel",
+	"main": "out/lib/init.luau",
+	"typesVersions": {
+		"*": {
+			"server": ["out/lib/server/index.d.ts"],
+			"client": ["out/lib/client/index.d.ts"]
+		}
+	},
+	"exports": {
+		".": {
+			"types": "./out/lib/index.d.ts",
+			"default": "./out/lib/init.luau"
+		},
+		"./server": {
+			"types": "./out/lib/server/index.d.ts",
+			"default": "./out/lib/server/init.luau"
+		},
+		"./client": {
+			"types": "./out/lib/client/index.d.ts",
+			"default": "./out/lib/client/init.luau"
+		},
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"build": "rbxtsc",
+		"watch": "rbxtsc -w",
+		"dev": "rbxtsc build --type game --watch",
+		"prepublishOnly": "npm run build"
+	},
+	"keywords": [
+		"Roblox",
+		"Backpack"
+	],
+	"repository": {
+		"url": "git+https://github.com/teakzc/backpack-plus.git"
+	},
+	"author": "teakzc",
+	"license": "MIT",
+	"type": "commonjs",
+	"types": "out/lib/index.d.ts",
+	"files": [
+		"out/lib/index.d.ts",
+		"out/lib/init.luau",
+		"out/lib/**",
+		"LICENSE",
+		"!**/*.tsbuildinfo"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"devDependencies": {
+		"@rbxts/compiler-types": "^3.0.0-types.0",
+		"@rbxts/types": "^1.0.903",
+		"@rbxts/ui-labs": "^2.4.2",
+		"@teakzc/eslint-config": "^1.0.2",
+		"@typescript-eslint/eslint-plugin": "^8.53.1",
+		"@typescript-eslint/parser": "^8.53.1",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.5",
+		"eslint-plugin-roblox-ts": "^1.3.1",
+		"prettier": "^3.8.1",
+		"prettier-plugin-organize-imports": "^4.3.0",
+		"roblox-ts": "^3.0.0",
+		"typescript": "~5.2.2"
+	},
+	"overrides": {
+		"@rbxts/react-charm": {
+			"@rbxts/react": "$@rbxts/react"
+		}
+	},
+	"dependencies": {
+		"@rbxts/charm": "^0.11.0",
+		"@rbxts/charm-sync": "^0.4.0",
+		"@rbxts/pretty-react-hooks": "^0.6.4",
+		"@rbxts/react": "^17.3.7-ts.1",
+		"@rbxts/react-charm": "^0.4.0",
+		"@rbxts/react-ripple": "^3.0.1",
+		"@rbxts/react-roblox": "^17.3.7-ts.1",
+		"@rbxts/ripple": "^0.10.2",
+		"@rbxts/services": "^1.6.0",
+		"@rbxts/sift": "^0.0.11",
+		"@rbxts/topbarplus": "^1.0.9"
+	}
 }
